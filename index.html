@@ -502,11 +502,11 @@
   <script>
     const KEY='moodeng_data';
     const USER_KEY='moodeng_user_id';
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBTFBxeIEsedt2tX2rclea0oe0gmtcRUUOrv7LExMf-Cf7bpwAmKWzSbRLBK8mf4rm/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzipfw42JYxH_O48lPyUEMw0MM9QCu-v6VugkzjiYTr_d3yOLSNWCPe6LzMOVDKNIPh/exec";
     
     const $=id=>document.getElementById(id);
     const storageKey=()=>KEY+'_'+deviceUserId;
-    const categoryIcons={'อาหาร':'utensils','เดินทาง':'bus-front','เครื่องดื่ม':'coffee','ช้อปปิ้ง':'shopping-bag','การศึกษา':'book-open','บันเทิง':'music','อื่น ๆ':'circle-dot','รายรับ':'wallet'};
+    const categoryIcons={'อาหาร 🍲':'utensils','เดินทาง 🚕':'bus-front','เครื่องดื่ม 🍹':'coffee','ช้อปปิ้ง 🛍️':'shopping-bag','การศึกษา 📒':'book-open','บันเทิง':'music','อื่น ๆ':'circle-dot','รายรับ':'wallet'};
     
     const deviceUserId=(()=>{
       try{
@@ -1035,7 +1035,7 @@
 
     function openSurvey(){
       if(localStorage.getItem('moodeng_survey_done_'+deviceUserId)){
-        toast('ส่งแบบสอบถามไปแล้ว ขอบคุณที่แชร์คับ');
+        toast('ส่งแบบสอบถามไปแล้ว ขอบคุณที่แชร์');
         return
       }
       openModal('surveyModal')
@@ -1070,7 +1070,7 @@
         localStorage.setItem('moodeng_survey_done_'+deviceUserId,'1');
         sparklePop();
         closeModal('surveyModal');
-        toast('ขอบคุณที่ร่วมตอบแบบสอบถามครับ!');
+        toast('ขอบคุณที่ร่วมตอบแบบสอบถาม!');
         $('surveyForm').reset();
       })
       .catch(err => {
