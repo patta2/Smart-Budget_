@@ -1,6 +1,21 @@
 <!doctype html>
 <html lang="th">
+ <style>
+  /* บังคับให้ข้อความและทุกองค์ประกอบในหน้าเว็บแสดงออกมา */
+  *, [data-template-id], .canva-text {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: revert !important;
+  }
+</style>
+
  <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260904-05-c4a2e96","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/9e99ecf74af2a081.telemetry_sdk.js" integrity="sha512-tZ7fmfTx2KpCLjXQnEuL9azQ4A5+7+xumsx6r/WYVD0zCP/8LP8hDeCypMQesmP+WyAew4g7l5Ah23Bjd6yoVg=="></script>
+  <!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8"> <!-- ใส่บรรทัดนี้ใน <head> -->
+    <title>หน้าเว็บของคุณ</title>
+</head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
   <meta name="theme-color" content="#F5F2FF">
@@ -9,6 +24,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Krub:wght@500;600&amp;family=Sarabun:wght@400;500&amp;display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
   <style>
+   body, p, span, h1, h2, h3 {
+    font-family: 'Prompt', 'Sarabun', sans-serif, system-ui !important;
+}
     :root{--ink:#111827;--muted:#475569;--paper:#fff;--canvas:#F7F5FF;--canvas2:#EEEAFE;--accent:#7056D9;--accent2:#5840BF;--soft:#EEEAFE;--line:#E7E3F2;--shadow:0 16px 38px rgba(44,30,105,.11);--good:#10B981;--bad:#F43F5E}
     body.green{--canvas:#F2FCF8;--canvas2:#DDF8EE;--accent:#149C78;--accent2:#08775A;--soft:#DDF8EE;--line:#D8EEE5;--shadow:0 16px 38px rgba(10,100,73,.10)}
     body.orange{--canvas:#FFF8F4;--canvas2:#FFE8DE;--accent:#DD7449;--accent2:#B95029;--soft:#FFE8DE;--line:#F3E0D5;--shadow:0 16px 38px rgba(150,69,34,.10)}
@@ -65,23 +83,32 @@
      <div>
       <strong data-template-id="saving-plant-title" class="canva-text">ต้นไม้ออมเงิน</strong>
       <p class="tiny muted" id="savingPlantText">เริ่มออมวันนี้ แล้วดูน้องเติบโตนะ</p>
-     </div>
-     <div id="goalList" class="w-full"></div>
+     </div><div id="goalList" class="w-full"></div>
     </article>
+    <!-- การ์ดสรุปยอดเงินคงเหลือ -->
     <article data-template-id="balance-card" class="canva-card glass balance">
      <div class="between">
-      <p data-template-id="balance-label" class="canva-text muted" style="font-weight:800"></p><button type="button" class="icon-btn" onclick="toggleMoney()" aria-label="ซ่อนหรือแสดงยอดเงิน"><i id="eyeIcon" data-lucide="eye"></i></button>
+      <p data-template-id="balance-label" class="canva-text muted" style="font-weight:800">ยอดเงินคงเหลือสุทธิ</p>
+      <button type="button" class="icon-btn" onclick="toggleMoney()" aria-label="ซ่อนหรือแสดงยอดเงิน"><i id="eyeIcon" data-lucide="eye"></i></button>
      </div>
      <div class="between" style="align-items:flex-end;margin-top:4px">
-      <strong id="balanceValue" class="money balance-number">฿0.00</strong><select id="currency" class="currency" aria-label="เลือกสกุลเงิน"><option>THB</option><option>USD</option><option>EUR</option><option>JPY</option></select>
+      <strong id="balanceValue" class="money balance-number">฿0.00</strong>
+      <select id="currency" class="currency" aria-label="เลือกสกุลเงิน">
+        <option>THB</option>
+        <option>USD</option>
+        <option>EUR</option>
+        <option>JPY</option>
+      </select>
      </div>
-     <p data-template-id="balance-helper" class="canva-text tiny muted" style="margin-top:4px"></p>
+     <p data-template-id="balance-helper" class="canva-text tiny muted" style="margin-top:4px">คำนวณจากรายรับหักลบรายจ่ายทั้งหมด</p>
+     
      <div style="margin-top:20px">
       <div class="between">
        <div>
-        <strong data-template-id="daily-budget-title" class="canva-text"></strong>
-        <p data-template-id="daily-budget-helper" class="canva-text tiny muted"></p>
-       </div><b id="dailyValue" class="money"></b>
+        <strong data-template-id="daily-budget-title" class="canva-text">งบประมาณที่ใช้ได้ต่อวัน</strong>
+        <p data-template-id="daily-budget-helper" class="canva-text tiny muted">คำนวณให้อัตโนมัติตามวันคงเหลือในเดือนนี้</p>
+       </div>
+       <b id="dailyValue" class="money">฿0.00</b>
       </div>
       <div class="progress" style="margin-top:9px">
        <span id="gauge"></span>
@@ -93,45 +120,88 @@
        ใช้ไป ฿0 / ฿0
       </div>
      </div>
+
      <div class="stat-grid" style="margin-top:15px">
       <div class="stat">
-       <span data-template-id="week-label" class="canva-text tiny muted"></span><b id="weekSpent" class="money expense"></b>
+       <span data-template-id="week-label" class="canva-text tiny muted">สัปดาห์นี้ใช้ไป</span>
+       <b id="weekSpent" class="money expense">฿0.00</b>
       </div>
       <div class="stat">
-       <span data-template-id="month-label" class="canva-text tiny muted"></span><b id="monthSpent" class="money expense"></b>
+       <span data-template-id="month-label" class="canva-text tiny muted">เดือนนี้ใช้ไป</span>
+       <b id="monthSpent" class="money expense">฿0.00</b>
       </div>
      </div>
     </article>
+
+    <!-- การ์ดบันทึกด่วน -->
     <article data-template-id="quick-card" class="canva-card glass card">
-     <h2 data-template-id="quick-title" class="canva-text"></h2>
-     <div class="quick-grid"><button data-template-id="quick-food" class="canva-button quick" type="button" onclick="quickAdd('อาหาร')"><i data-lucide="utensils"></i><span data-template-id="quick-food-label" class="canva-text"></span></button> <button data-template-id="quick-drink" class="canva-button quick" type="button" onclick="quickAdd('เครื่องดื่ม')"><i data-lucide="coffee"></i><span data-template-id="quick-drink-label" class="canva-text"></span></button> <button data-template-id="quick-travel" class="canva-button quick" type="button" onclick="quickAdd('เดินทาง')"><i data-lucide="bus-front"></i><span data-template-id="quick-travel-label" class="canva-text"></span></button> <button data-template-id="quick-shop" class="canva-button quick" type="button" onclick="quickAdd('ช้อปปิ้ง')"><i data-lucide="shopping-bag"></i><span data-template-id="quick-shop-label" class="canva-text"></span></button>
+     <h2 data-template-id="quick-title" class="canva-text">บันทึกรายการด่วน</h2>
+     <div class="quick-grid">
+       <button data-template-id="quick-food" class="canva-button quick" type="button" onclick="quickAdd('อาหาร')">
+         <i data-lucide="utensils"></i>
+         <span data-template-id="quick-food-label" class="canva-text">อาหาร</span>
+       </button>
+       <button data-template-id="quick-drink" class="canva-button quick" type="button" onclick="quickAdd('เครื่องดื่ม')">
+         <i data-lucide="coffee"></i>
+         <span data-template-id="quick-drink-label" class="canva-text">เครื่องดื่ม</span>
+       </button>
+       <button data-template-id="quick-travel" class="canva-button quick" type="button" onclick="quickAdd('เดินทาง')">
+         <i data-lucide="bus-front"></i>
+         <span data-template-id="quick-travel-label" class="canva-text">เดินทาง</span>
+       </button>
+       <button data-template-id="quick-shop" class="canva-button quick" type="button" onclick="quickAdd('ช้อปปิ้ง')">
+         <i data-lucide="shopping-bag"></i>
+         <span data-template-id="quick-shop-label" class="canva-text">ช้อปปิ้ง</span>
+       </button>
      </div>
     </article>
+
+    <!-- รายการประจำ -->
     <article data-template-id="recurring-card" class="canva-card glass card">
      <div class="between">
-      <h2 data-template-id="recurring-title" class="canva-text"></h2><button data-template-id="recurring-add" class="canva-button secondary" type="button" onclick="addRecurringBill()"></button>
+      <h2 data-template-id="recurring-title" class="canva-text">รายการประจำ / ค่าใช้จ่ายคงที่</h2>
+      <button data-template-id="recurring-add" class="canva-button secondary" type="button" onclick="addRecurringBill()">+ เพิ่มรายการ</button>
      </div>
      <div id="recurringList"></div>
-    </article><button data-template-id="savings-quick-action" class="canva-button glass card full" type="button" onclick="openModal('goalModal')" style="display:flex;align-items:center;gap:14px;text-align:left;color:#5840BF;background:linear-gradient(135deg,#FFF5C2,#FFE5F0);margin-top:16px"> <span class="cat-icon" aria-hidden="true"><i data-lucide="piggy-bank"></i></span><span><strong data-template-id="savings-quick-title" class="canva-text" style="display:block;font-family:Krub,sans-serif;font-size:22px;color:#111827"></strong><span data-template-id="savings-quick-helper" class="canva-text tiny muted"></span></span><i data-lucide="chevron-right" style="margin-left:auto"></i> </button>
+    </article>
+
+    <!-- ทางลัดเป้าหมายการออม -->
+    <button data-template-id="savings-quick-action" class="canva-button glass card full" type="button" onclick="openModal('goalModal')" style="display:flex;align-items:center;gap:14px;text-align:left;color:#5840BF;background:linear-gradient(135deg,#FFF5C2,#FFE5F0);margin-top:16px">
+      <span class="cat-icon" aria-hidden="true"><i data-lucide="piggy-bank"></i></span>
+      <span>
+        <strong data-template-id="savings-quick-title" class="canva-text" style="display:block;font-family:Krub,sans-serif;font-size:22px;color:#111827">กระปุกออมเงินเป้าหมาย</strong>
+        <span data-template-id="savings-quick-helper" class="canva-text tiny muted">คลิกเพื่อจัดการเป้าหมายทางการเงินของคุณ</span>
+      </span>
+      <i data-lucide="chevron-right" style="margin-left:auto"></i>
+    </button>
+
+    <!-- การตั้งค่างบประมาณ -->
     <article data-template-id="budget-card" class="canva-card glass card">
-     <h2 data-template-id="budget-title" class="canva-text"></h2>
+     <h2 data-template-id="budget-title" class="canva-text">ตั้งค่างบประมาณรายเดือน</h2>
      <form id="budgetForm">
       <div class="two">
        <div class="field">
-        <label data-template-id="allowance-label" class="canva-text" for="allowance"></label><input id="allowance" class="input money" type="number" min="0" step="any" inputmode="decimal">
+        <label data-template-id="allowance-label" class="canva-text" for="allowance">รายรับ / งบประมาณทั้งหมด</label>
+        <input id="allowance" class="input money" type="number" min="0" step="any" inputmode="decimal" placeholder="0.00">
        </div>
        <div class="field">
-        <label data-template-id="fixed-label" class="canva-text" for="fixed"></label><input id="fixed" class="input money" type="number" min="0" step="any" inputmode="decimal">
+        <label data-template-id="fixed-label" class="canva-text" for="fixed">รายจ่ายคงที่ต่อเดือน</label>
+        <input id="fixed" class="input money" type="number" min="0" step="any" inputmode="decimal" placeholder="0.00">
        </div>
-      </div><button data-template-id="budget-save" class="canva-button primary full" type="submit" style="margin-top:15px"></button>
+      </div>
+      <button data-template-id="budget-save" class="canva-button primary full" type="submit" style="margin-top:15px">บันทึกงบประมาณ</button>
      </form>
     </article>
+
+    <!-- รายการล่าสุด -->
     <article data-template-id="recent-card" class="canva-card glass card">
      <div class="between">
-      <h2 data-template-id="recent-title" class="canva-text"></h2><button data-template-id="add-link" class="canva-button secondary" type="button" onclick="showScreen('transactions')" style="min-height:40px;padding:7px 12px"></button>
+      <h2 data-template-id="recent-title" class="canva-text">รายการล่าสุด</h2>
+      <button data-template-id="add-link" class="canva-button secondary" type="button" onclick="showScreen('transactions')" style="min-height:40px;padding:7px 12px">ดูทั้งหมด</button>
      </div>
      <div id="recentList"></div>
     </article>
+
    </section>
    <section id="transactions" class="screen hidden" aria-label="ธุรกรรม">
     <header class="topbar">
@@ -304,37 +374,229 @@
    </div>
   </div>
   <div id="clearModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="clear-modal-title">
-   <div class="modal-box">
-    <h2 data-template-id="clear-modal-title" id="clear-modal-title" class="canva-text"></h2>
-    <p data-template-id="clear-helper" class="canva-text muted" style="margin-top:8px"></p>
+  <div class="modal-box">
+    <!-- ใส่หัวข้อ -->
+    <h2 data-template-id="clear-modal-title" id="clear-modal-title" class="canva-text">ยืนยันการลบข้อมูล</h2>
+    <!-- ใส่คำอธิบาย -->
+    <p data-template-id="clear-helper" class="canva-text muted" style="margin-top:8px">คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้</p>
+    
     <div class="modal-actions">
-     <button data-template-id="clear-cancel" class="canva-button secondary" type="button" onclick="closeModal('clearModal')"></button><button data-template-id="clear-confirm" class="canva-button danger" type="button" onclick="clearAll()"></button>
+     <!-- ใส่ข้อความบนปุ่ม -->
+     <button data-template-id="clear-cancel" class="canva-button secondary" type="button" onclick="closeModal('clearModal')">ยกเลิก</button>
+     <button data-template-id="clear-confirm" class="canva-button danger" type="button" onclick="clearAll()">ยืนยันลบข้อมูล</button>
     </div>
    </div>
   </div>
-  <div id="surveyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="survey-title">
+  <style>
+  .modal-box {
+    max-width: 500px !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
+    background: #ffffff !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+  }
+  .form-group-custom {
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  .form-label-custom {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+  }
+  .option-cards {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .option-cards input[type="radio"] {
+    display: none;
+  }
+  .option-cards label {
+    flex: 1;
+    min-width: 90px;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4a5568;
+    transition: all 0.2s ease;
+  }
+  .option-cards input[type="radio"]:checked + label {
+    border-color: #6366f1;
+    background-color: #eef2ff;
+    color: #4f46e5;
+    font-weight: 600;
+  }
+  .rating-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .rating-options input[type="radio"] {
+    display: none;
+  }
+  .rating-options label {
+    flex: 1;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #64748b;
+    transition: all 0.2s ease;
+  }
+  .rating-options input[type="radio"]:checked + label {
+    border-color: #f59e0b;
+    background-color: #fffbeb;
+    color: #d97706;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .btn-ui {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  .btn-ui:active { transform: scale(0.98); }
+  .btn-submit { background: #4f46e5; color: #fff; }
+  .btn-cancel { background: #f1f5f9; color: #64748b; }
+</style>
+
+<div id="surveyModal" class="modal" role="dialog" aria-modal="true">
    <div class="modal-box">
-    <h2 data-template-id="survey-title" id="survey-title" class="canva-text"></h2>
+    <h2 id="survey-title" style="margin-bottom: 20px; font-size: 20px; text-align: center;">แบบประเมินความพึงพอใจ</h2>
+    
     <form id="surveyForm">
-     <div class="field"><label data-template-id="survey-status-label" class="canva-text" for="surveyStatus"></label><select id="surveyStatus" class="select" required><option value="">เลือกสถานภาพ</option><option>นักเรียน/นักศึกษา</option><option>บุคคลทั่วไป/วัยทำงาน</option><option>อื่นๆ</option></select>
+     
+     <!-- Hidden Selects สำหรับส่งข้อมูลไปยัง Script ดั้งเดิมของ Canva -->
+     <select id="surveyStatus" style="display:none;" required><option value=""></option><option value="นักเรียน/นักศึกษา">นักเรียน/นักศึกษา</option><option value="บุคคลทั่วไป/วัยทำงาน">บุคคลทั่วไป/วัยทำงาน</option><option value="อื่นๆ">อื่นๆ</option></select>
+     <select id="surveyDevice" style="display:none;" required><option value=""></option><option value="iOS">iOS</option><option value="Android">Android</option><option value="Computer">Computer</option></select>
+     <select id="surveyUx" style="display:none;" required><option value=""></option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+     <select id="surveyFunction" style="display:none;" required><option value=""></option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+     <select id="surveyUi" style="display:none;" required><option value=""></option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+     <select id="surveyPerformance" style="display:none;" required><option value=""></option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+
+     <!-- 1. สถานภาพ -->
+     <div class="form-group-custom">
+      <label class="form-label-custom">สถานภาพของคุณ</label>
+      <div class="option-cards">
+        <input type="radio" name="surveyStatus_rad" id="st1" value="นักเรียน/นักศึกษา" required>
+        <label for="st1">นักเรียน/นักศึกษา</label>
+        
+        <input type="radio" name="surveyStatus_rad" id="st2" value="บุคคลทั่วไป/วัยทำงาน">
+        <label for="st2">วัยทำงาน</label>
+        
+        <input type="radio" name="surveyStatus_rad" id="st3" value="อื่นๆ">
+        <label for="st3">อื่นๆ</label>
+      </div>
      </div>
-     <div class="field"><label data-template-id="survey-device-label" class="canva-text" for="surveyDevice"></label><select id="surveyDevice" class="select" required><option value="">เลือกอุปกรณ์</option><option>iOS</option><option>Android</option><option>Computer</option></select>
+
+     <!-- 2. อุปกรณ์ -->
+     <div class="form-group-custom">
+      <label class="form-label-custom">อุปกรณ์ที่ใช้งาน</label>
+      <div class="option-cards">
+        <input type="radio" name="surveyDevice_rad" id="dev1" value="iOS" required>
+        <label for="dev1">iOS</label>
+        
+        <input type="radio" name="surveyDevice_rad" id="dev2" value="Android">
+        <label for="dev2">Android</label>
+        
+        <input type="radio" name="surveyDevice_rad" id="dev3" value="Computer">
+        <label for="dev3">คอมพิวเตอร์</label>
+      </div>
      </div>
-     <div class="field"><label data-template-id="survey-ux-label" class="canva-text" for="surveyUx"></label><select id="surveyUx" class="select" required><option value="">เลือกคะแนน 1-5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+
+     <!-- 3. คะแนน UX -->
+     <div class="form-group-custom">
+      <label class="form-label-custom">ความง่ายในการใช้งาน (UX)</label>
+      <div class="rating-options">
+        <input type="radio" name="surveyUx_rad" id="ux1" value="1" required><label for="ux1">1</label>
+        <input type="radio" name="surveyUx_rad" id="ux2" value="2"><label for="ux2">2</label>
+        <input type="radio" name="surveyUx_rad" id="ux3" value="3"><label for="ux3">3</label>
+        <input type="radio" name="surveyUx_rad" id="ux4" value="4"><label for="ux4">4</label>
+        <input type="radio" name="surveyUx_rad" id="ux5" value="5"><label for="ux5">5</label>
+      </div>
      </div>
-     <div class="field"><label data-template-id="survey-function-label" class="canva-text" for="surveyFunction"></label><select id="surveyFunction" class="select" required><option value="">เลือกคะแนน 1-5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+
+     <!-- 4. คะแนน Function -->
+     <div class="form-group-custom">
+      <label class="form-label-custom">ฟังก์ชันการทำงานระบบ</label>
+      <div class="rating-options">
+        <input type="radio" name="surveyFunction_rad" id="fn1" value="1" required><label for="fn1">1</label>
+        <input type="radio" name="surveyFunction_rad" id="fn2" value="2"><label for="fn2">2</label>
+        <input type="radio" name="surveyFunction_rad" id="fn3" value="3"><label for="fn3">3</label>
+        <input type="radio" name="surveyFunction_rad" id="fn4" value="4"><label for="fn4">4</label>
+        <input type="radio" name="surveyFunction_rad" id="fn5" value="5"><label for="fn5">5</label>
+      </div>
      </div>
-     <div class="field"><label data-template-id="survey-ui-label" class="canva-text" for="surveyUi"></label><select id="surveyUi" class="select" required><option value="">เลือกคะแนน 1-5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+
+     <!-- 5. คะแนน UI -->
+     <div class="form-group-custom">
+      <label class="form-label-custom">ความสวยงามของหน้าเว็บ (UI)</label>
+      <div class="rating-options">
+        <input type="radio" name="surveyUi_rad" id="ui1" value="1" required><label for="ui1">1</label>
+        <input type="radio" name="surveyUi_rad" id="ui2" value="2"><label for="ui2">2</label>
+        <input type="radio" name="surveyUi_rad" id="ui3" value="3"><label for="ui3">3</label>
+        <input type="radio" name="surveyUi_rad" id="ui4" value="4"><label for="ui4">4</label>
+        <input type="radio" name="surveyUi_rad" id="ui5" value="5"><label for="ui5">5</label>
+      </div>
      </div>
-     <div class="field"><label data-template-id="survey-performance-label" class="canva-text" for="surveyPerformance"></label><select id="surveyPerformance" class="select" required><option value="">เลือกคะแนน 1-5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+
+     <!-- 6. คะแนน Performance -->
+     <div class="form-group-custom">
+      <label class="form-label-custom">ความเร็วในการประมวลผล</label>
+      <div class="rating-options">
+        <input type="radio" name="surveyPerformance_rad" id="pf1" value="1" required><label for="pf1">1</label>
+        <input type="radio" name="surveyPerformance_rad" id="pf2" value="2"><label for="pf2">2</label>
+        <input type="radio" name="surveyPerformance_rad" id="pf3" value="3"><label for="pf3">3</label>
+        <input type="radio" name="surveyPerformance_rad" id="pf4" value="4"><label for="pf4">4</label>
+        <input type="radio" name="surveyPerformance_rad" id="pf5" value="5"><label for="pf5">5</label>
+      </div>
      </div>
-     <div class="field"><label data-template-id="survey-feedback-label" class="canva-text" for="surveyFeedback"></label><textarea id="surveyFeedback" class="textarea"></textarea>
+
+     <!-- 7. ข้อเสนอแนะ -->
+     <div class="form-group-custom">
+      <label class="form-label-custom">ข้อเสนอแนะเพิ่มเติม</label>
+      <textarea id="surveyFeedback" class="textarea" style="width: 100%; border-radius: 10px; border: 2px solid #e2e8f0; padding: 10px; box-sizing: border-box;" rows="3" placeholder="พิมพ์ความเห็นของคุณที่นี่..."></textarea>
      </div>
-     <div class="modal-actions"><button data-template-id="survey-cancel" class="canva-button secondary" type="button" onclick="closeModal('surveyModal')"></button><button data-template-id="survey-submit" class="canva-button primary" type="submit"></button>
+
+     <!-- ปุ่มกด -->
+     <div class="modal-actions">
+      <button class="btn-ui btn-cancel" type="button" onclick="closeModal('surveyModal')">ยกเลิก</button>
+      <button class="btn-ui btn-submit" type="submit">ส่งแบบประเมิน</button>
      </div>
     </form>
    </div>
   </div>
+
+<script>
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    const targetId = e.target.name.replace('_rad', '');
+    const select = document.getElementById(targetId);
+    if(select) {
+      select.value = e.target.value;
+      select.dispatchEvent(new Event('change'));
+    }
+  });
+});
+</script>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="/_sdk/5629ea66dc55d54f.editing_sdk.js" integrity="sha512-snPYzGvgiTEMUBOb+HlCBkFeiM0IRX4hcgA78wvalhC0WnJtaX+RCbosPWtNqZsZ7sZ9NwN0oePZYa+IlMwa+w=="></script>
   <script>
