@@ -502,6 +502,8 @@
   <script>
     const KEY='moodeng_data';
     const USER_KEY='moodeng_user_id';
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBTFBxeIEsedt2tX2rclea0oe0gmtcRUUOrv7LExMf-Cf7bpwAmKWzSbRLBK8mf4rm/exec";
+    
     const $=id=>document.getElementById(id);
     const storageKey=()=>KEY+'_'+deviceUserId;
     const categoryIcons={'อาหาร':'utensils','เดินทาง':'bus-front','เครื่องดื่ม':'coffee','ช้อปปิ้ง':'shopping-bag','การศึกษา':'book-open','บันเทิง':'music','อื่น ๆ':'circle-dot','รายรับ':'wallet'};
@@ -1041,10 +1043,40 @@
 
     $('surveyForm').addEventListener('submit',e=>{
       e.preventDefault();
-      localStorage.setItem('moodeng_survey_done_'+deviceUserId,'1');
-      sparklePop();
-      closeModal('surveyModal');
-      toast('ขอบคุณที่ร่วมตอบแบบสอบถามครับ!')
+
+      // ดึงข้อมูลจากฟอร์มแบบสอบถาม
+      const surveyPayload = {
+        userId: deviceUserId,
+        status: $('surveyStatus').value,
+        device: $('surveyDevice').value,
+        ux: $('surveyUx').value,
+        functionScore: $('surveyFunction').value,
+        ui: $('surveyUi').value,
+        performance: $('surveyPerformance').value,
+        feedback: $('surveyFeedback').value,
+        submittedAt: new Date().toLocaleString("th-TH")
+      };
+
+      // ยิงข้อมูลเข้า Google Apps Script
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(surveyPayload)
+      })
+      .then(() => {
+        localStorage.setItem('moodeng_survey_done_'+deviceUserId,'1');
+        sparklePop();
+        closeModal('surveyModal');
+        toast('ขอบคุณที่ร่วมตอบแบบสอบถามครับ!');
+        $('surveyForm').reset();
+      })
+      .catch(err => {
+        toast('ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+        console.error(err);
+      });
     });
 
     initLocal();
