@@ -1,2345 +1,424 @@
 <!doctype html>
 <html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<meta name="theme-color" content="#DDD3FF">
-<link rel="manifest" href="./manifest.json">
-<title>หมูเด้ง Smart Budget</title>
-
-<style>
-:root{
- --ink:#0F172A;--muted:#64748B;--paper:#fff;--canvas:#F7F5FF;
- --canvas2:#EEEAFE;--accent:#7056D9;--accent2:#5840BF;
- --soft:#EEEAFE;--line:#E7E3F2;--shadow:0 16px 38px rgba(44,30,105,.11);
- --good:#10B981;--bad:#F43F5E
-}
-body.green{--canvas:#F2FCF8;--canvas2:#DDF8EE;--accent:#149C78;--accent2:#08775A;--soft:#DDF8EE;--line:#D8EEE5}
-body.orange{--canvas:#FFF8F4;--canvas2:#FFE8DE;--accent:#DD7449;--accent2:#B95029;--soft:#FFE8DE;--line:#F3E0D5}
-body.pink{--canvas:#FFF6FA;--canvas2:#FFE5F0;--accent:#D9538D;--accent2:#B52E68;--soft:#FFE5F0;--line:#F2DFE8}
-
-*{box-sizing:border-box}
-body{
- margin:0;width:100%;min-height:100vh;
- background:linear-gradient(150deg,var(--canvas),var(--canvas2) 70%,#fff);
- color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Thai",sans-serif;
- font-size:17px
-}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
- outline:3px solid var(--soft);outline-offset:2px
-}
-h1,h2,h3,p{margin:0}
-h1{font-size:29px;line-height:1.12;font-weight:800}
-h2{font-size:21px;line-height:1.2;font-weight:800}
-h3{font-size:18px;font-weight:800}
-
-.app-shell{width:100%;max-width:630px;margin:auto;padding:21px 16px 108px}
-.screen{animation:up .22s ease}
-.hidden{display:none!important}
-@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-.tiny{font-size:14px}
-.muted{color:var(--muted)}
-.money{font-variant-numeric:tabular-nums;letter-spacing:-.035em}
-.income{color:var(--good)!important}
-.expense{color:var(--bad)!important}
-
-.topbar,.between{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.topbar{margin-bottom:18px}
-
-.glass{
- background:rgba(255,255,255,.91);backdrop-filter:blur(16px);
- border:1px solid rgba(255,255,255,.95);
- box-shadow:var(--shadow);border-radius:25px
-}
-.card{padding:17px;margin-top:16px}
-
-.avatar{
- width:56px;height:56px;border-radius:20px;overflow:hidden;display:grid;
- place-items:center;background:#fff;box-shadow:0 7px 16px rgba(31,25,70,.12);
- color:var(--accent);flex:none
-}
-.avatar.large{width:84px;height:84px;border-radius:29px;margin:0 auto 11px}
-.avatar img{height:100%;width:100%;object-fit:cover}
-
-.profile-trigger{
- border:0;background:transparent;color:var(--ink);padding:0;
- display:flex;gap:12px;align-items:center;text-align:left
-}
-.profile-name{display:block;font-size:25px;line-height:1.1}
-
-.icon-btn{
- width:48px;height:48px;display:grid;place-items:center;border:0;
- border-radius:16px;background:#fff;color:var(--ink);
- box-shadow:0 5px 14px rgba(30,22,69,.08)
-}
-
-.icon{
- width:22px;height:22px;display:inline-block;
- font-size:22px;line-height:1
-}
-
-.balance{padding:22px;background:linear-gradient(135deg,#fff,rgba(255,255,255,.74))}
-.balance-number{font-size:39px;line-height:1.1;font-weight:800;margin-top:7px}
-.currency{
- border:0;min-height:43px;border-radius:14px;padding:8px;
- background:var(--soft);color:var(--accent2);font-weight:800
-}
-
-.progress{height:11px;border-radius:999px;overflow:hidden;background:#E8EDF2}
-.progress span{
- height:100%;display:block;border-radius:inherit;background:#10B981;
- transition:width .45s ease
-}
-.progress span.status-near{background:#F97316}
-.progress span.status-low{background:#EAB308}
-.progress span.status-over{background:#EF4444}
-
-.budget-status{
- display:flex;justify-content:space-between;gap:10px;
- margin-top:7px;font-size:14px;font-weight:800
-}
-.budget-status.plan{color:#059669}
-.budget-status.near{color:#EA580C}
-.budget-status.low{color:#A16207}
-.budget-status.over{color:#DC2626}
-
-.stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.stat{padding:13px;border-radius:16px;background:#F8FAFC}
-.stat b{display:block;font-size:19px;margin-top:3px}
-
-.quick-grid{
- display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
- gap:9px;margin-top:12px
-}
-.quick{
- min-height:76px;padding:8px 4px;border:0;border-radius:18px;
- background:var(--soft);color:var(--accent2);font-weight:800;
- display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px
-}
-
-.field{margin-top:13px}
-.field label{display:block;margin-bottom:6px;font-weight:800;font-size:15px}
-.input,.select,.textarea{
- width:100%;min-height:50px;border:1px solid var(--line);
- border-radius:14px;background:#fff;padding:11px 13px;color:var(--ink)
-}
-.textarea{min-height:78px;resize:vertical}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-.primary,.secondary,.danger{
- border:0;min-height:48px;padding:10px 15px;border-radius:14px;font-weight:800
-}
-.primary{background:var(--accent);color:#fff;box-shadow:0 10px 18px rgba(112,86,217,.27)}
-.secondary{background:var(--soft);color:var(--accent2)}
-.danger{background:#FFF0F3;color:#BE123C}
-.full{width:100%}
-
-.segment{
- display:grid;grid-template-columns:1fr 1fr;gap:4px;
- padding:4px;border-radius:16px;background:var(--soft)
-}
-.segment button{
- border:0;min-height:43px;border-radius:12px;
- background:transparent;color:var(--muted);font-weight:800
-}
-.segment button.active{
- background:#fff;color:var(--accent2);
- box-shadow:0 3px 9px rgba(30,25,60,.09)
-}
-
-.list-item{
- display:flex;align-items:center;gap:11px;
- padding:13px 0;border-bottom:1px solid var(--line)
-}
-.list-item:last-child{border-bottom:0}
-.cat-icon{
- width:44px;height:44px;border-radius:15px;background:var(--soft);
- color:var(--accent2);display:grid;place-items:center;flex:none
-}
-.list-main{flex:1;min-width:0}
-.truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.delete{border:0;background:transparent;color:var(--muted);padding:4px;font-size:13px}
-
-.empty{text-align:center;padding:29px 8px;color:var(--muted)}
-.empty .icon{display:block;font-size:35px;margin-bottom:7px}
-.search{position:relative;margin-top:12px}
-.search .icon{position:absolute;left:14px;top:13px}
-.search .input{padding-left:43px}
-
-.preview{
- display:none;width:100%;height:150px;object-fit:cover;
- border:1px solid var(--line);border-radius:15px;margin-top:9px
-}
-
-.donut{
- width:187px;height:187px;border-radius:50%;display:grid;
- place-items:center;margin:20px auto;background:#E8EDF2
-}
-.donut-core{
- width:125px;height:125px;border-radius:50%;background:#fff;
- display:grid;place-items:center;text-align:center
-}
-
-.rank{display:flex;align-items:center;gap:9px;padding:11px 0}
-.rank-name{width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rank-track{flex:1;height:9px;overflow:hidden;border-radius:99px;background:#E8EDF2}
-.rank-track span{display:block;height:100%;border-radius:inherit;background:var(--accent)}
-
-.profile-card{text-align:center;padding:22px}
-.theme-row{display:flex;gap:14px;justify-content:center;margin-top:14px}
-.theme-btn{
- width:35px;height:35px;border-radius:50%;border:3px solid transparent
-}
-.theme-btn.active{outline:2px solid var(--ink);outline-offset:3px}
-.theme-btn.purple{background:#9C82EA}
-.theme-btn.green{background:#62C9A6}
-.theme-btn.orange{background:#F2A477}
-.theme-btn.pink{background:#E77AAA}
-
-.goal{padding:14px 0;border-bottom:1px solid var(--line)}
-.goal:last-child{border-bottom:0}
-.goal .progress{margin-top:8px}
-
-.answer{padding:15px;margin-top:12px;border-radius:16px;background:var(--soft)}
-.answer b{font-size:28px;display:block;margin-top:2px}
-
-.nav{
- position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);
- width:min(100%,630px);display:grid;grid-template-columns:repeat(4,1fr);
- padding:8px 9px calc(8px + env(safe-area-inset-bottom));
- background:rgba(255,255,255,.94);border-top:1px solid rgba(255,255,255,.9);
- backdrop-filter:blur(16px)
-}
-.nav button{
- min-height:57px;border:0;border-radius:16px;background:transparent;
- color:#718096;font-size:12px;font-weight:800;
- display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px
-}
-.nav button.active{background:var(--soft);color:var(--accent2)}
-
-.modal{
- position:fixed;z-index:50;inset:0;padding:18px;display:none;
- place-items:center;background:rgba(15,23,42,.46);backdrop-filter:blur(4px)
-}
-.modal.show{display:grid}
-.modal-box{
- width:min(100%,435px);max-height:88%;overflow:auto;background:#fff;
- border-radius:25px;padding:21px;box-shadow:0 24px 65px rgba(15,23,42,.25)
-}
-.modal-actions{display:flex;gap:9px;margin-top:18px}
-.modal-actions>*{flex:1}
-
-.toast{
- position:fixed;z-index:70;bottom:93px;left:50%;
- width:min(calc(100% - 32px),430px);
- transform:translate(-50%,20px);opacity:0;pointer-events:none;
- background:#0F172A;color:#fff;border-radius:14px;text-align:center;
- padding:13px 17px;font-weight:700;transition:.25s
-}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-
-@media(min-width:700px){
- .app-shell{padding-top:30px}
- .balance{padding:26px}
-}
-</style>
-</head>
-
-<body class="purple">
-
-<main class="app-shell">
-
-<!-- HOME -->
-<section id="home" class="screen" aria-label="หน้าหลัก">
-
-<header class="topbar">
-<button class="profile-trigger" onclick="openProfile()">
- <span class="avatar" id="homeAvatar"></span>
- <span>
-  <span class="tiny muted">สวัสดี 👋</span>
-  <strong id="homeName" class="profile-name"></strong>
- </span>
-</button>
-<button class="icon-btn" onclick="openProfile()" aria-label="แก้ไขโปรไฟล์">✏️</button>
-</header>
-
-<article class="glass balance">
-
-<div class="between">
- <p class="muted" style="font-weight:800">ยอดเงินคงเหลือ</p>
- <button class="icon-btn" onclick="toggleMoney()" id="eyeButton">👁️</button>
-</div>
-
-<div class="between" style="align-items:flex-end;margin-top:4px">
- <strong id="balanceValue" class="money balance-number">฿0.00</strong>
-
- <select id="currency" class="currency">
-  <option>THB</option>
-  <option>USD</option>
-  <option>EUR</option>
-  <option>JPY</option>
- </select>
-</div>
-
-<p class="tiny muted" style="margin-top:4px">
- เงินคงเหลือจากรายรับและรายจ่ายทั้งหมด
-</p>
-
-<div style="margin-top:20px">
-
-<div class="between">
- <div>
-  <strong>งบประมาณวันนี้</strong>
-  <p class="tiny muted">ติดตามการใช้เงินของเดือนนี้</p>
- </div>
- <b id="dailyValue" class="money"></b>
-</div>
-
-<div class="progress" style="margin-top:9px">
- <span id="gauge"></span>
-</div>
-
-<div id="budgetStatus" class="budget-status plan">
- <span id="budgetStatusText">อยู่ในแผน</span>
- <span id="budgetPercent">0%</span>
-</div>
-
-<div id="budgetUsage" class="tiny muted" style="margin-top:3px">
- ใช้ไป ฿0 / ฿0
-</div>
-
-</div>
-
-<div class="stat-grid" style="margin-top:15px">
-
-<div class="stat">
- <span class="tiny muted">รายจ่ายสัปดาห์นี้</span>
- <b id="weekSpent" class="money expense"></b>
-</div>
-
-<div class="stat">
- <span class="tiny muted">รายจ่ายเดือนนี้</span>
- <b id="monthSpent" class="money expense"></b>
-</div>
-
-</div>
-</article>
-
-<!-- QUICK -->
-<article class="glass card">
-
-<h2>เพิ่มรายการด่วน</h2>
-
-<div class="quick-grid">
-
-<button class="quick" onclick="quickAdd('อาหาร')">
- <span class="icon">🍜</span><span>อาหาร</span>
-</button>
-
-<button class="quick" onclick="quickAdd('เครื่องดื่ม')">
- <span class="icon">☕</span><span>เครื่องดื่ม</span>
-</button>
-
-<button class="quick" onclick="quickAdd('เดินทาง')">
- <span class="icon">🚌</span><span>เดินทาง</span>
-</button>
-
-<button class="quick" onclick="quickAdd('ช้อปปิ้ง')">
- <span class="icon">🛍️</span><span>ช้อปปิ้ง</span>
-</button>
-
-</div>
-</article>
-
-<!-- RECURRING -->
-<article class="glass card">
-
-<div class="between">
- <h2>รายจ่ายประจำ</h2>
- <button class="secondary" onclick="addRecurringBill()">+ เพิ่มบิล</button>
-</div>
-
-<div id="recurringList"></div>
-</article>
-
-<!-- BUDGET -->
-<article class="glass card">
-
-<h2>ตั้งงบประมาณ</h2>
-
-<form id="budgetForm">
-
-<div class="two">
-
-<div class="field">
-<label for="allowance">เงินที่มีต่อเดือน</label>
-<input id="allowance" class="input money" type="number" min="0" step="any">
-</div>
-
-<div class="field">
-<label for="fixed">รายจ่ายประจำ</label>
-<input id="fixed" class="input money" type="number" min="0" step="any">
-</div>
-
-</div>
-
-<button class="primary full" type="submit" style="margin-top:15px">
-บันทึกงบประมาณ
-</button>
-
-</form>
-</article>
-
-<!-- RECENT -->
-<article class="glass card">
-
-<div class="between">
-<h2>รายการล่าสุด</h2>
-<button class="secondary" onclick="showScreen('transactions')">ดูทั้งหมด</button>
-</div>
-
-<div id="recentList"></div>
-
-</article>
-
-</section>
-
-
-<!-- TRANSACTIONS -->
-<section id="transactions" class="screen hidden">
-
-<header class="topbar">
-
-<div>
-<p class="tiny muted">จัดการรายการ</p>
-<h1>รายรับรายจ่าย</h1>
-</div>
-
-<button class="icon-btn" onclick="showScreen('home')">←</button>
-
-</header>
-
-<article class="glass card" style="margin-top:0">
-
-<form id="txForm">
-
-<div class="segment">
-
-<button class="active" id="expenseTab" type="button" onclick="setType('expense')">
-รายจ่าย
-</button>
-
-<button id="incomeTab" type="button" onclick="setType('income')">
-รายรับ
-</button>
-
-</div>
-
-<div class="field">
-<label for="txCategory">หมวดหมู่</label>
-
-<select id="txCategory" class="select">
-<option>อาหาร</option>
-<option>เดินทาง</option>
-<option>เครื่องดื่ม</option>
-<option>ช้อปปิ้ง</option>
-<option>การศึกษา</option>
-<option>บันเทิง</option>
-<option>อื่น ๆ</option>
-<option>รายรับ</option>
-</select>
-</div>
-
-<div class="field">
-<label for="txAmount">จำนวนเงิน</label>
-<input id="txAmount" class="input money" type="number" min="0" step="any" required>
-</div>
-
-<div class="field">
-<label for="txDate">วันที่และเวลา</label>
-<input id="txDate" class="input" type="datetime-local" required>
-</div>
-
-<div class="field">
-<label for="txMemo">บันทึกเพิ่มเติม</label>
-<textarea id="txMemo" class="textarea" placeholder="เช่น กินข้าวกับเพื่อน"></textarea>
-</div>
-
-<div class="field">
-<label for="receipt">รูปใบเสร็จ</label>
-<input id="receipt" class="input" type="file" accept="image/*">
-<img id="receiptPreview" class="preview" alt="ตัวอย่างใบเสร็จ">
-</div>
-
-<button class="primary full" type="submit" style="margin-top:18px">
-บันทึกรายการ
-</button>
-
-</form>
-</article>
-
-
-<article class="glass card">
-
-<h2>ประวัติรายการ</h2>
-
-<div class="search">
-<span class="icon">🔎</span>
-<input id="search" class="input" type="search" placeholder="ค้นหารายการ...">
-</div>
-
-<div class="two" style="margin-top:10px">
-
-<select id="filterCategory" class="select">
-<option value="">ทุกหมวดหมู่</option>
-<option>อาหาร</option>
-<option>เดินทาง</option>
-<option>เครื่องดื่ม</option>
-<option>ช้อปปิ้ง</option>
-<option>การศึกษา</option>
-<option>บันเทิง</option>
-<option>อื่น ๆ</option>
-<option>รายรับ</option>
-</select>
-
-<select id="filterPeriod" class="select">
-<option value="all">ทุกช่วงเวลา</option>
-<option value="week">สัปดาห์นี้</option>
-<option value="month">เดือนนี้</option>
-</select>
-
-</div>
-
-<div id="txList"></div>
-
-</article>
-</section>
-
-
-<!-- ANALYTICS -->
-<section id="analytics" class="screen hidden">
-
-<header class="topbar">
-
-<div>
-<p class="tiny muted">ภาพรวมการเงิน</p>
-<h1>วิเคราะห์</h1>
-</div>
-
-<button class="icon-btn" onclick="exportCSV()">⬇️</button>
-
-</header>
-
-<article class="glass card" style="margin-top:0">
-
-<div class="segment">
-
-<button class="active" data-range="week" onclick="setRange('week')">
-สัปดาห์นี้
-</button>
-
-<button data-range="month" onclick="setRange('month')">
-เดือนนี้
-</button>
-
-</div>
-
-<div id="donut" class="donut">
-
-<div class="donut-core">
-
-<div>
-<strong id="chartSpent" class="money expense"></strong>
-<p class="tiny muted">รายจ่าย</p>
-</div>
-
-</div>
-</div>
-
-<div class="stat-grid">
-
-<div class="stat">
-<span class="tiny muted">รายรับ</span>
-<b id="chartIncome" class="money income"></b>
-</div>
-
-<div class="stat">
-<span class="tiny muted">คงเหลือสุทธิ</span>
-<b id="chartNet" class="money"></b>
-</div>
-
-</div>
-
-</article>
-
-<article class="glass card">
-
-<div class="between">
-<h2>หมวดหมู่ที่ใช้มากที่สุด</h2>
-<button class="secondary" onclick="exportCSV()">CSV</button>
-</div>
-
-<div id="rankList"></div>
-
-</article>
-
-</section>
-
-
-<!-- PROFILE -->
-<section id="profile" class="screen hidden">
-
-<article class="glass profile-card">
-
-<div class="avatar large" id="profileAvatar"></div>
-
-<h1 id="profileName"></h1>
-
-<button class="secondary" onclick="openProfile()" style="margin-top:10px">
-แก้ไขโปรไฟล์
-</button>
-
-</article>
-
-
-<article class="glass card">
-
-<h2>ธีมสี</h2>
-
-<div class="theme-row">
-
-<button class="theme-btn purple" data-theme="purple" onclick="setTheme('purple')"></button>
-<button class="theme-btn green" data-theme="green" onclick="setTheme('green')"></button>
-<button class="theme-btn orange" data-theme="orange" onclick="setTheme('orange')"></button>
-<button class="theme-btn pink" data-theme="pink" onclick="setTheme('pink')"></button>
-
-</div>
-
-</article>
-
-
-<article class="glass card">
-
-<div class="between">
-<h2>เป้าหมายการออม</h2>
-<button class="secondary" onclick="openModal('goalModal')">+ เพิ่ม</button>
-</div>
-
-<div id="goalList"></div>
-
-</article>
-
-
-<article class="glass card">
-
-<h2>หารบิล</h2>
-
-<div class="two" style="margin-top:12px">
-
-<div>
-<label class="tiny" style="font-weight:800">ยอดบิล</label>
-<input id="billTotal" class="input money" type="number" min="0">
-</div>
-
-<div>
-<label class="tiny" style="font-weight:800">จำนวนคน</label>
-<input id="billPeople" class="input money" type="number" min="1" value="2">
-</div>
-
-</div>
-
-<div class="answer">
-
-<span class="tiny muted">แต่ละคนจ่าย</span>
-<b id="billEach" class="money"></b>
-
-</div>
-
-</article>
-
-
-<article class="glass card">
-
-<h2>ข้อมูล</h2>
-
-<div class="two" style="margin-top:13px">
-
-<button class="secondary" onclick="openModal('pinModal')">🔒 ตั้ง PIN</button>
-
-<button class="secondary" onclick="exportBackup()">💾 สำรองข้อมูล</button>
-
-<label class="secondary" style="display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer">
-เรียกคืนข้อมูล
-<input id="restoreInput" class="hidden" type="file" accept=".json,application/json">
-</label>
-
-<button class="danger" onclick="openModal('clearModal')">ล้างข้อมูล</button>
-
-</div>
-
-</article>
-
-</section>
-
-</main>
-
-
-<!-- NAV -->
-<nav class="nav">
-
-<button class="active" data-screen="home" onclick="showScreen('home')">
-<span class="icon">🏠</span>
-<span>หน้าหลัก</span>
-</button>
-
-<button data-screen="transactions" onclick="showScreen('transactions')">
-<span class="icon">🧾</span>
-<span>รายการ</span>
-</button>
-
-<button data-screen="analytics" onclick="showScreen('analytics')">
-<span class="icon">📊</span>
-<span>วิเคราะห์</span>
-</button>
-
-<button data-screen="profile" onclick="showScreen('profile')">
-<span class="icon">👤</span>
-<span>โปรไฟล์</span>
-</button>
-
-</nav>
-
-
-<!-- PROFILE MODAL -->
-<div id="profileModal" class="modal">
-
-<div class="modal-box">
-
-<h2>แก้ไขโปรไฟล์</h2>
-
-<div class="field">
-<label for="nameInput">ชื่อ</label>
-<input id="nameInput" class="input" maxlength="40">
-</div>
-
-<div class="field">
-<label for="avatarUpload">รูปโปรไฟล์</label>
-<input id="avatarUpload" class="input" type="file" accept="image/*">
-</div>
-
-<div class="modal-actions">
-
-<button class="secondary" onclick="closeModal('profileModal')">
-ยกเลิก
-</button>
-
-<button class="primary" id="saveNameBtn">
-บันทึก
-</button>
-
-</div>
-
-</div>
-</div>
-
-
-<!-- IMPULSE MODAL -->
-<div id="impulseModal" class="modal">
-
-<div class="modal-box">
-
-<h2>แน่ใจหรือไม่? 🤔</h2>
-
-<p class="muted" style="margin-top:8px">
-รายการนี้มีมูลค่ามากกว่า ฿300 ลองถามตัวเองก่อนว่า จำเป็นจริง ๆ ไหม
-</p>
-
-<div class="modal-actions">
-
-<button class="secondary" onclick="closeModal('impulseModal')">
-กลับไปดู
-</button>
-
-<button class="primary" onclick="saveTransaction()">
-บันทึกอยู่ดี
-</button>
-
-</div>
-
-</div>
-</div>
-
-
-<!-- GOAL MODAL -->
-<div id="goalModal" class="modal">
-
-<div class="modal-box">
-
-<h2>เพิ่มเป้าหมายการออม</h2>
-
-<div class="field">
-<label for="goalName">ชื่อเป้าหมาย</label>
-<input id="goalName" class="input" placeholder="เช่น ซื้อ iPad">
-</div>
-
-<div class="field">
-<label for="goalAmount">จำนวนเงินเป้าหมาย</label>
-<input id="goalAmount" class="input money" type="number" min="0">
-</div>
-
-<div class="field">
-<label for="goalSaved">เงินที่มีแล้ว</label>
-<input id="goalSaved" class="input money" type="number" min="0" value="0">
-</div>
-
-<div class="field">
-<label for="goalDate">วันที่ต้องการบรรลุ</label>
-<input id="goalDate" class="input" type="date">
-</div>
-
-<div class="modal-actions">
-
-<button class="secondary" onclick="closeModal('goalModal')">
-ยกเลิก
-</button>
-
-<button class="primary" onclick="saveGoal()">
-เพิ่มเป้าหมาย
-</button>
-
-</div>
-
-</div>
-</div>
-
-
-<!-- PIN MODAL -->
-<div id="pinModal" class="modal">
-
-<div class="modal-box">
-
-<h2>ตั้ง PIN</h2>
-
-<p class="tiny muted" style="margin-top:6px">
-ตั้งรหัส PIN 4 หลักสำหรับแอปของคุณ
-</p>
-
-<div class="field">
-<label for="pinInput">PIN</label>
-<input id="pinInput" class="input" type="password" inputmode="numeric" maxlength="4">
-</div>
-
-<div class="modal-actions">
-
-<button class="secondary" onclick="closeModal('pinModal')">
-ยกเลิก
-</button>
-
-<button class="primary" onclick="savePin()">
-บันทึก PIN
-</button>
-
-</div>
-
-</div>
-</div>
-
-
-<!-- CLEAR MODAL -->
-<div id="clearModal" class="modal">
-
-<div class="modal-box">
-
-<h2>ล้างข้อมูลทั้งหมด?</h2>
-
-<p class="muted" style="margin-top:8px">
-ข้อมูลรายรับ รายจ่าย และเป้าหมายทั้งหมดจะถูกลบจากเครื่องนี้
-</p>
-
-<div class="modal-actions">
-
-<button class="secondary" onclick="closeModal('clearModal')">
-ยกเลิก
-</button>
-
-<button class="danger" onclick="clearAll()">
-ล้างข้อมูล
-</button>
-
-</div>
-
-</div>
-</div>
-
-
-<div id="toast" class="toast"></div>
-
-
-<script>
-/* =========================
-   หมูเด้ง Smart Budget
-   ระบบเก็บข้อมูลในเครื่อง
-   ========================= */
-
-const KEY="moodeng_data";
-
-const $=id=>document.getElementById(id);
-
-const categoryIcons={
- "อาหาร":"🍜",
- "เดินทาง":"🚌",
- "เครื่องดื่ม":"☕",
- "ช้อปปิ้ง":"🛍️",
- "การศึกษา":"📚",
- "บันเทิง":"🎵",
- "อื่น ๆ":"📌",
- "รายรับ":"💰",
- "ค่าใช้จ่ายประจำ":"🔁"
-};
-
-let state={
- name:"หมูเด้ง",
- photo:"",
- theme:"purple",
- currency:"THB",
- hidden:false,
- pin:"",
- allowance:0,
- fixed:0,
- transactions:[],
- goals:[],
- recurring:[]
-};
-
-let type="expense";
-let pending=null;
-let range="week";
-
-
-/* ---------- DATA ---------- */
-
-function loadData(){
-
- try{
-
-  const saved=localStorage.getItem(KEY);
-
-  if(saved){
-   const data=JSON.parse(saved);
-
-   state={
-    ...state,
-    ...data,
-    transactions:Array.isArray(data.transactions)?data.transactions:[],
-    goals:Array.isArray(data.goals)?data.goals:[],
-    recurring:Array.isArray(data.recurring)?data.recurring:[]
-   };
-  }
-
- }catch(e){
-  console.log("โหลดข้อมูลไม่สำเร็จ",e);
- }
-
- $("currency").value=state.currency||"THB";
-
- setTheme(state.theme||"purple",false);
-}
-
-
-function save(){
-
- try{
-  state.currency=$("currency").value||state.currency||"THB";
-  localStorage.setItem(KEY,JSON.stringify(state));
- }catch(e){
-  toast("พื้นที่จัดเก็บข้อมูลเต็ม กรุณาลบรูปใบเสร็จบางรายการ");
- }
-
-}
-
-
-/* ---------- UTILS ---------- */
-
-function id(){
-
- return crypto.randomUUID?
- crypto.randomUUID():
- Date.now().toString(36)+Math.random().toString(36).slice(2);
-
-}
-
-
-function money(value){
-
- if(state.hidden)return "••••••";
-
- const c=state.currency||"THB";
-
- try{
-
-  return new Intl.NumberFormat(
-   c==="THB"?"th-TH":"en-US",
-   {
-    style:"currency",
-    currency:c,
-    minimumFractionDigits:c==="JPY"?0:2
-   }
-  ).format(Number(value)||0);
-
- }catch(e){
-
-  return Number(value||0).toFixed(2);
-
- }
-
-}
-
-
-function signed(n,t){
-
- return (t==="income"?"+":"-")+money(n);
-
-}
-
-
-function total(items=state.transactions){
-
- return items.reduce((a,x)=>{
-
-  if(x.type==="income")
-   a.income+=Number(x.amount)||0;
-
-  else
-   a.expense+=Number(x.amount)||0;
-
-  return a;
-
- },{income:0,expense:0});
-
-}
-
-
-function within(tx,period){
-
- const d=new Date(tx.date);
- const now=new Date();
-
- if(isNaN(d))return false;
-
- if(period==="all")return true;
-
- if(period==="month")
-  return d.getFullYear()===now.getFullYear() &&
-         d.getMonth()===now.getMonth();
-
- let start=new Date(now);
- start.setHours(0,0,0,0);
- start.setDate(now.getDate()-((now.getDay()+6)%7));
-
- return d>=start;
-
-}
-
-
-function esc(s){
-
- return String(s||"").replace(/[&<>"']/g,c=>({
-  "&":"&amp;",
-  "<":"&lt;",
-  ">":"&gt;",
-  '"':"&quot;",
-  "'":"&#039;"
- }[c]));
-
-}
-
-
-function toast(message){
-
- $("toast").textContent=message;
- $("toast").classList.add("show");
-
- clearTimeout(window.toastTimer);
-
- window.toastTimer=setTimeout(()=>{
-  $("toast").classList.remove("show");
- },2600);
-
-}
-
-
-function setNow(){
-
- let d=new Date();
-
- d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
-
- $("txDate").value=d.toISOString().slice(0,16);
-
-}
-
-
-/* ---------- AVATAR ---------- */
-
-function avatar(){
-
- if(state.photo){
-
-  return '<img src="'+state.photo+'" alt="รูปโปรไฟล์">';
-
- }
-
- return '<span style="font-size:32px">🐷</span>';
-
-}
-
-
-/* ---------- RENDER HOME ---------- */
-
-function renderHome(){
-
- let t=total();
-
- let balance=
- Number(state.allowance||0)+
- t.income-
- t.expense;
-
- let now=new Date();
-
- let days=
- new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-
- now.getDate()+1;
-
- let week=
- total(
-  state.transactions.filter(x=>within(x,"week"))
- ).expense;
-
- let month=
- total(
-  state.transactions.filter(x=>within(x,"month"))
- ).expense;
-
- let budget=Math.max(0,Number(state.allowance)||0);
-
- let used=Math.max(0,t.expense);
-
- let percent=
- budget>0?(used/budget)*100:0;
-
- let status=
- percent>=100?"over":
- percent>=90?"low":
- percent>=70?"near":
- "plan";
-
- let statusText=
- status==="over"?"ใช้เกินงบแล้ว":
- status==="low"?"เงินใกล้หมดแล้ว":
- status==="near"?"ใกล้ถึงงบแล้ว":
- "อยู่ในแผน";
-
- $("balanceValue").textContent=money(balance);
-
- $("dailyValue").textContent=
- money(
-  Math.max(
-   0,
-   balance-Number(state.fixed||0)
-  )/Math.max(days,1)
- );
-
- $("weekSpent").textContent=signed(week,"expense");
- $("monthSpent").textContent=signed(month,"expense");
-
- $("gauge").style.width=
- Math.min(100,Math.max(0,percent))+"%";
-
- $("gauge").className=
- "status-"+status;
-
- $("budgetStatus").className=
- "budget-status "+status;
-
- $("budgetStatusText").textContent=statusText;
-
- $("budgetPercent").textContent=
- Math.round(percent)+"%";
-
- $("budgetUsage").textContent=
- "ใช้ไป "+money(used)+" / "+money(budget);
-
- $("homeName").textContent=state.name;
- $("profileName").textContent=state.name;
-
- $("allowance").value=
- state.allowance||"";
-
- $("fixed").value=
- state.fixed||"";
-
- $("homeAvatar").innerHTML=avatar();
- $("profileAvatar").innerHTML=avatar();
-
- let recent=
- [...state.transactions]
- .sort((a,b)=>new Date(b.date)-new Date(a.date))
- .slice(0,4);
-
- $("recentList").innerHTML=
- recent.length?
- recent.map(txMarkup).join(""):
- emptyMarkup("💰","ยังไม่มีรายการ","เริ่มบันทึกรายรับรายจ่ายได้เลย");
-
- renderRecurring();
-
-}
-
-
-/* ---------- TRANSACTIONS ---------- */
-
-function txMarkup(x){
-
- let d=new Date(x.date);
-
- return `
- <div class="list-item">
-
-  <div class="cat-icon">
-   <span class="icon">${categoryIcons[x.category]||"📌"}</span>
-  </div>
-
-  <div class="list-main">
-
-   <b>${esc(x.category)}</b>
-
-   <p class="tiny muted truncate">
-    ${esc(x.memo||"ไม่มีบันทึก")}
-    ·
-    ${isNaN(d)?"":d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})}
-   </p>
-
-  </div>
-
-  <div style="text-align:right">
-
-   <b class="money ${x.type}">
-    ${signed(x.amount,x.type)}
-   </b>
-
-   <button class="delete" onclick="deleteTx('${x.id}')">
-    ลบ
-   </button>
-
-  </div>
-
- </div>`;
-
-}
-
-
-function emptyMarkup(icon,title,subtitle){
-
- return `
- <div class="empty">
-  <span class="icon">${icon}</span>
-  <p>${title}</p>
-  <span class="tiny">${subtitle}</span>
- </div>`;
-
-}
-
-
-function renderTransactions(){
-
- let q=$("search").value.toLowerCase();
-
- let cat=$("filterCategory").value;
-
- let period=$("filterPeriod").value;
-
- let data=
- [...state.transactions]
- .filter(x=>
-  (
-   !q ||
-   (x.category+" "+x.memo)
-   .toLowerCase()
-   .includes(q)
-  ) &&
-  (!cat||x.category===cat) &&
-  within(x,period)
- )
- .sort(
-  (a,b)=>new Date(b.date)-new Date(a.date)
- );
-
- $("txList").innerHTML=
- data.length?
- data.map(txMarkup).join(""):
- emptyMarkup("🔎","ไม่พบรายการ","ลองเปลี่ยนคำค้นหาหรือช่วงเวลา");
-
-}
-
-
-/* ---------- ANALYTICS ---------- */
-
-function renderAnalytics(){
-
- let data=
- state.transactions.filter(
-  x=>within(x,range)
- );
-
- let t=total(data);
-
- let categories={};
-
- data
- .filter(x=>x.type==="expense")
- .forEach(x=>{
-  categories[x.category]=
-   (categories[x.category]||0)+Number(x.amount);
- });
-
- let ranks=
- Object.entries(categories)
- .sort((a,b)=>b[1]-a[1]);
-
- let sum=t.expense||1;
-
- let cursor=0;
-
- let colors=[
-  "#7056D9",
-  "#F43F5E",
-  "#0EA5E9",
-  "#F59E0B",
-  "#10B981",
-  "#64748B"
- ];
-
- let stops=
- ranks.map(([,v],i)=>{
-
-  let start=cursor;
-
-  cursor+=v/sum*100;
-
-  return colors[i%colors.length]+
-   " "+start+"% "+cursor+"%";
-
- });
-
- $("donut").style.background=
- ranks.length?
- "conic-gradient("+stops.join(",")+")":
- "#E8EDF2";
-
- $("chartSpent").textContent=
- signed(t.expense,"expense");
-
- $("chartIncome").textContent=
- signed(t.income,"income");
-
- $("chartNet").textContent=
- money(t.income-t.expense);
-
- $("rankList").innerHTML=
- ranks.length?
-
- ranks.map(([name,value])=>`
-
- <div class="rank">
-
-  <div class="cat-icon">
-   <span class="icon">
-    ${categoryIcons[name]||"📌"}
-   </span>
-  </div>
-
-  <b class="rank-name">
-   ${esc(name)}
-  </b>
-
-  <div class="rank-track">
-   <span style="width:${value/sum*100}%"></span>
-  </div>
-
-  <b class="money tiny expense">
-   ${signed(value,"expense")}
-  </b>
-
- </div>
-
- `).join("")
-
- :
-
- emptyMarkup(
-  "📊",
-  "ยังไม่มีรายจ่ายในช่วงนี้",
-  "เมื่อเริ่มบันทึกข้อมูลจะแสดงสถิติที่นี่"
- );
-
-}
-
-
-/* ---------- RECURRING ---------- */
-
-function renderRecurring(){
-
- let month=
- new Date().toISOString().slice(0,7);
-
- $("recurringList").innerHTML=
-
- state.recurring.length?
-
- state.recurring.map((b,i)=>{
-
-  let paid=b.paidMonth===month;
-
-  return `
-
-  <div class="list-item">
-
-   <div class="cat-icon">
-    <span class="icon">🔁</span>
+ <head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260904-05-c4a2e96","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/9e99ecf74af2a081.telemetry_sdk.js" integrity="sha512-tZ7fmfTx2KpCLjXQnEuL9azQ4A5+7+xumsx6r/WYVD0zCP/8LP8hDeCypMQesmP+WyAew4g7l5Ah23Bjd6yoVg=="></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <meta name="theme-color" content="#F5F2FF">
+  <title>หมูเด้ง Smart Budget</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Krub:wght@500;600&amp;family=Sarabun:wght@400;500&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root{--ink:#111827;--muted:#475569;--paper:#fff;--canvas:#F7F5FF;--canvas2:#EEEAFE;--accent:#7056D9;--accent2:#5840BF;--soft:#EEEAFE;--line:#E7E3F2;--shadow:0 16px 38px rgba(44,30,105,.11);--good:#10B981;--bad:#F43F5E}
+    body.green{--canvas:#F2FCF8;--canvas2:#DDF8EE;--accent:#149C78;--accent2:#08775A;--soft:#DDF8EE;--line:#D8EEE5;--shadow:0 16px 38px rgba(10,100,73,.10)}
+    body.orange{--canvas:#FFF8F4;--canvas2:#FFE8DE;--accent:#DD7449;--accent2:#B95029;--soft:#FFE8DE;--line:#F3E0D5;--shadow:0 16px 38px rgba(150,69,34,.10)}
+    body.pink{--canvas:#FFF6FA;--canvas2:#FFE5F0;--accent:#D9538D;--accent2:#B52E68;--soft:#FFE5F0;--line:#F2DFE8;--shadow:0 16px 38px rgba(152,38,90,.10)}body.daylight{--ambient:#FFE8D6}body.evening{--ambient:#E8E1FF}body{background:linear-gradient(150deg,var(--canvas),var(--canvas2) 70%,var(--ambient,#fff))}
+    *{box-sizing:border-box} body{margin:0;width:100%;min-height:calc(100 * min(var(--vh,1vh),1vh));background:linear-gradient(150deg,var(--canvas),var(--canvas2) 70%,var(--ambient,#fff));color:#111827;font-family:"Sarabun",sans-serif;font-size:18px;line-height:1.6;letter-spacing:.3px;transition:background .28s ease;position:relative;overflow-x:hidden} body::before,body::after{content:"";position:fixed;z-index:-1;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.72),rgba(238,234,254,.08) 68%,transparent 72%);filter:blur(3px);pointer-events:none;animation:float 8s ease-in-out infinite}body::before{top:8%;left:-55px}body::after{right:-48px;bottom:22%;width:130px;height:130px;animation-delay:-3.5s}@keyframes float{0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.55}50%{transform:translate3d(18px,-24px,0) scale(1.12);opacity:.95}}
+    p,label,input,textarea,span{font-family:"Sarabun",sans-serif;line-height:1.6;letter-spacing:.3px;color:var(--ink)} button,input,select,textarea{font:inherit} button{cursor:pointer} button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);outline-offset:2px}
+    h1,h2,h3,button{font-family:"Krub",sans-serif;line-height:1.6;letter-spacing:.3px;color:#111827} h1,h2,h3,p{margin:0}h1{font-size:34px;font-weight:700}h2{font-size:24px;font-weight:700}h3{font-size:20px;font-weight:700}.field label{font-size:16px}.tiny{font-size:16px}.money{font-size:28px}.balance-number{font-size:34px;font-weight:800}
+    .app-shell{width:100%;max-width:630px;margin:auto;padding:21px 16px 108px}.screen{animation:up .22s ease}.hidden{display:none!important}@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .tiny{font-size:16px}.muted{color:var(--muted)}.money{font-family:"Sarabun",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.3px}.income{color:var(--good)!important}.expense{color:var(--bad)!important}
+    .topbar,.between{display:flex;align-items:center;justify-content:space-between;gap:12px}.topbar{margin-bottom:18px}.glass{background:rgba(255,255,255,.91);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.95);box-shadow:var(--shadow);border-radius:25px;transition:transform .22s cubic-bezier(.68,-.6,.32,1.6),box-shadow .22s ease}.glass:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 20px 42px rgba(112,86,217,.20),0 0 24px rgba(248,169,196,.18)}.card{padding:17px;margin-top:16px}.quick,.primary,.secondary,.danger,.icon-btn,.theme-btn,.nav button,.segment button{transition:transform .2s cubic-bezier(.68,-.6,.32,1.6),box-shadow .2s ease}.quick:hover,.primary:hover,.secondary:hover,.danger:hover,.icon-btn:hover,.theme-btn:hover,.nav button:hover,.segment button:hover,.cat-icon:hover,.mascot:hover{transform:translateY(-6px) scale(1.02)}.quick:active,.primary:active,.secondary:active,.danger:active,.icon-btn:active,.cat-icon:active,.mascot:active{transform:translateY(-2px) scale(.98)}
+    .avatar{width:56px;height:56px;border-radius:20px;overflow:hidden;display:grid;place-items:center;background:#fff;box-shadow:0 7px 16px rgba(31,25,70,.12);color:var(--accent);flex:none}.avatar.large{width:84px;height:84px;border-radius:29px;margin:0 auto 11px}.avatar img{height:100%;width:100%;object-fit:cover}.avatar svg{width:78%;height:78%;stroke-width:2.2}
+    .profile-trigger{border:0;background:transparent;color:var(--ink);padding:0;display:flex;gap:12px;align-items:center;text-align:left}.profile-name{display:block;font-family:"Krub",sans-serif;font-size:25px;line-height:1.6;letter-spacing:.3px}.icon-btn{width:48px;height:48px;display:grid;place-items:center;border:0;border-radius:16px;background:#fff;color:var(--ink);box-shadow:0 5px 14px rgba(30,22,69,.08)}.icon-btn svg{width:22px;height:22px;stroke-width:2.2}
+    .balance{padding:22px;background:linear-gradient(135deg,#fff,rgba(255,255,255,.74))}.balance-number{font-size:34px;line-height:1.2;font-weight:800;margin-top:7px}.currency{border:0;min-height:43px;border-radius:14px;padding:8px;background:var(--soft);color:var(--accent2);font-weight:800}.progress{height:18px;border-radius:999px;overflow:hidden;background:#F1ECFF;box-shadow:0 0 0 4px rgba(221,248,238,.55);position:relative}.progress::after{content:'♡';position:absolute;right:8px;top:50%;transform:translateY(-55%);color:#D8CCFF;font-size:15px}.progress span{height:100%;display:block;border-radius:inherit;background:linear-gradient(90deg,#F8A9C4,#BCA7FF);transition:width .45s ease,background-color .45s ease;animation:softPulse 2.2s ease-in-out infinite;position:relative}.progress span::after{content:'♥';position:absolute;right:5px;top:50%;transform:translateY(-55%);color:#fff;font-size:12px;text-shadow:0 1px 2px rgba(112,86,217,.18)}.primary{animation:softPulse 2.6s ease-in-out infinite}.budget-status{border-radius:999px;background:var(--soft);padding:3px 10px;width:max-content;max-width:100%}@keyframes softPulse{0%,100%{box-shadow:0 0 0 rgba(16,185,129,0)}50%{box-shadow:0 0 16px rgba(16,185,129,.32)}}.celebrate{animation:celebrate .7s cubic-bezier(.68,-.6,.32,1.6)}@keyframes celebrate{0%{transform:scale(1)}35%{transform:scale(1.06)}70%{transform:scale(.99)}100%{transform:scale(1)}}.progress span.status-plan{background:#10B981}.progress span.status-near{background:#F97316}.progress span.status-low{background:#EAB308}.progress span.status-over{background:#EF4444}.budget-status{display:flex;justify-content:space-between;gap:10px;margin-top:7px;font-size:14px;font-weight:800}.budget-status.plan{color:#059669}.budget-status.near{color:#EA580C}.budget-status.low{color:#A16207}.budget-status.over{color:#DC2626}
+    .stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:13px;border-radius:16px;background:#F8FAFC}.stat b{display:block;font-size:19px;margin-top:3px}.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.quick{min-height:76px;padding:8px 4px;border:0;border-radius:18px;background:var(--soft);color:var(--accent2);font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}.quick svg{width:21px;height:21px;stroke-width:2.2}
+    .field{margin-top:13px}.field label{display:block;margin-bottom:6px;font-weight:800;font-size:15px}.input,.select,.textarea{width:100%;min-height:50px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:11px 13px;color:var(--ink)}.textarea{min-height:78px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.primary,.secondary,.danger{border:0;min-height:48px;padding:10px 15px;border-radius:14px;font-weight:800}.primary{background:var(--accent);color:#fff;box-shadow:0 10px 18px color-mix(in srgb,var(--accent) 27%,transparent)}.secondary{background:var(--soft);color:var(--accent2)}.danger{background:#FFF0F3;color:#BE123C}.full{width:100%}
+    .segment{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:16px;background:linear-gradient(135deg,#f3e8ff 0%,#ffffff 100%);box-shadow:0 10px 25px rgba(147,51,234,.08)}.segment button{border:0;min-height:43px;border-radius:12px;background:transparent;color:var(--muted);font-weight:800}.segment button.active{background:#fff;color:var(--accent2);box-shadow:0 3px 9px rgba(30,25,60,.09)}
+    .list-item{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid var(--line)}.list-item:last-child{border-bottom:0}.cat-icon{width:44px;height:44px;border-radius:15px;background:var(--soft);color:var(--accent2);display:grid;place-items:center;flex:none}.cat-icon svg{width:21px;stroke-width:2.2}.list-main{flex:1;min-width:0}.truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.delete{border:0;background:transparent;color:var(--muted);padding:4px;font-size:13px}
+    .empty{text-align:center;padding:29px 8px;color:var(--muted)}.empty svg{width:38px;height:38px;color:var(--accent);margin-bottom:7px}.search{position:relative;margin-top:12px}.search svg{position:absolute;left:14px;top:14px;width:21px;color:var(--muted)}.search .input{padding-left:43px}.preview{display:none;width:100%;height:150px;object-fit:cover;border:1px solid var(--line);border-radius:15px;margin-top:9px}
+    .donut{width:187px;height:187px;border-radius:50%;display:grid;place-items:center;margin:20px auto;background:#E8EDF2}.donut-core{width:125px;height:125px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center}.rank{display:flex;align-items:center;gap:9px;padding:11px 0}.rank-name{width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank-track{flex:1;height:9px;overflow:hidden;border-radius:99px;background:#E8EDF2}.rank-track span{display:block;height:100%;border-radius:inherit;background:var(--accent)}
+    .profile-card{text-align:center;padding:22px}.theme-row{display:flex;gap:14px;justify-content:center;margin-top:14px}.theme-btn{width:35px;height:35px;border-radius:50%;border:3px solid transparent}.theme-btn.active{outline:2px solid var(--ink);outline-offset:3px}.theme-btn.purple{background:#9C82EA}.theme-btn.green{background:#62C9A6}.theme-btn.orange{background:#F2A477}.theme-btn.pink{background:#E77AAA}
+    .goal{padding:14px 0;border-bottom:1px solid var(--line)}.goal:last-child{border-bottom:0}.goal .progress{margin-top:8px}.answer{padding:15px;margin-top:12px;border-radius:16px;background:var(--soft)}.answer b{font-size:28px;display:block;margin-top:2px}
+    .nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,630px);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 9px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.94);border-top:1px solid rgba(255,255,255,.9);backdrop-filter:blur(16px)}.nav button{min-height:57px;border:0;border-radius:16px;background:transparent;color:#718096;font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.nav button.active{background:var(--soft);color:var(--accent2)}.nav svg{width:22px;height:22px;stroke-width:2.2}
+    .cheer-card{display:flex;align-items:center;gap:13px;padding:14px 16px;background:linear-gradient(135deg,#FFF5FA,#F1ECFF);border:1px solid #F5DCEB}.mascot{width:58px;height:58px;border-radius:22px;display:grid;place-items:center;flex:none;background:#FFDDEB;color:#D9538D;box-shadow:0 7px 16px rgba(217,83,141,.16);animation:mascotBounce 2.8s ease-in-out infinite}.guardian-svg{width:52px;height:52px;transition:transform .2s ease}.mascot:hover .guardian-svg{transform:translateY(-5px)}.cheer-copy{flex:1}.cheer-copy strong{display:block;color:#5840BF;font-family:"Krub",sans-serif;font-size:18px}.saving-plant-card{display:flex;align-items:center;gap:14px;box-shadow:0 12px 28px rgba(248,169,196,.16),0 0 22px rgba(188,167,255,.14)}.saving-plant-visual{font-size:42px;line-height:1;filter:drop-shadow(0 8px 10px rgba(112,86,217,.18));transition:transform .45s ease,filter .45s ease}.saving-plant-card:hover .saving-plant-visual{transform:translateY(-6px) scale(1.04)}.streak-badge{display:flex;align-items:center;gap:7px;width:max-content;margin-top:5px;padding:5px 10px;border-radius:999px;background:#FFF0B8;color:#9A6700;font-weight:800;font-size:14px;animation:badgeGlow 2s ease-in-out infinite}.streak-badge svg{width:17px;height:17px}@keyframes mascotBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes badgeGlow{0%,100%{box-shadow:0 0 0 rgba(245,158,11,0)}50%{box-shadow:0 0 15px rgba(245,158,11,.28)}}.sparkle{position:fixed;z-index:80;pointer-events:none;font-size:20px;animation:sparklePop .8s ease-out forwards}@keyframes sparklePop{0%{opacity:0;transform:translate(0,10px) scale(.4)}25%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.15)}}
+    .modal{position:fixed;z-index:50;inset:0;padding:18px;display:none;place-items:center;background:rgba(15,23,42,.46);backdrop-filter:blur(4px)}.modal.show{display:grid}.modal-box{width:min(100%,435px);max-height:88%;overflow:auto;background:#fff;border-radius:25px;padding:21px;box-shadow:0 24px 65px rgba(15,23,42,.25)}.modal-actions{display:flex;gap:9px;margin-top:18px}.modal-actions>*{flex:1}.toast{position:fixed;z-index:70;bottom:93px;left:50%;width:min(calc(100% - 32px),430px);transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#0F172A;color:#fff;border-radius:14px;text-align:center;padding:13px 17px;font-weight:700;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(min-width:700px){.app-shell{padding-top:30px}.balance{padding:26px}}
+  </style>
+  <script src="/_sdk/fcb6dc01f91829ac.resizing_sdk.js" type="text/javascript" integrity="sha512-YK8JfnN705qaEaVhiL7pcVB2Rs/BbdX5yxV55Az8zT/1JanyEWTw9HqCF915m9iV1YEaoil8qsjJz03l1Kb0Ug=="></script>
+  <script src="/_sdk/fbe2ebfd64647c54.data_sdk.js" type="text/javascript" integrity="sha512-vkTX6CfvpHc3WbjK+tFJCaDuw4ERA4aEV/e5/7+MMJPMTF4RJYCI6CAwJBT/gtDW+dba4uLSsPUgDjVDHWtgUQ=="></script>
+ </head>
+ <body data-template-id="__page-root" class="purple">
+  <main class="app-shell">
+   <section id="home" class="screen" aria-label="หน้าหลัก">
+    <header class="topbar"><button type="button" class="profile-trigger" onclick="openProfile()" aria-label="แก้ไขโปรไฟล์"> <span class="avatar" id="homeAvatar"></span> <span><span data-template-id="home-greeting" class="canva-text tiny muted"></span><strong id="homeName" class="profile-name"></strong></span> </button> <button type="button" class="icon-btn" onclick="openProfile()" aria-label="แก้ไขโปรไฟล์"><i data-lucide="pencil"></i></button>
+    </header>
+    <article data-template-id="daily-cheer-card" class="canva-card glass cheer-card">
+     <div class="mascot" id="budgetGuardian" aria-label="ผู้พิทักษ์งบประมาณ">
+      <svg class="guardian-svg guardian-happy" viewbox="0 0 80 80" role="img" aria-label="ผู้พิทักษ์งบประมาณยิ้ม"><path d="M20 30V18c0-6 8-8 12-2l3 5 3-5c4-6 12-4 12 2v12" fill="#FFDAC1" stroke="#FF9AA2" stroke-width="3" stroke-linecap="round" /><path d="M16 36c0-14 11-23 24-23s24 9 24 23v13c0 11-11 18-24 18S16 60 16 49V36Z" fill="#FFB7B2" stroke="#FF9AA2" stroke-width="3" /><circle cx="31" cy="39" r="2.5" fill="#0F172A" /><circle cx="49" cy="39" r="2.5" fill="#0F172A" /><path d="M34 49c4 4 8 4 12 0" fill="none" stroke="#0F172A" stroke-width="3" stroke-linecap="round" /><path d="M38 48l2 2 2-2" fill="#FF9AA2" />
+      </svg>
+      <svg class="guardian-alert hidden" viewbox="0 0 80 80" role="img" aria-label="ผู้พิทักษ์งบประมาณกำลังเตือน"><path d="M20 30V18c0-6 8-8 12-2l3 5 3-5c4-6 12-4 12 2v12" fill="#C7CEEA" stroke="#FF9AA2" stroke-width="3" stroke-linecap="round" /><path d="M16 36c0-14 11-23 24-23s24 9 24 23v13c0 11-11 18-24 18S16 60 16 49V36Z" fill="#E2F0CB" stroke="#FF9AA2" stroke-width="3" /><circle cx="31" cy="39" r="3" fill="#0F172A" /><circle cx="49" cy="39" r="3" fill="#0F172A" /><circle cx="58" cy="28" r="3" fill="#B5EAD7" /><path d="M36 52c3-3 5-3 8 0" fill="none" stroke="#0F172A" stroke-width="3" stroke-linecap="round" />
+      </svg>
+     </div>
+     <div class="cheer-copy">
+      <strong id="dailyCheer">วันนี้เก่งมาก!</strong><span data-template-id="cheer-helper" class="canva-text tiny muted">ค่อยๆ เก็บเล็กผสมน้อยนะ</span>
+      <div class="streak-badge">
+       <i data-lucide="flame"></i><span>เช็กอิน <b id="streakCount">0</b> วันติด</span>
+      </div>
+     </div>
+    </article>
+    <article data-template-id="saving-plant-card" class="canva-card glass card saving-plant-card" aria-label="กระถางต้นไม้ออมเงิน">
+     <div class="saving-plant-visual" id="savingPlant" aria-hidden="true">
+      <svg viewbox="0 0 64 64" width="48" height="48" aria-hidden="true"><path d="M32 58V35M32 44c-10 0-16-5-16-13 9 0 16 4 16 13Zm0-7c0-10 7-16 16-16 0 9-6 16-16 16Z" fill="#B5EAD7" stroke="#149C78" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /><path d="M24 58h16" stroke="#FFB7B2" stroke-width="4" stroke-linecap="round" />
+      </svg>
+     </div>
+     <div>
+      <strong data-template-id="saving-plant-title" class="canva-text">ต้นไม้ออมเงิน</strong>
+      <p class="tiny muted" id="savingPlantText">เริ่มออมวันนี้ แล้วดูน้องเติบโตนะ</p>
+     </div>
+     <div id="goalList" class="w-full"></div>
+    </article>
+    <article data-template-id="balance-card" class="canva-card glass balance">
+     <div class="between">
+      <p data-template-id="balance-label" class="canva-text muted" style="font-weight:800"></p><button type="button" class="icon-btn" onclick="toggleMoney()" aria-label="ซ่อนหรือแสดงยอดเงิน"><i id="eyeIcon" data-lucide="eye"></i></button>
+     </div>
+     <div class="between" style="align-items:flex-end;margin-top:4px">
+      <strong id="balanceValue" class="money balance-number">฿0.00</strong><select id="currency" class="currency" aria-label="เลือกสกุลเงิน"><option>THB</option><option>USD</option><option>EUR</option><option>JPY</option></select>
+     </div>
+     <p data-template-id="balance-helper" class="canva-text tiny muted" style="margin-top:4px"></p>
+     <div style="margin-top:20px">
+      <div class="between">
+       <div>
+        <strong data-template-id="daily-budget-title" class="canva-text"></strong>
+        <p data-template-id="daily-budget-helper" class="canva-text tiny muted"></p>
+       </div><b id="dailyValue" class="money"></b>
+      </div>
+      <div class="progress" style="margin-top:9px">
+       <span id="gauge"></span>
+      </div>
+      <div id="budgetStatus" class="budget-status plan">
+       <span id="budgetStatusText">อยู่ในแผน</span><span id="budgetPercent">0%</span>
+      </div>
+      <div id="budgetUsage" class="tiny muted" style="margin-top:3px">
+       ใช้ไป ฿0 / ฿0
+      </div>
+     </div>
+     <div class="stat-grid" style="margin-top:15px">
+      <div class="stat">
+       <span data-template-id="week-label" class="canva-text tiny muted"></span><b id="weekSpent" class="money expense"></b>
+      </div>
+      <div class="stat">
+       <span data-template-id="month-label" class="canva-text tiny muted"></span><b id="monthSpent" class="money expense"></b>
+      </div>
+     </div>
+    </article>
+    <article data-template-id="quick-card" class="canva-card glass card">
+     <h2 data-template-id="quick-title" class="canva-text"></h2>
+     <div class="quick-grid"><button data-template-id="quick-food" class="canva-button quick" type="button" onclick="quickAdd('อาหาร')"><i data-lucide="utensils"></i><span data-template-id="quick-food-label" class="canva-text"></span></button> <button data-template-id="quick-drink" class="canva-button quick" type="button" onclick="quickAdd('เครื่องดื่ม')"><i data-lucide="coffee"></i><span data-template-id="quick-drink-label" class="canva-text"></span></button> <button data-template-id="quick-travel" class="canva-button quick" type="button" onclick="quickAdd('เดินทาง')"><i data-lucide="bus-front"></i><span data-template-id="quick-travel-label" class="canva-text"></span></button> <button data-template-id="quick-shop" class="canva-button quick" type="button" onclick="quickAdd('ช้อปปิ้ง')"><i data-lucide="shopping-bag"></i><span data-template-id="quick-shop-label" class="canva-text"></span></button>
+     </div>
+    </article>
+    <article data-template-id="recurring-card" class="canva-card glass card">
+     <div class="between">
+      <h2 data-template-id="recurring-title" class="canva-text"></h2><button data-template-id="recurring-add" class="canva-button secondary" type="button" onclick="addRecurringBill()"></button>
+     </div>
+     <div id="recurringList"></div>
+    </article><button data-template-id="savings-quick-action" class="canva-button glass card full" type="button" onclick="openModal('goalModal')" style="display:flex;align-items:center;gap:14px;text-align:left;color:#5840BF;background:linear-gradient(135deg,#FFF5C2,#FFE5F0);margin-top:16px"> <span class="cat-icon" aria-hidden="true"><i data-lucide="piggy-bank"></i></span><span><strong data-template-id="savings-quick-title" class="canva-text" style="display:block;font-family:Krub,sans-serif;font-size:22px;color:#111827"></strong><span data-template-id="savings-quick-helper" class="canva-text tiny muted"></span></span><i data-lucide="chevron-right" style="margin-left:auto"></i> </button>
+    <article data-template-id="budget-card" class="canva-card glass card">
+     <h2 data-template-id="budget-title" class="canva-text"></h2>
+     <form id="budgetForm">
+      <div class="two">
+       <div class="field">
+        <label data-template-id="allowance-label" class="canva-text" for="allowance"></label><input id="allowance" class="input money" type="number" min="0" step="any" inputmode="decimal">
+       </div>
+       <div class="field">
+        <label data-template-id="fixed-label" class="canva-text" for="fixed"></label><input id="fixed" class="input money" type="number" min="0" step="any" inputmode="decimal">
+       </div>
+      </div><button data-template-id="budget-save" class="canva-button primary full" type="submit" style="margin-top:15px"></button>
+     </form>
+    </article>
+    <article data-template-id="recent-card" class="canva-card glass card">
+     <div class="between">
+      <h2 data-template-id="recent-title" class="canva-text"></h2><button data-template-id="add-link" class="canva-button secondary" type="button" onclick="showScreen('transactions')" style="min-height:40px;padding:7px 12px"></button>
+     </div>
+     <div id="recentList"></div>
+    </article>
+   </section>
+   <section id="transactions" class="screen hidden" aria-label="ธุรกรรม">
+    <header class="topbar">
+     <div>
+      <p data-template-id="transaction-kicker" class="canva-text tiny muted"></p>
+      <h1 data-template-id="transaction-title" class="canva-text"></h1>
+     </div><button class="icon-btn" type="button" onclick="showScreen('home')" aria-label="กลับหน้าหลัก"><i data-lucide="arrow-left"></i></button>
+    </header>
+    <article data-template-id="transaction-form-card" class="canva-card glass card" style="margin-top:0">
+     <form id="txForm">
+      <div class="segment">
+       <button data-template-id="expense-tab" class="canva-button active" id="expenseTab" type="button" onclick="setType('expense')"></button><button data-template-id="income-tab" class="canva-button" id="incomeTab" type="button" onclick="setType('income')"></button>
+      </div>
+      <div class="field">
+       <label data-template-id="category-label" class="canva-text" for="txCategory"></label><select id="txCategory" class="select"><option>อาหาร</option><option>เดินทาง</option><option>เครื่องดื่ม</option><option>ช้อปปิ้ง</option><option>การศึกษา</option><option>บันเทิง</option><option>อื่น ๆ</option><option>รายรับ</option></select>
+      </div>
+      <div class="field">
+       <label data-template-id="amount-label" class="canva-text" for="txAmount"></label><input id="txAmount" class="input money" type="number" min="0" step="any" inputmode="decimal">
+      </div>
+      <div class="field">
+       <label data-template-id="date-label" class="canva-text" for="txDate"></label><input id="txDate" class="input" type="datetime-local" required>
+      </div>
+      <div class="field">
+       <label data-template-id="note-label" class="canva-text" for="txMemo"></label><textarea id="txMemo" class="textarea"></textarea>
+      </div>
+      <div class="field">
+       <label data-template-id="receipt-label" class="canva-text" for="receipt"></label><input id="receipt" class="input" type="file" accept="image/*"><img id="receiptPreview" class="preview" alt="ตัวอย่างรูปใบเสร็จ">
+      </div><button data-template-id="transaction-save" class="canva-button primary full" type="submit" style="margin-top:18px"></button>
+     </form>
+    </article>
+    <article data-template-id="history-card" class="canva-card glass card">
+     <h2 data-template-id="history-title" class="canva-text"></h2>
+     <div class="search">
+      <i data-lucide="search"></i><input data-template-id="search-input" id="search" class="canva-input input" type="search">
+     </div>
+     <div class="two" style="margin-top:10px">
+      <select id="filterCategory" class="select"><option value="">ทุกหมวดหมู่</option><option>อาหาร</option><option>เดินทาง</option><option>เครื่องดื่ม</option><option>ช้อปปิ้ง</option><option>การศึกษา</option><option>บันเทิง</option><option>อื่น ๆ</option><option>รายรับ</option></select><select id="filterPeriod" class="select"><option value="all">ทุกช่วงเวลา</option><option value="week">สัปดาห์นี้</option><option value="month">เดือนนี้</option></select>
+     </div>
+     <div id="txList"></div>
+    </article>
+   </section>
+   <section id="analytics" class="screen hidden" aria-label="วิเคราะห์">
+    <header class="topbar">
+     <div>
+      <p data-template-id="analytics-kicker" class="canva-text tiny muted"></p>
+      <h1 data-template-id="analytics-title" class="canva-text"></h1>
+     </div><button data-template-id="csv-header-btn" class="canva-button icon-btn" type="button" onclick="exportCSV()" aria-label="ส่งออก CSV"><i data-lucide="download"></i></button>
+    </header>
+    <article data-template-id="analytics-card" class="canva-card glass card" style="margin-top:0">
+     <div class="segment">
+      <button data-template-id="week-filter" class="canva-button active" data-range="week" type="button" onclick="setRange('week')"></button><button data-template-id="month-filter" class="canva-button" data-range="month" type="button" onclick="setRange('month')"></button>
+     </div>
+     <div id="donut" class="donut">
+      <div class="donut-core">
+       <div>
+        <strong id="chartSpent" class="money expense" style="font-size:21px"></strong>
+        <p data-template-id="chart-expense-label" class="canva-text tiny muted"></p>
+       </div>
+      </div>
+     </div>
+     <div class="stat-grid">
+      <div class="stat">
+       <span data-template-id="chart-income-label" class="canva-text tiny muted"></span><b id="chartIncome" class="money income"></b>
+      </div>
+      <div class="stat">
+       <span data-template-id="chart-net-label" class="canva-text tiny muted"></span><b id="chartNet" class="money"></b>
+      </div>
+     </div>
+    </article>
+    <article data-template-id="ranking-card" class="canva-card glass card">
+     <div class="between">
+      <h2 data-template-id="ranking-title" class="canva-text"></h2><button data-template-id="csv-btn" class="canva-button secondary" style="min-height:40px;padding:7px 12px" type="button" onclick="exportCSV()"></button>
+     </div>
+     <div id="rankList"></div>
+    </article>
+   </section>
+   <section id="profile" class="screen hidden" aria-label="โปรไฟล์และตั้งค่า">
+    <article data-template-id="profile-card" class="canva-card glass profile-card" style="margin-top:0">
+     <div class="avatar large" id="profileAvatar"></div>
+     <h1 id="profileName"></h1><button data-template-id="profile-edit-btn" class="canva-button secondary" type="button" onclick="openProfile()" style="margin-top:10px;min-height:40px;padding:7px 13px"></button>
+    </article>
+    <article data-template-id="theme-card" class="canva-card glass card">
+     <h2 data-template-id="theme-title" class="canva-text"></h2>
+     <div class="theme-row">
+      <button class="theme-btn purple" data-theme="purple" type="button" onclick="setTheme('purple')" aria-label="ธีมสีม่วง"></button><button class="theme-btn green" data-theme="green" type="button" onclick="setTheme('green')" aria-label="ธีมสีเขียว"></button><button class="theme-btn orange" data-theme="orange" type="button" onclick="setTheme('orange')" aria-label="ธีมสีส้ม"></button><button class="theme-btn pink" data-theme="pink" type="button" onclick="setTheme('pink')" aria-label="ธีมสีชมพู"></button>
+     </div>
+    </article>
+    <article data-template-id="split-card" class="canva-card glass card">
+     <h2 data-template-id="split-title" class="canva-text"></h2>
+     <div class="two" style="margin-top:12px">
+      <div>
+       <label data-template-id="bill-label" class="canva-text tiny" style="font-weight:800" for="billTotal"></label><input id="billTotal" class="input money" type="number" min="0" step="any" inputmode="decimal">
+      </div>
+      <div>
+       <label data-template-id="people-label" class="canva-text tiny" style="font-weight:800" for="billPeople"></label><input id="billPeople" class="input money" type="number" min="1" value="2" inputmode="numeric">
+      </div>
+     </div>
+     <div class="answer">
+      <span data-template-id="each-label" class="canva-text tiny muted"></span><b id="billEach" class="money"></b>
+     </div>
+    </article>
+    <article data-template-id="data-card" class="canva-card glass card">
+     <h2 data-template-id="data-title" class="canva-text"></h2>
+     <div class="two" style="margin-top:13px">
+      <button data-template-id="pin-btn" class="canva-button secondary" type="button" onclick="openModal('pinModal')"></button><button data-template-id="backup-btn" class="canva-button secondary" type="button" onclick="exportBackup()"></button><label data-template-id="restore-label" class="canva-button secondary" style="display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer"><span data-template-id="restore-label-text" class="canva-text"></span><input id="restoreInput" class="hidden" type="file" accept=".json,application/json"></label><button data-template-id="clear-btn" class="canva-button danger" type="button" onclick="openModal('clearModal')"></button><button data-template-id="survey-open-btn" class="canva-button secondary" type="button" onclick="openSurvey()"></button>
+     </div>
+    </article>
+   </section>
+  </main>
+  <nav class="nav" aria-label="เมนูหลัก"><button data-template-id="nav-home" class="canva-button active" data-screen="home" type="button" onclick="showScreen('home')"><i data-lucide="house"></i><span data-template-id="nav-home-label" class="canva-text"></span></button> <button data-template-id="nav-transactions" class="canva-button" data-screen="transactions" type="button" onclick="showScreen('transactions')"><i data-lucide="receipt-text"></i><span data-template-id="nav-transactions-label" class="canva-text"></span></button> <button data-template-id="nav-analytics" class="canva-button" data-screen="analytics" type="button" onclick="showScreen('analytics')">
+    <svg aria-hidden="true" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5" /><path d="M4 19h16" /><path d="m7 15 3-4 3 2 4-6" />
+    </svg><span data-template-id="nav-analytics-label" class="canva-text"></span></button> <button data-template-id="nav-profile" class="canva-button" data-screen="profile" type="button" onclick="showScreen('profile')"><i data-lucide="user-round"></i><span data-template-id="nav-profile-label" class="canva-text"></span></button>
+  </nav>
+  <div id="profileModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+   <div class="modal-box">
+    <h2 data-template-id="profile-modal-title" id="profile-modal-title" class="canva-text"></h2>
+    <div class="field">
+     <label data-template-id="name-input-label" class="canva-text" for="nameInput"></label><input id="nameInput" class="input" type="text" maxlength="40">
+    </div>
+    <div class="field">
+     <label data-template-id="photo-upload-label" class="canva-text" for="avatarUpload"></label><input id="avatarUpload" class="input" type="file" accept="image/*">
+    </div>
+    <div class="modal-actions">
+     <button data-template-id="modal-cancel" class="canva-button secondary" type="button" onclick="closeModal('profileModal')"></button><button data-template-id="modal-save" id="saveNameBtn" class="canva-button primary" type="button"></button>
+    </div>
    </div>
-
-   <div class="list-main">
-
-    <b>${esc(b.name)}</b>
-
-    <p class="tiny muted money">
-     ${money(b.amount)}
-     ${paid?" · ชำระแล้ว":""}
-    </p>
-
-   </div>
-
-   <button
-    class="${paid?"secondary":"primary"}"
-    ${paid?"disabled":`onclick="payRecurring(${i})"`}>
-    ${paid?"ชำระแล้ว":"จ่าย"}
-   </button>
-
   </div>
-
-  `;
-
- }).join("")
-
- :
-
- emptyMarkup(
-  "🔁",
-  "ยังไม่มีรายจ่ายประจำ",
-  "เพิ่มบิลที่ต้องจ่ายทุกเดือนได้ที่นี่"
- );
-
-}
-
-
-function addRecurringBill(){
-
- let name=prompt("ชื่อรายจ่ายประจำ เช่น ค่าเน็ตมือถือ");
-
- if(!name)return;
-
- let amount=
- parseFloat(
-  prompt("จำนวนเงิน")||"0"
- );
-
- if(!amount||amount<=0){
-
-  toast("กรุณากรอกจำนวนเงินให้ถูกต้อง");
-  return;
-
- }
-
- state.recurring.push({
-  id:id(),
-  name:name.trim(),
-  amount:amount,
-  paidMonth:""
- });
-
- save();
- renderRecurring();
-
- toast("เพิ่มรายจ่ายประจำแล้ว");
-
-}
-
-
-function payRecurring(index){
-
- let b=state.recurring[index];
-
- if(!b)return;
-
- let month=
- new Date().toISOString().slice(0,7);
-
- if(b.paidMonth===month)return;
-
- b.paidMonth=month;
-
- state.transactions.push({
-  id:id(),
-  type:"expense",
-  category:"ค่าใช้จ่ายประจำ",
-  amount:Number(b.amount),
-  date:new Date().toISOString(),
-  memo:b.name,
-  receipt:""
- });
-
- save();
- renderAll();
-
- toast("ชำระ "+b.name+" แล้ว");
-
-}
-
-
-/* ---------- GOALS ---------- */
-
-function renderGoals(){
-
- $("goalList").innerHTML=
-
- state.goals.length?
-
- state.goals.map(g=>{
-
-  let pc=
-   Math.min(
-    100,
-    g.saved/g.amount*100
-   );
-
-  let days=
-   Math.max(
-    1,
-    Math.ceil(
-     (new Date(g.date+"T23:59")-new Date())/
-     86400000
-    )
-   );
-
-  let daily=
-   Math.max(0,g.amount-g.saved)/days;
-
-  return `
-
-  <div class="goal">
-
-   <div class="between">
-
-    <b>${esc(g.name)}</b>
-
-    <button
-     class="delete"
-     onclick="deleteGoal('${g.id}')">
-     ลบ
-    </button>
-
+  <div id="impulseModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="impulse-title">
+   <div class="modal-box">
+    <h2 data-template-id="impulse-title" id="impulse-title" class="canva-text"></h2>
+    <p data-template-id="impulse-text" class="canva-text muted" style="margin-top:8px"></p>
+    <div class="modal-actions">
+     <button data-template-id="impulse-back" class="canva-button secondary" type="button" onclick="closeModal('impulseModal')"></button><button data-template-id="impulse-confirm" class="canva-button primary" type="button" onclick="saveTransaction()"></button>
+    </div>
    </div>
-
-   <div
-    class="between tiny muted"
-    style="margin-top:3px">
-
-    <span class="money">
-     ${money(g.saved)} / ${money(g.amount)}
-    </span>
-
-    <span>${Math.round(pc)}%</span>
-
-   </div>
-
-   <div class="progress">
-    <span style="width:${pc}%"></span>
-   </div>
-
-   <p class="tiny" style="margin-top:8px">
-    แนะนำเก็บ
-    <b class="money">${money(daily)}</b>
-    ต่อวัน
-   </p>
-
   </div>
-
-  `;
-
- }).join("")
-
- :
-
- emptyMarkup(
-  "🐷",
-  "ยังไม่มีกระปุกเป้าหมาย",
-  "เพิ่มเป้าหมายเพื่อเริ่มวางแผนการออม"
- );
-
-}
-
-
-/* ---------- GENERAL RENDER ---------- */
-
-function renderAll(){
-
- $("currency").value=state.currency||"THB";
-
- renderHome();
- renderTransactions();
- renderAnalytics();
- renderGoals();
- renderRecurring();
- splitBill();
-
-}
-
-
-/* ---------- NAV ---------- */
-
-function showScreen(screen){
-
- document
- .querySelectorAll(".screen")
- .forEach(x=>
-  x.classList.toggle(
-   "hidden",
-   x.id!==screen
-  )
- );
-
- document
- .querySelectorAll(".nav button")
- .forEach(x=>
-  x.classList.toggle(
-   "active",
-   x.dataset.screen===screen
-  )
- );
-
- if(screen==="transactions")
-  renderTransactions();
-
- if(screen==="analytics")
-  renderAnalytics();
-
- if(screen==="profile")
-  renderGoals();
-
- window.scrollTo({
-  top:0,
-  behavior:"smooth"
- });
-
-}
-
-
-/* ---------- TYPE ---------- */
-
-function setType(next){
-
- type=next;
-
- $("expenseTab")
- .classList.toggle(
-  "active",
-  next==="expense"
- );
-
- $("incomeTab")
- .classList.toggle(
-  "active",
-  next==="income"
- );
-
- if(next==="income")
-  $("txCategory").value="รายรับ";
-
-}
-
-
-/* ---------- QUICK ADD ---------- */
-
-function quickAdd(category){
-
- showScreen("transactions");
-
- setType("expense");
-
- $("txCategory").value=category;
-
- $("txAmount").focus();
-
-}
-
-
-/* ---------- TRANSACTION FORM ---------- */
-
-$("txForm").addEventListener(
- "submit",
- function(e){
-
-  e.preventDefault();
-
-  let amount=
-   parseFloat(
-    $("txAmount").value.replace(/,/g,"")
-   );
-
-  if(isNaN(amount)||amount<=0){
-
-   toast("กรุณากรอกจำนวนเงินให้ถูกต้อง");
-   return;
-
-  }
-
-  pending={
-   id:id(),
-   type:type,
-   category:$("txCategory").value,
-   amount:amount,
-   date:$("txDate").value,
-   memo:$("txMemo").value.trim(),
-   receipt:$("receiptPreview").dataset.image||""
-  };
-
-  if(
-   type==="expense" &&
-   amount>300
-  ){
-
-   openModal("impulseModal");
-
-  }else{
-
-   saveTransaction();
-
-  }
-
- }
-);
-
-
-function saveTransaction(){
-
- if(!pending)return;
-
- state.transactions.push(pending);
-
- pending=null;
-
- closeModal("impulseModal");
-
- $("txForm").reset();
-
- $("receiptPreview").style.display="none";
-
- $("receiptPreview").dataset.image="";
-
- setNow();
-
- save();
-
- renderAll();
-
- toast("บันทึกรายการแล้ว");
-
-}
-
-
-function deleteTx(txid){
-
- state.transactions=
- state.transactions.filter(
-  x=>x.id!==txid
- );
-
- save();
- renderAll();
-
- toast("ลบรายการแล้ว");
-
-}
-
-
-/* ---------- RECEIPT ---------- */
-
-$("receipt").addEventListener(
- "change",
- function(e){
-
-  let f=e.target.files[0];
-
-  if(!f)return;
-
-  let reader=new FileReader();
-
-  reader.onload=function(){
-
-   $("receiptPreview").src=reader.result;
-
-   $("receiptPreview").dataset.image=
-    reader.result;
-
-   $("receiptPreview").style.display=
-    "block";
-
-  };
-
-  reader.readAsDataURL(f);
-
- }
-);
-
-
-/* ---------- SEARCH ---------- */
-
-$("search").addEventListener(
- "input",
- renderTransactions
-);
-
-$("filterCategory").addEventListener(
- "change",
- renderTransactions
-);
-
-$("filterPeriod").addEventListener(
- "change",
- renderTransactions
-);
-
-
-/* ---------- CURRENCY ---------- */
-
-$("currency").addEventListener(
- "change",
- function(){
-
-  state.currency=this.value;
-
-  save();
-  renderAll();
-
- }
-);
-
-
-/* ---------- BUDGET ---------- */
-
-$("budgetForm").addEventListener(
- "submit",
- function(e){
-
-  e.preventDefault();
-
-  let allowance=
-   parseFloat(
-    $("allowance").value.replace(/,/g,"")
-   )||0;
-
-  let fixed=
-   parseFloat(
-    $("fixed").value.replace(/,/g,"")
-   )||0;
-
-  if(allowance<0||fixed<0){
-
-   toast("กรุณากรอกจำนวนเงินให้ถูกต้อง");
-   return;
-
-  }
-
-  state.allowance=allowance;
-  state.fixed=fixed;
-
-  save();
-  renderAll();
-
-  toast("บันทึกงบประมาณแล้ว");
-
- }
-);
-
-
-/* ---------- RANGE ---------- */
-
-function setRange(next){
-
- range=next;
-
- document
- .querySelectorAll("[data-range]")
- .forEach(x=>
-  x.classList.toggle(
-   "active",
-   x.dataset.range===next
-  )
- );
-
- renderAnalytics();
-
-}
-
-
-/* ---------- PROFILE ---------- */
-
-function openProfile(){
-
- $("nameInput").value=state.name;
-
- $("avatarUpload").value="";
-
- openModal("profileModal");
-
-}
-
-
-$("avatarUpload").addEventListener(
- "change",
- function(e){
-
-  let f=e.target.files[0];
-
-  if(!f)return;
-
-  let reader=new FileReader();
-
-  reader.onload=function(){
-
-   state.photo=reader.result;
-
-   $("profileAvatar").innerHTML=
-    avatar();
-
-  };
-
-  reader.readAsDataURL(f);
-
- }
-);
-
-
-function saveProfile(){
-
- let name=
-  $("nameInput").value.trim();
-
- if(!name){
-
-  toast("กรุณาใส่ชื่อ");
-  return;
-
- }
-
- state.name=name;
-
- save();
-
- closeModal("profileModal");
-
- renderHome();
-
- toast("บันทึกโปรไฟล์แล้ว");
-
-}
-
-
-$("saveNameBtn").addEventListener(
- "click",
- saveProfile
-);
-
-
-/* ---------- MODALS ---------- */
-
-function openModal(id){
-
- $(id).classList.add("show");
-
-}
-
-
-function closeModal(id){
-
- $(id).classList.remove("show");
-
-}
-
-
-/* ---------- GOAL ---------- */
-
-function saveGoal(){
-
- let name=
-  $("goalName").value.trim();
-
- let amount=
-  Number($("goalAmount").value);
-
- let saved=
-  Number($("goalSaved").value)||0;
-
- let date=
-  $("goalDate").value;
-
- if(!name||!amount||!date){
-
-  toast("กรอกข้อมูลเป้าหมายให้ครบ");
-  return;
-
- }
-
- state.goals.push({
-  id:id(),
-  name:name,
-  amount:amount,
-  saved:saved,
-  date:date
- });
-
- save();
-
- closeModal("goalModal");
-
- $("goalName").value="";
- $("goalAmount").value="";
- $("goalSaved").value="0";
- $("goalDate").value="";
-
- renderGoals();
-
- toast("เพิ่มเป้าหมายแล้ว");
-
-}
-
-
-function deleteGoal(gid){
-
- state.goals=
- state.goals.filter(
-  g=>g.id!==gid
- );
-
- save();
- renderGoals();
-
- toast("ลบเป้าหมายแล้ว");
-
-}
-
-
-/* ---------- SPLIT BILL ---------- */
-
-function splitBill(){
-
- let all=
-  Number($("billTotal").value)||0;
-
- let people=
-  Math.max(
-   1,
-   Number($("billPeople").value)||1
-  );
-
- $("billEach").textContent=
-  money(all/people);
-
-}
-
-
-$("billTotal").addEventListener(
- "input",
- splitBill
-);
-
-$("billPeople").addEventListener(
- "input",
- splitBill
-);
-
-
-/* ---------- PIN ---------- */
-
-function savePin(){
-
- let pin=
-  $("pinInput").value;
-
- if(!/^\d{4}$/.test(pin)){
-
-  toast("PIN ต้องเป็นตัวเลข 4 หลัก");
-  return;
-
- }
-
- state.pin=pin;
-
- save();
-
- closeModal("pinModal");
-
- $("pinInput").value="";
-
- toast("บันทึก PIN แล้ว");
-
-}
-
-
-/* ---------- THEME ---------- */
-
-function setTheme(theme,store=true){
-
- document.body.className=theme;
-
- state.theme=theme;
-
- document
- .querySelectorAll(".theme-btn")
- .forEach(x=>
-  x.classList.toggle(
-   "active",
-   x.dataset.theme===theme
-  )
- );
-
- if(store)
-  save();
-
-}
-
-
-/* ---------- HIDE MONEY ---------- */
-
-function toggleMoney(){
-
- state.hidden=!state.hidden;
-
- save();
-
- $("eyeButton").textContent=
-  state.hidden?"🙈":"👁️";
-
- renderAll();
-
-}
-
-
-/* ---------- DOWNLOAD ---------- */
-
-function download(blob,name){
-
- let a=
-  document.createElement("a");
-
- a.href=
-  URL.createObjectURL(blob);
-
- a.download=name;
-
- a.click();
-
- setTimeout(
-  ()=>URL.revokeObjectURL(a.href),
-  800
- );
-
-}
-
-
-/* ---------- CSV ---------- */
-
-function exportCSV(){
-
- let rows=[
-  ["วันที่","ประเภท","หมวดหมู่","จำนวนเงิน","บันทึก"],
-  ...state.transactions.map(
-   x=>[
-    x.date,
-    x.type==="income"?"รายรับ":"รายจ่าย",
-    x.category,
-    x.amount,
-    x.memo
-   ]
-  )
- ];
-
- let csv=
-  rows.map(
-   row=>
-    row.map(
-     v=>
-      '"'+
-      String(v||"")
-      .replaceAll('"','""')+
-      '"'
-    ).join(",")
-  ).join("\n");
-
- download(
-  new Blob(
-   ["\ufeff"+csv],
-   {type:"text/csv;charset=utf-8"}
-  ),
-  "moodeng-report.csv"
- );
-
- toast("ส่งออก CSV แล้ว");
-
-}
-
-
-/* ---------- BACKUP ---------- */
-
-function exportBackup(){
-
- download(
-  new Blob(
-   [JSON.stringify(state,null,2)],
-   {type:"application/json"}
-  ),
-  "moodeng-backup.json"
- );
-
- toast("สำรองข้อมูลแล้ว");
-
-}
-
-
-$("restoreInput").addEventListener(
- "change",
- function(e){
-
-  let f=e.target.files[0];
-
-  if(!f)return;
-
-  let reader=new FileReader();
-
-  reader.onload=function(){
-
-   try{
-
-    let data=
-     JSON.parse(reader.result);
-
-    if(
-     !Array.isArray(data.transactions)||
-     !Array.isArray(data.goals)
-    )
-     throw new Error();
-
-    state={
-     ...state,
-     ...data
-    };
-
-    $("currency").value=
-     state.currency||"THB";
-
-    setTheme(
-     state.theme||"purple",
-     false
-    );
-
-    save();
-    renderAll();
-
-    toast("เรียกคืนข้อมูลแล้ว");
-
-   }catch(err){
-
-    toast("ไม่สามารถอ่านไฟล์สำรองนี้ได้");
-
-   }
-
-  };
-
-  reader.readAsText(f);
-
-  e.target.value="";
-
- }
-);
-
-
-/* ---------- CLEAR ---------- */
-
-function clearAll(){
-
- state={
-  name:"หมูเด้ง",
-  photo:"",
-  theme:state.theme,
-  currency:state.currency,
-  hidden:false,
-  pin:"",
-  allowance:0,
-  fixed:0,
-  transactions:[],
-  goals:[],
-  recurring:[]
- };
-
- save();
-
- closeModal("clearModal");
-
- renderAll();
-
- toast("ล้างข้อมูลทั้งหมดแล้ว");
-
-}
-
-
-/* ---------- START ---------- */
-
-loadData();
-
-setNow();
-
-renderAll();
-
-$("eyeButton").textContent=
- state.hidden?"🙈":"👁️";
-
-</script>
-
-
-<!-- OFFLINE -->
-<script>
-if("serviceWorker" in navigator){
-
- window.addEventListener(
-  "load",
-  ()=>{
-   navigator.serviceWorker
-   .register("./service-worker.js")
-   .then(
-    ()=>console.log("หมูเด้ง Offline พร้อมใช้งาน")
-   )
-   .catch(
-    e=>console.error("Offline setup error:",e)
-   );
-  }
- );
-
-}
-</script>
-
-</body>
+  <div id="goalModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="goal-modal-title">
+   <div class="modal-box">
+    <h2 data-template-id="goal-modal-title" id="goal-modal-title" class="canva-text"></h2>
+    <div class="field">
+     <label data-template-id="goal-name-label" class="canva-text" for="goalName"></label><input id="goalName" class="input" type="text">
+    </div>
+    <div class="field">
+     <label data-template-id="goal-amount-label" class="canva-text" for="goalAmount"></label><input id="goalAmount" class="input money" type="number" min="0" step="any" inputmode="decimal">
+    </div>
+    <div class="field">
+     <label data-template-id="goal-saved-label" class="canva-text" for="goalSaved"></label><input id="goalSaved" class="input money" type="number" min="0" step="any" inputmode="decimal" value="0">
+    </div>
+    <div class="field">
+     <label data-template-id="goal-date-label" class="canva-text" for="goalDate"></label><input id="goalDate" class="input" type="date">
+    </div>
+    <div class="field hidden" id="depositField">
+     <label data-template-id="deposit-amount-label" class="canva-text" for="depositAmount"></label><input id="depositAmount" class="input money" type="number" min="0" step="any" inputmode="decimal">
+    </div>
+    <div class="modal-actions">
+     <button data-template-id="goal-cancel" class="canva-button secondary" type="button" onclick="closeModal('goalModal')"></button><button data-template-id="goal-save" class="canva-button primary" type="button" onclick="saveGoal()"></button>
+    </div><button data-template-id="deposit-save" class="canva-button primary full hidden" id="depositSave" type="button" onclick="depositToGoal()"></button>
+   </div>
+  </div>
+  <div id="pinModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="pin-modal-title">
+   <div class="modal-box">
+    <h2 data-template-id="pin-modal-title" id="pin-modal-title" class="canva-text"></h2>
+    <p data-template-id="pin-helper" class="canva-text tiny muted" style="margin-top:6px"></p>
+    <div class="field">
+     <label data-template-id="pin-label" class="canva-text" for="pinInput"></label><input id="pinInput" class="input money" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}">
+    </div>
+    <div class="modal-actions">
+     <button data-template-id="pin-cancel" class="canva-button secondary" type="button" onclick="closeModal('pinModal')"></button><button data-template-id="pin-save" class="canva-button primary" type="button" onclick="savePin()"></button>
+    </div>
+   </div>
+  </div>
+  <div id="clearModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="clear-modal-title">
+   <div class="modal-box">
+    <h2 data-template-id="clear-modal-title" id="clear-modal-title" class="canva-text"></h2>
+    <p data-template-id="clear-helper" class="canva-text muted" style="margin-top:8px"></p>
+    <div class="modal-actions">
+     <button data-template-id="clear-cancel" class="canva-button secondary" type="button" onclick="closeModal('clearModal')"></button><button data-template-id="clear-confirm" class="canva-button danger" type="button" onclick="clearAll()"></button>
+    </div>
+   </div>
+  </div>
+  <div id="surveyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="survey-title">
+   <div class="modal-box">
+    <h2 data-template-id="survey-title" id="survey-title" class="canva-text"></h2>
+    <form id="surveyForm">
+     <div class="field"><label data-template-id="survey-status-label" class="canva-text" for="surveyStatus"></label><select id="surveyStatus" class="select" required><option value="">เลือกสถานภาพ</option><option>นักเรียน/นักศึกษา</option><option>บุคคลทั่วไป/วัยทำงาน</option><option>อื่นๆ</option></select>
+     </div>
+     <div class="field"><label data-template-id="survey-device-label" class="canva-text" for="surveyDevice"></label><select id="surveyDevice" class="select" required><option value="">เลือกอุปกรณ์</option><option>iOS</option><option>Android</option><option>Computer</option></select>
+     </div>
+     <div class="field"><label data-template-id="survey-ux-label" class="canva-text" for="surveyUx"></label><select id="surveyUx" class="select" required><option value="">เลือกคะแนน 1-5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+     </div>
+     <div class="field"><label data-template-id="survey-function-label" class="canva-text" for="surveyFunction"></label><select id="surveyFunction" class="select" required><option value="">เลือกคะแนน 1-5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+     </div>
+     <div class="field"><label data-template-id="survey-ui-label" class="canva-text" for="surveyUi"></label><select id="surveyUi" class="select" required><option value="">เลือกคะแนน 1-5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+     </div>
+     <div class="field"><label data-template-id="survey-performance-label" class="canva-text" for="surveyPerformance"></label><select id="surveyPerformance" class="select" required><option value="">เลือกคะแนน 1-5</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+     </div>
+     <div class="field"><label data-template-id="survey-feedback-label" class="canva-text" for="surveyFeedback"></label><textarea id="surveyFeedback" class="textarea"></textarea>
+     </div>
+     <div class="modal-actions"><button data-template-id="survey-cancel" class="canva-button secondary" type="button" onclick="closeModal('surveyModal')"></button><button data-template-id="survey-submit" class="canva-button primary" type="submit"></button>
+     </div>
+    </form>
+   </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/_sdk/5629ea66dc55d54f.editing_sdk.js" integrity="sha512-snPYzGvgiTEMUBOb+HlCBkFeiM0IRX4hcgA78wvalhC0WnJtaX+RCbosPWtNqZsZ7sZ9NwN0oePZYa+IlMwa+w=="></script>
+  <script>
+    const KEY='moodeng_data';
+    const USER_KEY='moodeng_user_id';
+    const $=id=>document.getElementById(id);
+    const storageKey=()=>KEY+'_'+deviceUserId;
+    const categoryIcons={'อาหาร':'utensils','เดินทาง':'bus-front','เครื่องดื่ม':'coffee','ช้อปปิ้ง':'shopping-bag','การศึกษา':'book-open','บันเทิง':'music','อื่น ๆ':'circle-dot','รายรับ':'wallet'};
+    const deviceUserId=(()=>{try{let value=localStorage.getItem(USER_KEY);if(!value){value=crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);localStorage.setItem(USER_KEY,value)}return value}catch(e){return 'device-'+Date.now().toString(36)}})();
+    let state={user_id:deviceUserId,name:'',photo:'',theme:'purple',currency:'THB',hidden:false,pin:'',allowance:0,fixed:0,transactions:[],goals:[],recurring:[]};
+    let type='expense',pending=null,range='week',sheetRecord=null;
+    const cheers=['วันนี้เก่งมาก!','ออมเงินเก่งสุดๆ!','หมูเด้งภูมิใจในตัวเธอ!','ทีละนิดก็พิชิตเป้าหมายได้!'];
+    function dailyCheckIn(){let today=new Date().toISOString().slice(0,10),last=state.check_in_date;if(last!==today){let yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);state.check_in_streak=last===yesterday.toISOString().slice(0,10)?(Number(state.check_in_streak)||0)+1:1;state.check_in_date=today;save()}$('streakCount').textContent=Number(state.check_in_streak)||0;$('dailyCheer').textContent=cheers[(Number(state.check_in_streak)||0)%cheers.length]}
+    function sparklePop(){['<svg viewBox="0 0 24 24"><path d="M12 2l1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8Z" fill="#FFDAC1"/></svg>','<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" stroke="#B5EAD7" stroke-width="3" stroke-linecap="round"/></svg>','<svg viewBox="0 0 24 24"><path d="M12 20S4 15 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 11-8 11Z" fill="#FF9AA2"/></svg>','<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#E2F0CB" stroke="#149C78" stroke-width="2"/></svg>','<svg viewBox="0 0 24 24"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z" fill="#C7CEEA"/></svg>'].forEach((mark,i)=>{let el=document.createElement('span');el.className='sparkle';el.innerHTML=mark;el.querySelector('svg').style.width='22px';el.querySelector('svg').style.height='22px';el.style.left=(45+Math.random()*10)+'%';el.style.top=(38+Math.random()*18)+'%';el.style.setProperty('--dx',((Math.random()-.5)*170)+'px');el.style.setProperty('--dy',(-35-Math.random()*90)+'px');el.style.color=['#F8A9C4','#BCA7FF','#F6C85F','#8ED8C0','#F59AB5'][i];document.body.appendChild(el);setTimeout(()=>el.remove(),850)})}
+    const id=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
+    const save=()=>{try{state.user_id=deviceUserId;const snapshot={userId:deviceUserId,data:JSON.parse(JSON.stringify(state)),savedAt:new Date().toISOString()};localStorage.setItem(storageKey(),JSON.stringify(snapshot));localStorage.setItem(KEY,JSON.stringify(snapshot));if(window.dataSdk&&typeof window.dataSdk.create==='function')syncToSheet(snapshot)}catch(e){toast('บันทึกข้อมูลในอุปกรณ์ไม่สำเร็จ')}};
+    let sheetSyncBusy=false;
+    async function syncToSheet(snapshot){if(sheetSyncBusy)return;sheetSyncBusy=true;try{const payload={...snapshot.data,transactions:JSON.stringify(snapshot.data.transactions||[]),goals:JSON.stringify(snapshot.data.goals||[]),recurring:JSON.stringify(snapshot.data.recurring||[]),user_id:deviceUserId};if(sheetRecord&&window.dataSdk.update)await window.dataSdk.update({...sheetRecord,...payload});else if(window.dataSdk.create){const result=await window.dataSdk.create(payload);if(result&&result.isOk)sheetRecord={...(sheetRecord||{}),...payload}}}catch(e){}finally{sheetSyncBusy=false}}
+    function applySaved(saved){if(saved&&typeof saved==='object'){let savedUserId=saved.userId||saved.user_id;let savedData=saved.data||saved;if(savedUserId&&savedUserId!==deviceUserId)return;state={...state,...savedData,user_id:deviceUserId};try{state.transactions=typeof savedData.transactions==='string'?JSON.parse(savedData.transactions):savedData.transactions;state.goals=typeof savedData.goals==='string'?JSON.parse(savedData.goals):savedData.goals;state.recurring=typeof savedData.recurring==='string'?JSON.parse(savedData.recurring):savedData.recurring}catch(e){}if(savedData.userName&&!savedData.name)state.name=savedData.userName;if(Array.isArray(savedData.fixedExpenses)&&!state.recurring.length)state.recurring=savedData.fixedExpenses.map(x=>({...x,name:x.name||x.title||'รายจ่ายประจำ',paidMonth:x.isPaid?new Date().toISOString().slice(0,7):''}))}state.user_id=deviceUserId;state.transactions=Array.isArray(state.transactions)?state.transactions:[];state.goals=Array.isArray(state.goals)?state.goals:[];state.recurring=Array.isArray(state.recurring)?state.recurring:[];$('currency').value=state.currency;setTheme(state.theme,false)}
+    function avatar(){return state.photo?'<img src="'+state.photo+'" alt="รูปโปรไฟล์">':'<svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M11 22c0-3 2-5 5-5h32c3 0 5 2 5 5v27c0 3-2 5-5 5H16c-3 0-5-2-5-5V22Z" fill="#FFF5C2" stroke="currentColor" stroke-width="3"/><path d="M11 24h35c4 0 7 3 7 7v6H41c-4 0-7-3-7-7v-6H11Z" fill="#FFD6E7" stroke="currentColor" stroke-width="3"/><circle cx="43" cy="31" r="2.5" fill="currentColor"/><path d="M18 17v-4c0-3 2-5 5-5h20c3 0 5 2 5 5v4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M22 40h8M22 46h14" stroke="#D9538D" stroke-width="3" stroke-linecap="round"/></svg>'}
+    function money(value){if(state.hidden)return '••••••';let c=$('currency').value||'THB';return new Intl.NumberFormat(c==='THB'?'th-TH':'en-US',{style:'currency',currency:c,minimumFractionDigits:c==='JPY'?0:2}).format(Number(value)||0)}
+    function countTo(el,value){let target=Number(value)||0,start=Number(el.dataset.count||0),begin=performance.now();el.dataset.count=target;function tick(now){let p=Math.min(1,(now-begin)/420),ease=1-Math.pow(1-p,3);el.textContent=money(start+(target-start)*ease);if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)}
+    function syncAmbient(){let h=new Date().getHours();document.body.classList.toggle('daylight',h>=6&&h<18);document.body.classList.toggle('evening',h<6||h>=18)}
+    function renderSavingPlant(balance){let goal=state.goals[0],pc=goal&&Number(goal.amount)>0?Math.min(100,Math.max(0,(Number(goal.saved)||0)/Number(goal.amount)*100)):0,level=pc<=30?'sprout':pc<=70?'bush':'bloom';let art=level==='sprout'?'<path d="M32 58V38M32 45c-8 0-13-4-13-11 7 0 13 4 13 11Zm0-6c0-8 5-13 13-13 0 8-5 13-13 13Z" fill="#B5EAD7" stroke="#149C78" stroke-width="3"/>':level==='bush'?'<path d="M32 58V30M32 42c-13 0-19-7-19-17 11 0 19 6 19 17Zm0-8c0-12 8-20 19-20 0 11-7 20-19 20Z" fill="#B5EAD7" stroke="#149C78" stroke-width="3"/>':'<path d="M32 58V31M32 38c-12-8-11-18-5-24 7 5 8 14 5 24Zm0 0c12-8 11-18 5-24-7 5-8 14-5 24Z" fill="#FFB7B2" stroke="#D9538D" stroke-width="3"/><path d="M24 58h16" stroke="#FFDAC1" stroke-width="4" stroke-linecap="round"/><circle cx="15" cy="20" r="3" fill="#C7CEEA"/><circle cx="49" cy="17" r="3" fill="#E2F0CB"/>';$('savingPlant').innerHTML='<svg viewBox="0 0 64 64" width="48" height="48" aria-label="ต้นไม้ออมเงิน">'+art+'</svg>';$('savingPlant').style.transform='scale('+(1+level*.08)+')';$('savingPlantText').textContent=level>=4?'ผลิบานเต็มที่แล้ว เก่งมาก!':level?'น้องกำลังโตขึ้นจากเงินออมของเรา':'เริ่มออมวันนี้ แล้วดูน้องเติบโตนะ';let alert=Number(state.allowance)>0&&Math.max(0,Number(state.allowance))>0&&Math.max(0,Number(state.allowance)-Number(balance))/Number(state.allowance)>=.8;document.querySelector('.guardian-happy').classList.toggle('hidden',alert);document.querySelector('.guardian-alert').classList.toggle('hidden',!alert)}
+    const signed=(n,t)=>(t==='income'?'+':'-')+money(n);
+    function total(items=state.transactions){return items.reduce((a,x)=>{a[x.type]+=(Number(x.amount)||0);return a},{income:0,expense:0})}
+    function within(tx,period){const d=new Date(tx.date),now=new Date();if(isNaN(d))return false;if(period==='all')return true;if(period==='month')return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();if(period==='year')return d.getFullYear()===now.getFullYear();let start=new Date(now);start.setHours(0,0,0,0);start.setDate(now.getDate()-((now.getDay()+6)%7));return d>=start}
+    function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+    let audioContext=null;
+    function unlockAudio(){if(!audioContext){const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return;audioContext=new AudioCtor()}if(audioContext.state==='suspended')audioContext.resume()}
+    function playClick(){unlockAudio();if(!audioContext)return;const now=audioContext.currentTime,osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type='sine';osc.frequency.setValueAtTime(520,now);osc.frequency.exponentialRampToValueAtTime(760,now+.07);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.045,now+.012);gain.gain.exponentialRampToValueAtTime(.0001,now+.09);osc.connect(gain);gain.connect(audioContext.destination);osc.start(now);osc.stop(now+.1)}
+    document.addEventListener('pointerdown',unlockAudio,{once:true,passive:true});
+    document.addEventListener('click',e=>{if(e.target.closest('button,[role="button"],select,input[type="checkbox"],input[type="radio"]'))playClick()},{passive:true});
+    function icons(){if(window.lucide)lucide.createIcons()}
+    function toast(message){$('toast').textContent=message;$('toast').classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2600)}
+    function setNow(){let d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('txDate').value=d.toISOString().slice(0,16)}
+    function txMarkup(x){let d=new Date(x.date);return '<div class="list-item"><div class="cat-icon"><i data-lucide="'+(categoryIcons[x.category]||'circle-dot')+'"></i></div><div class="list-main"><b>'+esc(x.category)+'</b><p class="tiny muted truncate">'+esc(x.memo||'ไม่มีบันทึก')+' · '+(isNaN(d)?'':d.toLocaleDateString('th-TH',{day:'numeric',month:'short'}))+'</p></div><div style="text-align:right"><b class="money '+x.type+'">'+signed(x.amount,x.type)+'</b><button class="delete" type="button" onclick="deleteTx(\''+x.id+'\')">ลบ</button></div></div>'}
+    function renderHome(){let t=total(),bal=Number(state.allowance)+t.income-t.expense,now=new Date(),days=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate()+1,week=total(state.transactions.filter(x=>within(x,'week'))).expense,month=total(state.transactions.filter(x=>within(x,'month'))).expense,budget=Math.max(0,Number(state.allowance)||0),used=Math.max(0,t.expense),percent=budget>0?(used/budget)*100:0,status=percent>=100?'over':percent>=90?'low':percent>=70?'near':'plan',statusText=status==='over'?'ใช้เกินงบแล้ว':status==='low'?'เงินใกล้หมดแล้ว':status==='near'?'ใกล้ถึงงบแล้ว':'อยู่ในแผน';countTo($('balanceValue'),bal);countTo($('dailyValue'),Math.max(0,bal-Number(state.fixed||0))/days);countTo($('weekSpent'),-week);countTo($('monthSpent'),-month);renderSavingPlant(bal);$('gauge').style.width=Math.min(100,Math.max(0,percent))+'%';$('gauge').className='status-'+status;$('budgetStatus').className='budget-status '+status;$('budgetStatusText').textContent=statusText;$('budgetPercent').textContent=Math.round(percent)+'%';$('budgetUsage').textContent='ใช้ไป '+money(used)+' / '+money(budget);$('homeName').textContent=state.name;$('profileName').textContent=state.name;$('allowance').value=state.allowance||'';$('fixed').value=state.fixed||'';let recent=[...state.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);$('recentList').innerHTML=recent.length?recent.map(txMarkup).join(''):'<div class="empty"><i data-lucide="wallet-cards"></i><p>ยังไม่มีรายการ</p><span class="tiny">เริ่มบันทึกเพื่อเห็นภาพการเงิน</span></div>';$('homeAvatar').innerHTML=avatar();$('profileAvatar').innerHTML=avatar();icons()}
+    function renderTransactions(){let q=$('search').value.toLowerCase(),cat=$('filterCategory').value,p=$('filterPeriod').value;let data=[...state.transactions].filter(x=>(!q||(x.category+' '+x.memo).toLowerCase().includes(q))&&(!cat||x.category===cat)&&within(x,p)).sort((a,b)=>new Date(b.date)-new Date(a.date));$('txList').innerHTML=data.length?data.map(txMarkup).join(''):'<div class="empty"><i data-lucide="search-x"></i><p>ไม่พบรายการ</p></div>';icons()}
+    function renderAnalytics(){let data=state.transactions.filter(x=>within(x,range)),t=total(data),categories={};data.filter(x=>x.type==='expense').forEach(x=>categories[x.category]=(categories[x.category]||0)+Number(x.amount));let ranks=Object.entries(categories).sort((a,b)=>b[1]-a[1]),sum=t.expense||1,colors=['#7056D9','#F43F5E','#0EA5E9','#F59E0B','#10B981','#64748B'],cursor=0,stops=ranks.map(([,v],i)=>{let s=cursor;cursor+=v/sum*100;return colors[i%colors.length]+' '+s+'% '+cursor+'%'});$('donut').style.background=ranks.length?'conic-gradient('+stops.join(',')+')':'#E8EDF2';$('chartSpent').textContent=signed(t.expense,'expense');$('chartIncome').textContent=signed(t.income,'income');$('chartNet').textContent=money(t.income-t.expense);$('rankList').innerHTML=ranks.length?ranks.map(([n,v])=>'<div class="rank"><div class="cat-icon"><i data-lucide="'+(categoryIcons[n]||'circle-dot')+'"></i></div><b class="rank-name">'+esc(n)+'</b><div class="rank-track"><span style="width:'+(v/sum*100)+'%"></span></div><b class="money tiny expense">'+signed(v,'expense')+'</b></div>').join(''):'<div class="empty"><i data-lucide="chart-no-axes-combined"></i><p>ยังไม่มีรายจ่ายในช่วงนี้</p></div>';icons()}
+    function renderRecurring(){let month=new Date().toISOString().slice(0,7);$('recurringList').innerHTML=state.recurring.length?state.recurring.map((b,i)=>{let paid=b.paidMonth===month;return '<div class="list-item"><div class="cat-icon"><i data-lucide="repeat"></i></div><div class="list-main"><b>'+esc(b.name)+'</b><p class="tiny muted money">'+money(b.amount)+(paid?' · ชำระแล้ว':'')+'</p></div><button class="'+(paid?'secondary':'primary')+'" type="button" '+(paid?'disabled':'onclick="payRecurring('+i+')"')+'>'+(paid?'ชำระแล้ว':'จ่าย')+'</button></div>'}).join(''):'<div class="empty"><i data-lucide="calendar-clock"></i><p>ยังไม่มีรายจ่ายประจำ</p><span class="tiny">เพิ่มบิลที่ต้องจ่ายทุกเดือนได้ที่นี่</span></div>';icons()}
+    function addRecurringBill(){let list=$('recurringList');list.innerHTML='<form id="recurringForm" class="field"><label for="recurringName">ชื่อรายจ่ายประจำ</label><input id="recurringName" class="input" required placeholder="เช่น ค่าเน็ตมือถือ"><label for="recurringAmount">จำนวนเงิน</label><input id="recurringAmount" class="input money" type="number" min="0" step="any" inputmode="decimal"><button class="primary full" type="submit">บันทึกบิล</button></form>'+list.innerHTML;$('recurringForm').addEventListener('submit',e=>{e.preventDefault();let name=$('recurringName').value.trim(),rawValue=$('recurringAmount').value.replace(/,/g,''),amount=parseFloat(rawValue);if(!name||isNaN(amount)||amount<=0)return toast('กรุณากรอกจำนวนเงินเป็นตัวเลขที่มากกว่า 0');state.recurring.push({id:id(),name,amount,paidMonth:''});save();renderRecurring();toast('เพิ่มรายจ่ายประจำแล้ว')})}
+    function payRecurring(index){let b=state.recurring[index],month=new Date().toISOString().slice(0,7);if(!b||b.paidMonth===month)return;let amount=Number(b.amount);if(!b.name||!Number.isFinite(amount)||amount<=0)return toast('ข้อมูลรายจ่ายประจำไม่ถูกต้อง');b.paidMonth=month;state.transactions.push({id:id(),type:'expense',category:'ค่าใช้จ่ายประจำ',amount,date:new Date().toISOString(),memo:b.name,receipt:''});save();renderAll();toast('ชำระ '+b.name+' แล้ว')}
+    function renderGoals(){let list=$('goalList');if(!list)return;list.innerHTML=state.goals.length?state.goals.map(g=>{let pc=Math.min(100,g.saved/g.amount*100),days=Math.max(1,Math.ceil((new Date(g.date+'T23:59')-new Date())/86400000)),daily=Math.max(0,g.amount-g.saved)/days;return '<div class="goal"><div class="between"><b>'+esc(g.name)+'</b><button class="delete" type="button" onclick="deleteGoal(\''+g.id+'\')">ลบ</button></div><div class="between tiny muted" style="margin-top:3px"><span class="money">'+money(g.saved)+' / '+money(g.amount)+'</span><span>'+Math.round(pc)+'%</span></div><div class="progress"><span style="width:'+pc+'%"></span></div><p class="tiny" style="margin-top:8px">แนะนำเก็บ <b class="money">'+money(daily)+'</b> ต่อวัน</p><button class="primary full" type="button" onclick="openDeposit(\''+g.id+'\')">+ ฝากเงินออม</button></div>'}).join(''):'<div class="empty"><i data-lucide="piggy-bank"></i><p>ยังไม่มีกระปุกเป้าหมาย</p></div>';icons()}
+    let depositGoalId=null;
+    function openDeposit(goalId){depositGoalId=goalId;$('depositField').classList.remove('hidden');$('depositSave').classList.remove('hidden');$('goalName').closest('.field').classList.add('hidden');$('goalAmount').closest('.field').classList.add('hidden');$('goalSaved').closest('.field').classList.add('hidden');$('goalDate').closest('.field').classList.add('hidden');openModal('goalModal')}
+    function depositToGoal(){let goal=state.goals.find(g=>g.id===depositGoalId),amount=Number($('depositAmount').value);if(!goal||!Number.isFinite(amount)||amount<=0)return toast('กรุณากรอกจำนวนเงินออม');goal.saved=Math.min(Number(goal.amount),Number(goal.saved)+amount);save();closeModal('goalModal');$('depositAmount').value='';depositGoalId=null;renderAll();sparklePop();toast('ฝากเงินออมแล้ว')}
+    function renderAll(persist=true){state.currency=$('currency').value;if(persist)save();renderHome();renderTransactions();renderAnalytics();renderGoals();renderRecurring();splitBill()}
+    function showScreen(screen){document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('hidden',x.id!==screen));document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===screen));if(screen==='transactions')renderTransactions();if(screen==='analytics')renderAnalytics();if(screen==='profile')renderGoals();window.scrollTo({top:0,behavior:'smooth'})}
+    function setType(next){type=next;$('expenseTab').classList.toggle('active',next==='expense');$('incomeTab').classList.toggle('active',next==='income');if(next==='income')$('txCategory').value='รายรับ'}
+    function quickAdd(category){showScreen('transactions');setType('expense');$('txCategory').value=category;$('txAmount').focus()}
+    $('txForm').addEventListener('submit',e=>{e.preventDefault();let rawValue=$('txAmount').value.replace(/,/g,'');let amount=parseFloat(rawValue);if(isNaN(amount)||amount<=0)return toast('กรุณากรอกจำนวนเงินเป็นตัวเลขที่มากกว่า 0');pending={id:id(),type,category:$('txCategory').value,amount,date:$('txDate').value,memo:$('txMemo').value.trim(),receipt:$('receiptPreview').dataset.image||''};if(type==='expense'&&amount>300)openModal('impulseModal');else saveTransaction()});
+    function saveTransaction(){if(!pending)return;state.transactions.push(pending);pending=null;closeModal('impulseModal');sparklePop();$('txForm').reset();$('receiptPreview').style.display='none';$('receiptPreview').dataset.image='';setNow();renderAll();document.querySelector('[data-template-id="balance-card"]').classList.remove('celebrate');void document.querySelector('[data-template-id="balance-card"]').offsetWidth;document.querySelector('[data-template-id="balance-card"]').classList.add('celebrate');toast('บันทึกรายการแล้ว')}
+    function deleteTx(txid){state.transactions=state.transactions.filter(x=>x.id!==txid);renderAll();toast('ลบรายการแล้ว')}
+    $('receipt').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{$('receiptPreview').src=r.result;$('receiptPreview').dataset.image=r.result;$('receiptPreview').style.display='block'};r.readAsDataURL(f)});
+    $('search').addEventListener('input',renderTransactions);$('filterCategory').addEventListener('change',renderTransactions);$('filterPeriod').addEventListener('change',renderTransactions);$('currency').addEventListener('change',renderAll);
+    $('budgetForm').addEventListener('submit',e=>{e.preventDefault();let allowanceRaw=$('allowance').value.replace(/,/g,''),fixedRaw=$('fixed').value.replace(/,/g,''),allowance=parseFloat(allowanceRaw)||0,fixed=parseFloat(fixedRaw)||0;if(allowance<0||fixed<0)return toast('กรุณากรอกจำนวนเงินเป็นตัวเลขที่ไม่ติดลบ');state.allowance=allowance;state.fixed=fixed;renderAll();toast('บันทึกงบประมาณแล้ว')});
+    function setRange(next){range=next;document.querySelectorAll('[data-range]').forEach(x=>x.classList.toggle('active',x.dataset.range===next));renderAnalytics()}
+    function openProfile(){$('nameInput').value=state.name;$('avatarUpload').value='';openModal('profileModal')}
+    $('avatarUpload').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{state.photo=r.result;$('profileAvatar').innerHTML=avatar()};r.readAsDataURL(f)});
+    function saveProfile(){let name=$('nameInput').value.trim();if(!name)return toast('กรุณาใส่ชื่อ');state.name=name;save();closeModal('profileModal');renderHome();toast('บันทึกโปรไฟล์แล้ว')}
+    $('saveNameBtn').addEventListener('click',saveProfile);
+    function openModal(mid){if(mid==='goalModal'&&!depositGoalId){$('depositField').classList.add('hidden');$('depositSave').classList.add('hidden');$('goalName').closest('.field').classList.remove('hidden');$('goalAmount').closest('.field').classList.remove('hidden');$('goalSaved').closest('.field').classList.remove('hidden');$('goalDate').closest('.field').classList.remove('hidden')}$(mid).classList.add('show')} function closeModal(mid){$(mid).classList.remove('show')}
+    function saveGoal(){let name=$('goalName').value.trim(),amount=Number($('goalAmount').value),saved=Number($('goalSaved').value)||0,date=$('goalDate').value;if(!name||!amount||!date)return toast('กรอกข้อมูลเป้าหมายให้ครบ');state.goals.push({id:id(),name,amount,saved,date});save();closeModal('goalModal');$('goalName').value='';$('goalAmount').value='';$('goalSaved').value='0';$('goalDate').value='';renderGoals();toast('เพิ่มกระปุกแล้ว')}
+    function deleteGoal(gid){state.goals=state.goals.filter(g=>g.id!==gid);save();renderGoals();toast('ลบกระปุกแล้ว')}
+    function splitBill(){let all=Number($('billTotal').value)||0,people=Math.max(1,Number($('billPeople').value)||1);$('billEach').textContent=money(all/people)}$('billTotal').addEventListener('input',splitBill);$('billPeople').addEventListener('input',splitBill);
+    function savePin(){let pin=$('pinInput').value;if(!/^\d{4}$/.test(pin))return toast('PIN ต้องเป็นตัวเลข 4 หลัก');state.pin=pin;save();closeModal('pinModal');toast('บันทึก PIN แล้ว')}
+    function setTheme(theme,store=true){document.body.className=theme;state.theme=theme;document.querySelectorAll('.theme-btn').forEach(x=>x.classList.toggle('active',x.dataset.theme===theme));if(store)save()}
+    function toggleMoney(){state.hidden=!state.hidden;save();$('eyeIcon').outerHTML='<i id="eyeIcon" data-lucide="'+(state.hidden?'eye-off':'eye')+'"></i>';renderAll();icons()}
+    function download(blob,name){let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),800)}
+    function exportCSV(){let rows=[['วันที่','ประเภท','หมวดหมู่','จำนวนเงิน','บันทึก'],...state.transactions.map(x=>[x.date,x.type==='income'?'รายรับ':'รายจ่าย',x.category,x.amount,x.memo])];download(new Blob(['\ufeff'+rows.map(row=>row.map(v=>'"'+String(v||'').replaceAll('"','""')+'"').join(',')).join('\n')],{type:'text/csv;charset=utf-8'}),'moodeng-report.csv');toast('ส่งออก CSV แล้ว')}
+    function exportBackup(){download(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),'moodeng-backup.json');toast('สำรองข้อมูลเก็บไว้แล้ว')}
+    $('restoreInput').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let data=JSON.parse(r.result);if(!Array.isArray(data.transactions)||!Array.isArray(data.goals))throw new Error();state={...state,...data};$('currency').value=state.currency||'THB';setTheme(state.theme||'purple',false);renderAll();toast('เรียกคืนข้อมูลเดิมแล้ว')}catch(err){toast('ไม่สามารถอ่านไฟล์สำรองนี้ได้')}};r.readAsText(f);e.target.value=''});
+    function clearAll(){state={user_id:deviceUserId,name:'',photo:'',theme:state.theme,currency:state.currency,hidden:false,pin:'',allowance:0,fixed:0,transactions:[],goals:[],recurring:[]};try{localStorage.removeItem(storageKey());localStorage.removeItem(KEY)}catch(e){}closeModal('clearModal');renderAll(false);toast('ล้างข้อมูลทั้งหมดแล้ว')}
+    async function initLocal(){
+      try{const local=localStorage.getItem(storageKey())||localStorage.getItem(KEY);if(local)applySaved(JSON.parse(local))}catch(e){toast('ไม่สามารถอ่านข้อมูลที่บันทึกไว้ได้')}
+      setNow();syncAmbient();renderAll(false);dailyCheckIn();icons();
+      if(window.dataSdk&&typeof window.dataSdk.init==='function'){
+        try{await window.dataSdk.init({onDataChanged(records){const remote=records.find(x=>x.user_id===deviceUserId);if(remote){sheetRecord=remote;const local=localStorage.getItem(storageKey());if(!local){applySaved({...remote,userId:deviceUserId,data:remote});renderAll(false)}}}})}catch(e){}
+      }
+    }
+    function openSurvey(){if(localStorage.getItem('moodeng_survey_done_'+deviceUserId)){toast('ส่งแบบสอบถามไปแล้ว ขอบคุณที่แชร์คับ');return}openModal('surveyModal')}
+    $('surveyForm').addEventListener('submit',async e=>{e.preventDefault();let payload={user_id:deviceUserId,survey_status:$('surveyStatus').value,survey_device:$('surveyDevice').value,survey_ux_rating:Number($('surveyUx').value),survey_function_rating:Number($('surveyFunction').value),survey_ui_rating:Number($('surveyUi').value),survey_performance_rating:Number($('surveyPerformance').value),survey_feedback:$('surveyFeedback').value.trim(),survey_timestamp:new Date().toISOString()};let result=window.dataSdk&&window.dataSdk.create?await window.dataSdk.create(payload):{isOk:false};if(result.isOk){localStorage.setItem('moodeng_survey_done_'+deviceUserId,'1');sparklePop();closeModal('surveyModal');document.querySelector('[data-template-id="survey-open-btn"]').classList.remove('celebrate');void document.querySelector('[data-template-id="survey-open-btn"]').offsetWidth;document.querySelector('[data-template-id="survey-open-btn"]').classList.add('celebrate');toast('ขอบคุณที่แชร์คับ')}else toast('ขออภัย ไม่สามารถส่งแบบสอบถามได้ในขณะนี้')});
+    initLocal();
+  </script>
+ </body>
 </html>
