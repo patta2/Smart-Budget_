@@ -1,4 +1,4 @@
-const CACHE_NAME = 'moodeng-budget-v2';
+const CACHE_NAME = 'moodeng-budget-v4';
 // ระบุไฟล์ทั้งหมดที่จำเป็นต้องใช้ในการแสดงผล
 const ASSETS_TO_CACHE = [
   './',
