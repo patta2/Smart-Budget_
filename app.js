@@ -612,9 +612,20 @@ window.addEventListener('online', () => {
 });
 
 initLocal();
+// ==========================================
+// ระบบ PIN Security (แก้ไขเรียบร้อยแล้ว)
+// ==========================================
 let currentPinInput = "";
 
-// ฟังก์ชันแสดงหน้า PIN
+// 1. ตรวจสอบว่าตั้ง PIN ไว้หรือไม่ตอนเปิดแอป ถ้ามีให้เด้งหน้า PIN ขึ้นมาทันที
+function checkPinLock() {
+  const isPinEnabled = localStorage.getItem('pin_enabled') !== 'false'; // ค่าเริ่มต้นให้ใช้องค์ประกอบ PIN ถ้ามีรหัส
+  if ((state.pin || localStorage.getItem('user_pin')) && isPinEnabled) {
+    showPinScreen();
+  }
+}
+
+// 2. แสดงหน้าจอกรอก PIN
 function showPinScreen() {
   const pinScreen = document.getElementById('pin-screen');
   if (pinScreen) {
@@ -624,7 +635,7 @@ function showPinScreen() {
   }
 }
 
-// ฟังก์ชันซ่อนหน้า PIN
+// 3. ซ่อนหน้าจอกรอก PIN
 function hidePinScreen() {
   const pinScreen = document.getElementById('pin-screen');
   if (pinScreen) {
@@ -632,26 +643,25 @@ function hidePinScreen() {
   }
 }
 
-// ฟังก์ชันเมื่อกดปุ่มตัวเลข
+// 4. ฟังก์ชันเมื่อกดปุ่มตัวเลข
 function pressPin(num) {
   if (currentPinInput.length < 4) {
     currentPinInput += num;
     updatePinDots();
 
-    // เมื่อกรอกครบ 4 หลัก
     if (currentPinInput.length === 4) {
       setTimeout(verifyPin, 100);
     }
   }
 }
 
-// ฟังก์ชันลบตัวเลข
+// 5. ฟังก์ชันลบตัวเลข
 function clearPin() {
   currentPinInput = "";
   updatePinDots();
 }
 
-// ฟังก์ชันอัปเดตจุดแสดงรหัส
+// 6. อัปเดตจุดแสดงรหัส
 function updatePinDots() {
   const dots = document.querySelectorAll('.pin-dot');
   dots.forEach((dot, index) => {
@@ -665,15 +675,33 @@ function updatePinDots() {
   });
 }
 
-// ตรวจสอบความถูกต้องของ PIN
+// 7. ตรวจสอบความถูกต้องของ PIN
 function verifyPin() {
-  const savedPin = localStorage.getItem('user_pin');
-  if (currentPinInput === savedPin) {
-    if (typeof showToast === 'function') showToast("ปลดล็อกสำเร็จ", "success");
+  // ดึงรหัสจากทั้ง state.pin และ user_pin ให้ตรงกัน
+  const activePin = state.pin || localStorage.getItem('user_pin');
+  
+  if (currentPinInput === activePin) {
+    toast("ปลดล็อกสำเร็จ");
     hidePinScreen();
   } else {
-    if (typeof showToast === 'function') showToast("รหัส PIN ไม่ถูกต้อง", "error");
+    toast("รหัส PIN ไม่ถูกต้อง");
     clearPin();
   }
 }
 
+// 8. ฟังก์ชันบันทึก PIN (ซิงค์ค่าให้ตรงกันทั้ง 2 ระบบ)
+function savePin() {
+  let pin = $('pinInput') ? $('pinInput').value : currentPinInput;
+  if (!/^\d{4}$/.test(pin)) return toast('PIN ต้องเป็นตัวเลข 4 หลัก');
+  
+  state.pin = pin;
+  localStorage.setItem('user_pin', pin);
+  localStorage.setItem('pin_enabled', 'true');
+  save();
+  
+  if ($('pinModal')) closeModal('pinModal');
+  toast('บันทึก PIN เรียบร้อยแล้ว');
+}
+
+// เรียกให้ระบบตรวจเช็กล็อก PIN ทันทีหลังจากโหลดข้อมูล local เรียบร้อยแล้ว
+checkPinLock();
