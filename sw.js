@@ -1,31 +1,27 @@
-const CACHE_NAME = 'moodeng-budget-v4';
-// ระบุไฟล์ทั้งหมดที่จำเป็นต้องใช้ในการแสดงผล
+const CACHE_NAME = 'moodeng-budget-v1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json',
+  './styles.css',
+  './app.js',
   './icon.png',
-  './app.js'
+  './manifest.json'
 ];
 
-// ติดตั้งและบันทึกไฟล์ลงในเครื่อง
+// 1. บันทึกไฟล์ทั้งหมดลงเครื่องตอนติดตั้ง
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting();
 });
 
-// ทำงานตอนออฟไลน์: ถ้าไม่มีเน็ต ให้ไปดึงไฟล์ที่จำไว้ในเครื่องมาแสดงแทน
+// 2. ดึงไฟล์จากความจำเครื่องมาแสดงแม้ออฟไลน์อยู่
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request);
+      return cachedResponse || fetch(event.request);
     })
   );
 });
