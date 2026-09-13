@@ -1,4 +1,4 @@
-const CACHE_NAME = 'moodeng-budget-v2'; // เปลี่ยนเป็น v2 เพื่ออัปเดตไฟล์ใหม่
+const CACHE_NAME = 'moodeng-budget-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const ASSETS_TO_CACHE = [
   './manifest.json'
 ];
 
-// 1. ติดตั้งและดาวน์โหลดไฟล์ใหม่เก็บไว้ใช้ออฟไลน์
+// ติดตั้งและดาวน์โหลดไฟล์เก็บไว้ในเครื่อง
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -18,7 +18,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. ลบ Cache เวอร์ชันเก่าทิ้งเมื่อมีการอัปเดต
+// ลบ Cache เก่าทิ้งเมื่อมีการอัปเดตเวอร์ชัน
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -33,7 +33,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. ดึงไฟล์จากเครื่องมาแสดงผลแม้ออฟไลน์
+// ดึงไฟล์จากเครื่องมาแสดงผลแม้ออฟไลน์
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
