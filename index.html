@@ -29,7 +29,7 @@
       <span class="avatar" id="homeAvatar"></span>
       <span>
        <span class="tiny muted">ยินดีต้อนรับคุณ</span>
-       <strong id="homeName" class="profile-name">ผู้ใช้งาน</strong>
+       <strong id="homeName" class="profile-name">หมูเด้ง</strong>
       </span>
      </button>
      <button type="button" class="icon-btn" onclick="openProfile()" aria-label="แก้ไขโปรไฟล์"><i data-lucide="pencil"></i></button>
@@ -496,5 +496,16 @@
       });
     }
   </script>
+  <script>
+  // ลงทะเบียน Service Worker เพื่อรองรับการทำงานออฟไลน์
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker Registered!'))
+        .catch(err => console.log('Service Worker Error:', err));
+    });
+  }
+</script>
+
  </body>
 </html>
