@@ -612,3 +612,68 @@ window.addEventListener('online', () => {
 });
 
 initLocal();
+let currentPinInput = "";
+
+// ฟังก์ชันแสดงหน้า PIN
+function showPinScreen() {
+  const pinScreen = document.getElementById('pin-screen');
+  if (pinScreen) {
+    currentPinInput = "";
+    updatePinDots();
+    pinScreen.style.display = 'flex';
+  }
+}
+
+// ฟังก์ชันซ่อนหน้า PIN
+function hidePinScreen() {
+  const pinScreen = document.getElementById('pin-screen');
+  if (pinScreen) {
+    pinScreen.style.display = 'none';
+  }
+}
+
+// ฟังก์ชันเมื่อกดปุ่มตัวเลข
+function pressPin(num) {
+  if (currentPinInput.length < 4) {
+    currentPinInput += num;
+    updatePinDots();
+
+    // เมื่อกรอกครบ 4 หลัก
+    if (currentPinInput.length === 4) {
+      setTimeout(verifyPin, 100);
+    }
+  }
+}
+
+// ฟังก์ชันลบตัวเลข
+function clearPin() {
+  currentPinInput = "";
+  updatePinDots();
+}
+
+// ฟังก์ชันอัปเดตจุดแสดงรหัส
+function updatePinDots() {
+  const dots = document.querySelectorAll('.pin-dot');
+  dots.forEach((dot, index) => {
+    if (index < currentPinInput.length) {
+      dot.style.background = '#10b981';
+      dot.style.borderColor = '#10b981';
+    } else {
+      dot.style.background = 'transparent';
+      dot.style.borderColor = '#9ca3af';
+    }
+  });
+}
+
+// ตรวจสอบความถูกต้องของ PIN
+function verifyPin() {
+  const savedPin = localStorage.getItem('user_pin');
+  if (currentPinInput === savedPin) {
+    if (typeof showToast === 'function') showToast("ปลดล็อกสำเร็จ", "success");
+    hidePinScreen();
+  } else {
+    if (typeof showToast === 'function') showToast("รหัส PIN ไม่ถูกต้อง", "error");
+    clearPin();
+  }
+}
+
