@@ -506,6 +506,38 @@
     });
   }
 </script>
+<!-- หน้าจอ OverLay กรอก PIN สไตล์มินิมอล iOS -->
+<div id="pin-screen" style="display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif;">
+  <div style="text-align: center; margin-bottom: 24px;">
+    <div style="font-size: 48px; margin-bottom: 8px;">🔒</div>
+    <h2 style="margin: 0; color: #1f2937; font-size: 20px;">หมูเด้ง Smart Budget</h2>
+    <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 14px;">กรอกรหัส PIN 4 หลักเพื่อเข้าใช้งาน</p>
+  </div>
+
+  <!-- จุดแสดงจำนวนรหัสที่กรอก -->
+  <div style="display: flex; gap: 16px; margin-bottom: 32px;">
+    <div class="pin-dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #9ca3af;"></div>
+    <div class="pin-dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #9ca3af;"></div>
+    <div class="pin-dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #9ca3af;"></div>
+    <div class="pin-dot" style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #9ca3af;"></div>
+  </div>
+
+  <!-- แป้นตัวเลข (Numpad) -->
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 240px;">
+    <button onclick="pressPin('1')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">1</button>
+    <button onclick="pressPin('2')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">2</button>
+    <button onclick="pressPin('3')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">3</button>
+    <button onclick="pressPin('4')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">4</button>
+    <button onclick="pressPin('5')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">5</button>
+    <button onclick="pressPin('6')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">6</button>
+    <button onclick="pressPin('7')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">7</button>
+    <button onclick="pressPin('8')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">8</button>
+    <button onclick="pressPin('9')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">9</button>
+    <div></div>
+    <button onclick="pressPin('0')" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: #f3f4f6; font-size: 24px; font-weight: 600; cursor: pointer;">0</button>
+    <button onclick="clearPin()" style="width: 64px; height: 64px; border-radius: 50%; border: none; background: transparent; font-size: 16px; color: #ef4444; font-weight: 600; cursor: pointer;">ลบ</button>
+  </div>
+</div>
 
  </body>
 </html>
