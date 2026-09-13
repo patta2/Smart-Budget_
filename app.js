@@ -705,3 +705,16 @@ function savePin() {
 
 // เรียกให้ระบบตรวจเช็กล็อก PIN ทันทีหลังจากโหลดข้อมูล local เรียบร้อยแล้ว
 checkPinLock();
+// ซ่อน Splash Screen หลังเปิดแอป 1.8 วินาที
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+      splash.style.opacity = '0';
+      splash.style.visibility = 'hidden';
+      setTimeout(() => {
+        splash.remove(); // ลบออกจาก DOM หลังเล่นอนิเมชันเสร็จ
+      }, 500);
+    }
+  }, 1800); // 1800ms = 1.8 วินาที
+});
