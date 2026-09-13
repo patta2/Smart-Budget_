@@ -1,4 +1,4 @@
-const CACHE_NAME = 'moodeng-budget-v1';
+const CACHE_NAME = 'moodeng-budget-v2'; // เปลี่ยนเป็น v2 เพื่ออัปเดตไฟล์ใหม่
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,8 +8,9 @@ const ASSETS_TO_CACHE = [
   './manifest.json'
 ];
 
-// 1. บันทึกไฟล์ทั้งหมดลงเครื่องตอนติดตั้ง
+// 1. ติดตั้งและดาวน์โหลดไฟล์ใหม่เก็บไว้ใช้ออฟไลน์
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
@@ -17,11 +18,26 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. ดึงไฟล์จากความจำเครื่องมาแสดงแม้ออฟไลน์อยู่
+// 2. ลบ Cache เวอร์ชันเก่าทิ้งเมื่อมีการอัปเดต
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// 3. ดึงไฟล์จากเครื่องมาแสดงผลแม้ออฟไลน์
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
     })
   );
 });
