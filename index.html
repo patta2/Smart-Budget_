@@ -21,32 +21,32 @@
   <link rel="stylesheet" href="styles.css">
  </head>
  <body class="purple">
-  <!-- Splash Screen เปิดแอป -->
-<div id="app-splash" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:#F5F2FF;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999999;transition:opacity 0.4s ease, visibility 0.4s ease;">
-  <img src="icon.png" alt="Logo" style="width:100px;height:100px;border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,0.12);animation:splash-pop 0.6s ease-out;">
-  <h2 style="margin-top:16px;font-family:'Krub',sans-serif;font-size:1.4rem;color:#5840BF;font-weight:700;">หมูเด้ง Smart Budget</h2>
-</div>
 
-<style>
-@keyframes splash-pop {
-  0% { transform: scale(0.5); opacity: 0; }
-  80% { transform: scale(1.05); }
-  100% { transform: scale(1); opacity: 1; }
-}
-</style>
+  <!-- 1. Splash Screen แสดงโลโก้ตอนเปิดแอป -->
+  <div id="app-splash" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:#F5F2FF;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999999;transition:opacity 0.4s ease, visibility 0.4s ease;">
+    <img src="icon.png" alt="Logo" style="width:100px;height:100px;border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,0.12);animation:splash-pop 0.6s ease-out;">
+    <h2 style="margin-top:16px;font-family:'Krub',sans-serif;font-size:1.4rem;color:#5840BF;font-weight:700;">หมูเด้ง Smart Budget</h2>
+  </div>
 
-<script>
-  // ซ่อนหน้า Splash หลังแอปพร้อมใช้งาน
-  window.addEventListener('load', function() {
-    const splash = document.getElementById('app-splash');
-    if (splash) {
-      setTimeout(function() {
-        splash.style.opacity = '0';
-        splash.style.visibility = 'hidden';
-      }, 800); // แสดง 0.8 วินาทีแล้วค่อยจางหายไป
-    }
-  });
-</script>
+  <!-- 2. หน้าจอปลดล็อก PIN ก่อนเข้าแอป -->
+  <div id="pin-lock-screen" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:#F5F2FF;display:none;flex-direction:column;justify-content:center;align-items:center;z-index:999998;font-family:'Krub',sans-serif;">
+    <div style="background:#fff;padding:30px 24px;border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;width:90%;max-width:320px;">
+      <div style="font-size:3rem;margin-bottom:10px;">🔒</div>
+      <h3 style="font-size:1.3rem;font-weight:700;color:#111827;margin-bottom:6px;">กรอกรหัส PIN</h3>
+      <p class="tiny muted" style="margin-bottom:20px;">เพื่อเข้าใช้งาน หมูเด้ง Smart Budget</p>
+      <input type="password" id="unlockPinInput" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="••••" style="font-size:2rem;text-align:center;width:160px;padding:8px;border:2px solid #DDD;border-radius:14px;letter-spacing:12px;outline:none;margin-bottom:20px;">
+      <button type="button" onclick="verifyAppPin()" class="primary full" style="font-size:1rem;padding:12px;">ปลดล็อก</button>
+    </div>
+  </div>
+
+  <style>
+  @keyframes splash-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  </style>
+
   <main class="app-shell">
    <!-- หน้าหลัก -->
    <section id="home" class="screen" aria-label="หน้าหลัก">
@@ -339,9 +339,23 @@
 
     <article class="glass card">
      <h2>จัดการข้อมูล & ความปลอดภัย</h2>
-     <div class="two" style="margin-top:13px">
+
+     <!-- สวิตช์ เปิด-ปิด PIN ล็อก -->
+     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;margin-bottom:12px;padding:12px;background:rgba(255,255,255,0.6);border-radius:14px;border:1px solid rgba(0,0,0,0.05);">
+      <div>
+       <strong style="display:block;font-size:0.95rem;color:#111827;">ถาม PIN ก่อนเข้าแอป</strong>
+       <span class="tiny muted">ล็อกหน้าจอทุกครั้งที่เปิดเข้าใช้งาน</span>
+      </div>
+      <label style="position:relative;display:inline-block;width:48px;height:26px;">
+       <input type="checkbox" id="pinToggle" onchange="togglePinSecurity(this.checked)" style="opacity:0;width:0;height:0;">
+       <span id="sliderBg" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#CCC;transition:.3s;border-radius:26px;"></span>
+       <span id="sliderDot" style="position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%;"></span>
+      </label>
+     </div>
+
+     <div class="two">
+      <button class="secondary" type="button" onclick="openModal('pinModal')">ตั้ง / เปลี่ยนรหัส PIN</button>
       <button class="secondary" type="button" onclick="switchUserPrompt()">สลับผู้ใช้งาน / สร้างใหม่</button>
-      <button class="secondary" type="button" onclick="openModal('pinModal')">ตั้งรหัส PIN</button>
       <button class="secondary" type="button" onclick="exportBackup()">สำรองข้อมูล</button>
       <label class="secondary" style="display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer">
        <span>เรียกคืนข้อมูล</span>
@@ -432,17 +446,18 @@
    </div>
   </div>
 
+  <!-- Modal ตั้งรหัส PIN -->
   <div id="pinModal" class="modal" role="dialog" aria-modal="true">
    <div class="modal-box">
     <h2>ตั้งรหัสผ่าน PIN</h2>
-    <p class="tiny muted" style="margin-top:6px">กรอกรหัสตัวเลข 4 หลักเพื่อความปลอดภัย</p>
+    <p class="tiny muted" style="margin-top:6px">กรอกรหัสตัวเลข 4 หลักเพื่อเปิดใช้ความปลอดภัย</p>
     <div class="field">
      <label for="pinInput">รหัส PIN 4 หลัก</label>
      <input id="pinInput" class="input money" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}">
     </div>
     <div class="modal-actions">
      <button class="secondary" type="button" onclick="closeModal('pinModal')">ยกเลิก</button>
-     <button class="primary" type="button" onclick="savePin()">ตั้งรหัสผ่าน</button>
+     <button class="primary" type="button" onclick="savePinFromModal()">บันทึกรหัสผ่าน</button>
     </div>
    </div>
   </div>
@@ -513,8 +528,92 @@
   <!-- Custom Logic Script -->
   <script src="app.js"></script>
 
-  <!-- ลงทะเบียน Service Worker เพื่อให้แอปใช้งานแบบ Offline ได้ -->
+  <!-- สคริปต์ควบคุมการทำงานของ Splash Screen & PIN ล็อก -->
   <script>
+    // 1. ซ่อน Splash Screen เมื่อแอปโหลดเสร็จ
+    window.addEventListener('load', function() {
+      const splash = document.getElementById('app-splash');
+      if (splash) {
+        setTimeout(function() {
+          splash.style.opacity = '0';
+          splash.style.visibility = 'hidden';
+        }, 800);
+      }
+      checkPinToggleState();
+      checkPinOnStartup();
+    });
+
+    // 2. เช็กและเปลี่ยนหน้าตาสวิตช์เปิด-ปิด PIN
+    function checkPinToggleState() {
+      const isPinEnabled = localStorage.getItem('pin_enabled') === 'true';
+      const toggle = document.getElementById('pinToggle');
+      if (toggle) {
+        toggle.checked = isPinEnabled;
+        updateToggleStyle(isPinEnabled);
+      }
+    }
+
+    // 3. สลับการเปิด-ปิดสวิตช์ PIN
+    function togglePinSecurity(enabled) {
+      const savedPin = localStorage.getItem('user_pin');
+      if (enabled && !savedPin) {
+        alert('กรุณาตั้งรหัส PIN 4 หลักก่อนเปิดใช้งานครับ');
+        document.getElementById('pinToggle').checked = false;
+        openModal('pinModal');
+        return;
+      }
+      localStorage.setItem('pin_enabled', enabled ? 'true' : 'false');
+      updateToggleStyle(enabled);
+    }
+
+    function updateToggleStyle(enabled) {
+      const bg = document.getElementById('sliderBg');
+      const dot = document.getElementById('sliderDot');
+      if (bg && dot) {
+        bg.style.backgroundColor = enabled ? '#7056D9' : '#CCC';
+        dot.style.transform = enabled ? 'translateX(22px)' : 'translateX(0px)';
+      }
+    }
+
+    // 4. บันทึกรหัส PIN ใหม่จาก Modal
+    function savePinFromModal() {
+      const pinVal = document.getElementById('pinInput').value;
+      if (pinVal && pinVal.length === 4) {
+        localStorage.setItem('user_pin', pinVal);
+        localStorage.setItem('pin_enabled', 'true');
+        checkPinToggleState();
+        closeModal('pinModal');
+        document.getElementById('pinInput').value = '';
+        alert('ตั้งรหัส PIN และเปิดใช้งานเรียบร้อยแล้ว!');
+      } else {
+        alert('กรุณากรอกรหัส PIN เป็นตัวเลข 4 หลักครับ');
+      }
+    }
+
+    // 5. เช็กการล็อกเมื่อเปิดเข้าแอป
+    function checkPinOnStartup() {
+      const isPinEnabled = localStorage.getItem('pin_enabled') === 'true';
+      const savedPin = localStorage.getItem('user_pin');
+      if (isPinEnabled && savedPin) {
+        const pinScreen = document.getElementById('pin-lock-screen');
+        if (pinScreen) pinScreen.style.display = 'flex';
+      }
+    }
+
+    // 6. ตรวจสอบรหัส PIN เพื่อปลดล็อกเข้าแอป
+    function verifyAppPin() {
+      const inputVal = document.getElementById('unlockPinInput').value;
+      const savedPin = localStorage.getItem('user_pin');
+      if (inputVal === savedPin) {
+        document.getElementById('pin-lock-screen').style.display = 'none';
+        document.getElementById('unlockPinInput').value = '';
+      } else {
+        alert('รหัส PIN ไม่ถูกต้อง!');
+        document.getElementById('unlockPinInput').value = '';
+      }
+    }
+
+    // 7. ลงทะเบียน Service Worker ใช้งานออฟไลน์
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
