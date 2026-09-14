@@ -48,16 +48,17 @@ function compressImage(file, callback) {
 }
 
 function dailyCheckIn() {
-  let today = new Date().toISOString().slice(0, 10), last = state.check_in_date;
+  let today = new Date().toLocaleDateString('sv-SE'), last = state.check_in_date;
   if (last !== today) {
     let yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    state.check_in_streak = last === yesterday.toISOString().slice(0, 10) ? (Number(state.check_in_streak) || 0) + 1 : 1;
+    let yesterdayStr = yesterday.toLocaleDateString('sv-SE');
+    state.check_in_streak = last === yesterdayStr ? (Number(state.check_in_streak) || 0) + 1 : 1;
     state.check_in_date = today;
     save();
   }
   $('streakCount').textContent = Number(state.check_in_streak) || 0;
-  $('dailyCheer').textContent = cheers[(Number(state.check_in_streak) || 0) % cheers.length];
+  $('dailyCheer').textContent = cheers[(Math.abs(Number(state.check_in_streak)) || 0) % cheers.length];
 }
 
 function sparklePop() {
@@ -237,7 +238,7 @@ function renderTransactions() {
 function renderAnalytics() {
   let data = state.transactions.filter(x => within(x, range)), t = total(data), categories = {};
   data.filter(x => x.type === 'expense').forEach(x => categories[x.category] = (categories[x.category] || 0) + Number(x.amount));
-  let ranks = Object.entries(categories).sort((a, b) => b[1] - a[1]), sum = t.expense || 1, colors = ['#7056D9', '#F43F5E', '#0EA5E9', '#F59E0B', '#10B981', '#64748B'], cursor = 0, stops = ranks.map(([, v], i) => { let s = cursor; cursor += v / sum * 100; return colors[i % colors.length] + ' ' + s + '% ' + cursor + '%'; });
+  let ranks = Object.entries(categories).sort((a, b) => b[1] - a[1]), sum = t.expense || 1, colors = ['#B5EAD7', '#FFDAC1', '#FFB7B2', '#FF9AA2', '#E2F0CB', '#C7CEEA'], cursor = 0, stops = ranks.map(([, v], i) => { let s = cursor; cursor += v / sum * 100; return colors[i % colors.length] + ' ' + s + '% ' + cursor + '%'; });
   $('donut').style.background = ranks.length ? 'conic-gradient(' + stops.join(',') + ')' : '#E8EDF2';
   $('chartSpent').textContent = signed(t.expense, 'expense');
   $('chartIncome').textContent = signed(t.income, 'income');
