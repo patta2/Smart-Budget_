@@ -23,6 +23,30 @@ let state = { user_id: deviceUserId, name: 'ผู้ใช้งาน', photo:
 let type = 'expense', pending = null, range = 'week';
 const cheers = ['วันนี้เก่งมาก!', 'ออมเงินเก่งสุดๆ!', 'หมูเด้งภูมิใจในตัวเธอ!', 'ทีละนิดก็พิชิตเป้าหมายได้!'];
 
+// ฟังก์ชันย่อขนาดรูปสลิปให้อัตโนมัติ ป้องกันความจำไอแพดเต็ม
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 400; // บีบความกว้างไม่ให้เกิน 400 พิกเซล
+      const scaleSize = MAX_WIDTH / img.width;
+      canvas.width = MAX_WIDTH;
+      canvas.height = img.height * scaleSize;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      
+      // แปลงเป็นไฟล์ภาพ JPEG คุณภาพ 70% (ไฟล์จะเล็กมาก เซฟติดแน่นอน)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      callback(dataUrl);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function dailyCheckIn() {
   let today = new Date().toISOString().slice(0, 10), last = state.check_in_date;
   if (last !== today) {
@@ -84,16 +108,6 @@ function applySaved(saved) {
   state.recurring = Array.isArray(state.recurring) ? state.recurring : [];
   $('currency').value = state.currency || 'THB';
   setTheme(state.theme || 'purple', false);
-}
-
-function switchUserPrompt() {
-  const newUserId = prompt('กรอกรหัสผู้ใช้งานที่ต้องการสลับ หรือพิมพ์ชื่อใหม่เพื่อสร้างบัญชีแยก:', deviceUserId);
-  if (newUserId && newUserId !== deviceUserId) {
-    deviceUserId = newUserId;
-    localStorage.setItem(USER_KEY, deviceUserId);
-    initLocal();
-    toast('สลับไปใช้บัญชี: ' + deviceUserId);
-  }
 }
 
 function avatar() {
@@ -175,9 +189,18 @@ function icons() { if (window.lucide) lucide.createIcons(); }
 function toast(message) { $('toast').textContent = message; $('toast').classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2600); }
 function setNow() { let d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); $('txDate').value = d.toISOString().slice(0, 16); }
 
+// อัปเดตส่วนแสดงรายการ ให้โชว์รูปสลิปจิ๋วและกดดูรูปใหญ่ได้
 function txMarkup(x) {
   let d = new Date(x.date);
-  return '<div class="list-item"><div class="cat-icon"><i data-lucide="' + (categoryIcons[x.category] || 'circle-dot') + '"></i></div><div class="list-main"><b>' + esc(x.category) + '</b><p class="tiny muted truncate">' + esc(x.memo || 'ไม่มีบันทึก') + ' · ' + (isNaN(d) ? '' : d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })) + '</p></div><div style="text-align:right"><b class="money ' + x.type + '">' + signed(x.amount, x.type) + '</b><button class="delete" type="button" onclick="deleteTx(\'' + x.id + '\')">ลบ</button></div></div>';
+  let receiptHtml = '';
+  if (x.receipt) {
+    receiptHtml = `<div style="margin-top:4px;">
+      <a href="${x.receipt}" target="_blank">
+        <img src="${x.receipt}" alt="สลิป" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid #ddd;">
+      </a>
+    </div>`;
+  }
+  return '<div class="list-item"><div class="cat-icon"><i data-lucide="' + (categoryIcons[x.category] || 'circle-dot') + '"></i></div><div class="list-main"><b>' + esc(x.category) + '</b><p class="tiny muted truncate">' + esc(x.memo || 'ไม่มีบันทึก') + ' · ' + (isNaN(d) ? '' : d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })) + '</p>' + receiptHtml + '</div><div style="text-align:right"><b class="money ' + x.type + '">' + signed(x.amount, x.type) + '</b><button class="delete" type="button" onclick="deleteTx(\'' + x.id + '\')">ลบ</button></div></div>';
 }
 
 function renderHome() {
@@ -354,16 +377,15 @@ function deleteTx(txid) {
   toast('ลบรายการแล้ว');
 }
 
+// ใช้ compressImage ตอนอัปโหลดสลิป เพื่อป้องกันภาพใหญ่เกินไป
 $('receipt').addEventListener('change', e => {
   let f = e.target.files[0];
   if (!f) return;
-  let r = new FileReader();
-  r.onload = () => {
-    $('receiptPreview').src = r.result;
-    $('receiptPreview').dataset.image = r.result;
+  compressImage(f, function(base64Image) {
+    $('receiptPreview').src = base64Image;
+    $('receiptPreview').dataset.image = base64Image;
     $('receiptPreview').style.display = 'block';
-  };
-  r.readAsDataURL(f);
+  });
 });
 
 $('search').addEventListener('input', renderTransactions);
@@ -393,15 +415,14 @@ function openProfile() {
   openModal('profileModal');
 }
 
+// ย่อรูปโปรไฟล์ด้วย เพื่อความปลอดภัยไม่ให้ LocalStorage เต็ม
 $('avatarUpload').addEventListener('change', e => {
   let f = e.target.files[0];
   if (!f) return;
-  let r = new FileReader();
-  r.onload = () => {
-    state.photo = r.result;
+  compressImage(f, function(base64Image) {
+    state.photo = base64Image;
     $('profileAvatar').innerHTML = avatar();
-  };
-  r.readAsDataURL(f);
+  });
 });
 
 function saveProfile() {
@@ -457,15 +478,6 @@ function splitBill() {
 }
 $('billTotal').addEventListener('input', splitBill);
 $('billPeople').addEventListener('input', splitBill);
-
-function savePin() {
-  let pin = $('pinInput').value;
-  if (!/^\d{4}$/.test(pin)) return toast('PIN ต้องเป็นตัวเลข 4 หลัก');
-  state.pin = pin;
-  save();
-  closeModal('pinModal');
-  toast('บันทึก PIN แล้ว');
-}
 
 function setTheme(theme, store = true) {
   document.body.className = theme;
@@ -543,17 +555,8 @@ function initLocal() {
   icons();
 }
 
-function openSurvey() {
-  if (localStorage.getItem('moodeng_survey_done_' + deviceUserId)) {
-    toast('ส่งแบบสอบถามไปแล้ว ขอบคุณที่แชร์');
-    return;
-  }
-  openModal('surveyModal');
-}
-
 $('surveyForm').addEventListener('submit', e => {
   e.preventDefault();
-
   const surveyPayload = {
     userId: deviceUserId,
     status: $('surveyStatus').value,
@@ -582,10 +585,8 @@ $('surveyForm').addEventListener('submit', e => {
     })
     .catch(err => {
       toast('ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
-      console.error(err);
     });
   } else {
-    // บันทึกคำตอบออฟไลน์ไว้ก่อน ส่งเมื่อต่อเน็ตได้
     localStorage.setItem('pending_survey_' + deviceUserId, JSON.stringify(surveyPayload));
     localStorage.setItem('moodeng_survey_done_' + deviceUserId, '1');
     sparklePop();
@@ -595,7 +596,6 @@ $('surveyForm').addEventListener('submit', e => {
   }
 });
 
-// ส่งแบบสอบถามที่ค้างไว้เมื่อต่ออินเทอร์เน็ตได้
 window.addEventListener('online', () => {
   const pendingSurvey = localStorage.getItem('pending_survey_' + deviceUserId);
   if (pendingSurvey) {
@@ -612,20 +612,15 @@ window.addEventListener('online', () => {
 });
 
 initLocal();
-// ==========================================
-// ระบบ PIN Security (แก้ไขเรียบร้อยแล้ว)
-// ==========================================
-let currentPinInput = "";
 
-// 1. ตรวจสอบว่าตั้ง PIN ไว้หรือไม่ตอนเปิดแอป ถ้ามีให้เด้งหน้า PIN ขึ้นมาทันที
+let currentPinInput = "";
 function checkPinLock() {
-  const isPinEnabled = localStorage.getItem('pin_enabled') !== 'false'; // ค่าเริ่มต้นให้ใช้องค์ประกอบ PIN ถ้ามีรหัส
+  const isPinEnabled = localStorage.getItem('pin_enabled') !== 'false';
   if ((state.pin || localStorage.getItem('user_pin')) && isPinEnabled) {
     showPinScreen();
   }
 }
 
-// 2. แสดงหน้าจอกรอก PIN
 function showPinScreen() {
   const pinScreen = document.getElementById('pin-screen');
   if (pinScreen) {
@@ -635,7 +630,6 @@ function showPinScreen() {
   }
 }
 
-// 3. ซ่อนหน้าจอกรอก PIN
 function hidePinScreen() {
   const pinScreen = document.getElementById('pin-screen');
   if (pinScreen) {
@@ -643,25 +637,21 @@ function hidePinScreen() {
   }
 }
 
-// 4. ฟังก์ชันเมื่อกดปุ่มตัวเลข
 function pressPin(num) {
   if (currentPinInput.length < 4) {
     currentPinInput += num;
     updatePinDots();
-
     if (currentPinInput.length === 4) {
       setTimeout(verifyPin, 100);
     }
   }
 }
 
-// 5. ฟังก์ชันลบตัวเลข
 function clearPin() {
   currentPinInput = "";
   updatePinDots();
 }
 
-// 6. อัปเดตจุดแสดงรหัส
 function updatePinDots() {
   const dots = document.querySelectorAll('.pin-dot');
   dots.forEach((dot, index) => {
@@ -675,11 +665,8 @@ function updatePinDots() {
   });
 }
 
-// 7. ตรวจสอบความถูกต้องของ PIN
 function verifyPin() {
-  // ดึงรหัสจากทั้ง state.pin และ user_pin ให้ตรงกัน
   const activePin = state.pin || localStorage.getItem('user_pin');
-  
   if (currentPinInput === activePin) {
     toast("ปลดล็อกสำเร็จ");
     hidePinScreen();
@@ -689,23 +676,19 @@ function verifyPin() {
   }
 }
 
-// 8. ฟังก์ชันบันทึก PIN (ซิงค์ค่าให้ตรงกันทั้ง 2 ระบบ)
 function savePin() {
   let pin = $('pinInput') ? $('pinInput').value : currentPinInput;
   if (!/^\d{4}$/.test(pin)) return toast('PIN ต้องเป็นตัวเลข 4 หลัก');
-  
   state.pin = pin;
   localStorage.setItem('user_pin', pin);
   localStorage.setItem('pin_enabled', 'true');
   save();
-  
   if ($('pinModal')) closeModal('pinModal');
   toast('บันทึก PIN เรียบร้อยแล้ว');
 }
 
-// เรียกให้ระบบตรวจเช็กล็อก PIN ทันทีหลังจากโหลดข้อมูล local เรียบร้อยแล้ว
 checkPinLock();
-// ซ่อน Splash Screen หลังเปิดแอป 1.8 วินาที
+
 window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const splash = document.getElementById('splash-screen');
@@ -713,8 +696,8 @@ window.addEventListener('DOMContentLoaded', () => {
       splash.style.opacity = '0';
       splash.style.visibility = 'hidden';
       setTimeout(() => {
-        splash.remove(); // ลบออกจาก DOM หลังเล่นอนิเมชันเสร็จ
+        splash.remove();
       }, 500);
     }
-  }, 1800); // 1800ms = 1.8 วินาที
+  }, 1800);
 });
