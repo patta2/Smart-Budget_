@@ -58,18 +58,17 @@ function dailyCheckIn() {
 }
 
 function sparklePop() {
-  // ปรับสีประกายให้สดใสและโดดเด่นขึ้นแบบจัดเต็ม
-  ['<svg viewBox="0 0 24 24"><path d="M12 2l1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8Z" fill="#FF3366"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" stroke="#00CCE6" stroke-width="3" stroke-linecap="round"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 20S4 15 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 11-8 11Z" fill="#FF6B6B"/></svg>', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#FFE66D" stroke="#E17055" stroke-width="2"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z" fill="#6C5CE7"/></svg>'].forEach((mark, i) => {
+  ['<svg viewBox="0 0 24 24"><path d="M12 2l1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8Z" fill="#FFDAC1"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" stroke="#B5EAD7" stroke-width="3" stroke-linecap="round"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 20S4 15 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 11-8 11Z" fill="#FF9AA2"/></svg>', '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#E2F0CB" stroke="#149C78" stroke-width="2"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z" fill="#C7CEEA"/></svg>'].forEach((mark, i) => {
     let el = document.createElement('span');
     el.className = 'sparkle';
     el.innerHTML = mark;
-    el.querySelector('svg').style.width = '24px';
-    el.querySelector('svg').style.height = '24px';
+    el.querySelector('svg').style.width = '22px';
+    el.querySelector('svg').style.height = '22px';
     el.style.left = (45 + Math.random() * 10) + '%';
     el.style.top = (38 + Math.random() * 18) + '%';
-    el.style.setProperty('--dx', ((Math.random() - .5) * 190) + 'px');
-    el.style.setProperty('--dy', (-40 - Math.random() * 100) + 'px');
-    el.style.color = ['#FF3366', '#6C5CE7', '#FFE66D', '#00CCE6', '#FF8B94'][i];
+    el.style.setProperty('--dx', ((Math.random() - .5) * 170) + 'px');
+    el.style.setProperty('--dy', (-35 - Math.random() * 90) + 'px');
+    el.style.color = ['#F8A9C4', '#BCA7FF', '#F6C85F', '#8ED8C0', '#F59AB5'][i];
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 850);
   });
@@ -109,7 +108,7 @@ function applySaved(saved) {
 }
 
 function avatar() {
-  return state.photo ? '<img src="' + state.photo + '" alt="รูปโปรไฟล์">' : '<svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M11 22c0-3 2-5 5-5h32c3 0 5 2 5 5v27c0 3-2 5-5 5H16c-3 0-5-2-5-5V22Z" fill="#FFE66D" stroke="currentColor" stroke-width="3"/><path d="M11 24h35c4 0 7 3 7 7v6H41c-4 0-7-3-7-7v-6H11Z" fill="#FF6B6B" stroke="currentColor" stroke-width="3"/><circle cx="43" cy="31" r="2.5" fill="#FFF"/><path d="M18 17v-4c0-3 2-5 5-5h20c3 0 5 2 5 5v4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M22 40h8M22 46h14" stroke="#D63031" stroke-width="3" stroke-linecap="round"/></svg>';
+  return state.photo ? '<img src="' + state.photo + '" alt="รูปโปรไฟล์">' : '<svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M11 22c0-3 2-5 5-5h32c3 0 5 2 5 5v27c0 3-2 5-5 5H16c-3 0-5-2-5-5V22Z" fill="#FFF5C2" stroke="currentColor" stroke-width="3"/><path d="M11 24h35c4 0 7 3 7 7v6H41c-4 0-7-3-7-7v-6H11Z" fill="#FFD6E7" stroke="currentColor" stroke-width="3"/><circle cx="43" cy="31" r="2.5" fill="currentColor"/><path d="M18 17v-4c0-3 2-5 5-5h20c3 0 5 2 5 5v4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M22 40h8M22 46h14" stroke="#D9538D" stroke-width="3" stroke-linecap="round"/></svg>';
 }
 
 function money(value) {
@@ -137,7 +136,8 @@ function syncAmbient() {
 
 function renderSavingPlant(balance) {
   let goal = state.goals[0], pc = goal && Number(goal.amount) > 0 ? Math.min(100, Math.max(0, (Number(goal.saved) || 0) / Number(goal.amount) * 100)) : 0, level = pc <= 30 ? 'sprout' : pc <= 70 ? 'bush' : 'bloom';
-  let art = level === 'sprout' ? '<path d="M32 58V38M32 45c-8 0-13-4-13-11 7 0 13 4 13 11Zm0-6c0-8 5-13 13-13 0 8-5 13-13 13Z" fill="#00CEC9" stroke="#0984E3" stroke-width="3"/>' : level === 'bush' ? '<path d="M32 58V30M32 42c-13 0-19-7-19-17 11 0 19 6 19 17Zm0-8c0-12 8-20 19-20 0 11-7 20-19 20Z" fill="#00CEC9" stroke="#0984E3" stroke-width="3"/>' : '<path d="M32 58V31M32 38c-12-8-11-18-5-24 7 5 8 14 5 24Zm0 0c12-8 11-18 5-24-7 5-8 14-5 24Z" fill="#FF7675" stroke="#D63031" stroke-width="3"/><path d="M24 58h16" stroke="#FFEAA7" stroke-width="4" stroke-linecap="round"/><circle cx="15" cy="20" r="3.5" fill="#6C5CE7"/><circle cx="49" cy="17" r="3.5" fill="#00CEC9"/>';
+  // คืนค่าสีต้นไม้ออมเงินกลับเป็นโทนเดิมที่คุ้นเคยและสบายตา
+  let art = level === 'sprout' ? '<path d="M32 58V38M32 45c-8 0-13-4-13-11 7 0 13 4 13 11Zm0-6c0-8 5-13 13-13 0 8-5 13-13 13Z" fill="#B5EAD7" stroke="#149C78" stroke-width="3"/>' : level === 'bush' ? '<path d="M32 58V30M32 42c-13 0-19-7-19-17 11 0 19 6 19 17Zm0-8c0-12 8-20 19-20 0 11-7 20-19 20Z" fill="#B5EAD7" stroke="#149C78" stroke-width="3"/>' : '<path d="M32 58V31M32 38c-12-8-11-18-5-24 7 5 8 14 5 24Zm0 0c12-8 11-18 5-24-7 5-8 14-5 24Z" fill="#FFB7B2" stroke="#D9538D" stroke-width="3"/><path d="M24 58h16" stroke="#FFDAC1" stroke-width="4" stroke-linecap="round"/><circle cx="15" cy="20" r="3" fill="#C7CEEA"/><circle cx="49" cy="17" r="3" fill="#E2F0CB"/>';
   $('savingPlant').innerHTML = '<svg viewBox="0 0 64 64" width="48" height="48" aria-label="ต้นไม้ออมเงิน">' + art + '</svg>';
   $('savingPlantText').textContent = level === 'bloom' ? 'ผลิบานเต็มที่แล้ว เก่งมาก!' : level === 'bush' ? 'น้องกำลังโตขึ้นจากเงินออมของเรา' : 'เริ่มออมวันนี้ แล้วดูน้องเติบโตนะ';
   let alert = Number(state.allowance) > 0 && Math.max(0, Number(state.allowance)) > 0 && Math.max(0, Number(state.allowance) - Number(balance)) / Number(state.allowance) >= .8;
@@ -236,9 +236,14 @@ function renderAnalytics() {
   data.filter(x => x.type === 'expense').forEach(x => categories[x.category] = (categories[x.category] || 0) + Number(x.amount));
   let ranks = Object.entries(categories).sort((a, b) => b[1] - a[1]), sum = t.expense || 1;
   
-  // เปลี่ยนโทนสีวงล้อ (Donut Chart) ให้สดใส ชัดเจน และมีมิติยิ่งขึ้น
-  let colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8B94', '#6C5CE7', '#00B894', '#E17055', '#0984E3'];
-  let cursor = 0, stops = ranks.map(([, v], i) => { let s = cursor; cursor += v / sum * 100; return colors[i % colors.length] + ' ' + s + '% ' + cursor + '%'; });
+  // ปรับสีวงล้อ (Donut Chart) ใหม่ให้มีความสมูท ดูพาสเทลพรีเมียม กลมกลืน ไม่แข็งทื่อ
+  let colors = ['#818cf8', '#34d399', '#fbbf24', '#f43f5e', '#a855f7', '#38bdf8', '#fb923c', '#e879f9'];
+  let cursor = 0, stops = ranks.map(([, v], i) => { 
+    let s = cursor; 
+    cursor += v / sum * 100; 
+    let c = colors[i % colors.length];
+    return c + ' ' + s + '% ' + cursor + '%'; 
+  });
   
   $('donut').style.background = ranks.length ? 'conic-gradient(' + stops.join(',') + ')' : '#E8EDF2';
   $('chartSpent').textContent = signed(t.expense, 'expense');
@@ -677,7 +682,7 @@ function verifyPin() {
 }
 
 function savePin() {
-  let pin = $('pinInput') ? $('pinInput').value : currentPinInput;
+  let pin = $('pinInput') ? $('pinInput'].value : currentPinInput;
   if (!/^\d{4}$/.test(pin)) return toast('PIN ต้องเป็นตัวเลข 4 หลัก');
   state.pin = pin;
   localStorage.setItem('user_pin', pin);
