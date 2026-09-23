@@ -129,7 +129,24 @@
       </div>
      </div>
     </article>
-
+<div class="kplus-shortcuts" style="display: flex; justify-content: space-around; margin: 16px 0; text-align: center;">
+  <div onclick="showScreen('transactions'); setType('expense');" style="cursor:pointer;">
+    <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;"><i data-lucide="minus" style="color:var(--primary)"></i></div>
+    <span class="tiny">จ่ายออก</span>
+  </div>
+  <div onclick="showScreen('transactions'); setType('income');" style="cursor:pointer;">
+    <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;"><i data-lucide="plus" style="color:var(--primary)"></i></div>
+    <span class="tiny">รับเข้า</span>
+  </div>
+  <div onclick="showScreen('profile');" style="cursor:pointer;">
+    <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;"><i data-lucide="piggy-bank" style="color:var(--primary)"></i></div>
+    <span class="tiny">ออมเงิน</span>
+  </div>
+  <div onclick="showScreen('analytics');" style="cursor:pointer;">
+    <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px;"><i data-lucide="pie-chart" style="color:var(--primary)"></i></div>
+    <span class="tiny">สถิติ</span>
+  </div>
+</div>
     <article class="glass card">
      <h2>บันทึกด่วน</h2>
      <div class="quick-grid">
@@ -215,6 +232,12 @@
       <div class="field">
        <label for="txAmount">จำนวนเงิน</label>
        <input id="txAmount" class="input money" type="number" min="0" step="any" inputmode="decimal" placeholder="0.00" required>
+       <div class="quick-amounts" style="display: flex; gap: 8px; margin: 8px 0 16px 0;">
+  <button type="button" class="secondary" onclick="addQuickAmount(20)">+20</button>
+  <button type="button" class="secondary" onclick="addQuickAmount(50)">+50</button>
+  <button type="button" class="secondary" onclick="addQuickAmount(100)">+100</button>
+  <button type="button" class="secondary" onclick="addQuickAmount(500)">+500</button>
+</div>
       </div>
       <div class="field">
        <label for="txDate">วันที่และเวลา</label>
