@@ -72,7 +72,7 @@
       transition: all 0.25s ease;
     }
 
-    /* Minimal Circle Icon Buttons (ปรับตามคำขอ: ปุ่มลัดเปลี่ยนเป็นวงกลม) */
+    /* Minimal Circle Icon Buttons */
     .circle-btn {
       width: 52px;
       height: 52px;
@@ -105,7 +105,7 @@
       border: 1px solid rgba(255,255,255,0.8);
     }
 
-    /* Theme Circular Selector Buttons (ปรับเป็นวงกลมน่ารักๆ หน้าที่สี่) */
+    /* Theme Circular Selector Buttons */
     .theme-circle-btn {
       width: 46px;
       height: 46px;
@@ -136,7 +136,7 @@
     .avatar.large { width: 84px; height: 84px; margin: 0 auto 10px; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Animated Mascot & Cheer Card (ปรับแต่งการเช็กอิน & มาสคอตขยับได้) */
+    /* Animated Mascot & Cheer Card */
     .cheer-card { display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #FFF9E6 0%, #F3E8FF 100%); position: relative; overflow: hidden; }
     
     .mascot-svg-wrapper {
@@ -151,7 +151,7 @@
       50% { transform: translateY(-6px) rotate(4deg); }
     }
 
-    /* Dynamic Glowing Energy Gauge (หลอดพลังงานงบทั้งหมดเรืองแสง + จุดรูปดาว) */
+    /* Dynamic Glowing Energy Gauge */
     .energy-gauge-box {
       position: relative;
       margin-top: 14px;
@@ -169,7 +169,6 @@
       border-radius: 12px;
       transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
-      /* Glow Effect */
       box-shadow: 0 0 12px var(--primary);
     }
     .progress-bar.green { background: linear-gradient(90deg, #34D399, #10B981); box-shadow: 0 0 14px rgba(16, 185, 129, 0.5); }
@@ -182,7 +181,7 @@
       100% { box-shadow: 0 0 18px #F43F5E; }
     }
 
-    /* Star Markers บนหลอดพลังงาน (ใช้จุดรูปดาวแทนอิโมจิ) */
+    /* Star Markers บนหลอดพลังงาน */
     .star-markers-container {
       position: absolute;
       top: -3px;
@@ -215,7 +214,7 @@
       transform: scale(1.15);
     }
 
-    /* Form Controls & Glowing Input Box (กรอบเรืองแสงหน้าที่ 2) */
+    /* Form Controls & Glowing Input Box */
     .glow-box-container {
       border: 2px solid var(--primary-light);
       border-radius: 18px;
@@ -230,9 +229,9 @@
     }
 
     .compact-date-input {
-      width: 175px !important;
-      padding: 6px 10px !important;
-      font-size: 0.88rem !important;
+      width: 100% !important;
+      padding: 10px 12px !important;
+      font-size: 0.92rem !important;
     }
 
     .field { margin-bottom: 12px; }
@@ -277,7 +276,7 @@
     .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #111827; color: white; padding: 12px 22px; border-radius: 20px; font-weight: 600; font-family: 'Krub', sans-serif; font-size: 0.9rem; z-index: 9999; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* Character Effect Pop-Up (ตัวการ์ตูนป๊อปอัปเวลาบันทึก) */
+    /* Character Effect Pop-Up */
     .popup-mascot-overlay {
       position: fixed;
       inset: 0;
@@ -339,7 +338,6 @@
     <header class="topbar">
      <button type="button" class="profile-trigger" onclick="openProfile()" aria-label="แก้ไขโปรไฟล์">
       <span class="avatar" id="homeAvatar">
-        <!-- Cute SVG Pig Avatar -->
         <svg viewBox="0 0 100 100" width="100%" height="100%">
           <circle cx="50" cy="50" r="45" fill="#FCE7F3" />
           <ellipse cx="50" cy="55" rx="18" ry="12" fill="#F472B6" />
@@ -359,10 +357,8 @@
      <button type="button" class="squircle-btn" style="width:40px;height:40px;" onclick="openProfile()" aria-label="ตั้งค่าโปรไฟล์"><i data-lucide="settings" style="width:20px;height:20px;color:var(--primary);"></i></button>
     </header>
 
-    <!-- ปรับตามคำขอ: เปลี่ยนเป็น "เช็กอิน" + รูปการ์ตูนน่ารักขยับได้ -->
     <article class="glass cheer-card card">
      <div class="mascot-svg-wrapper" id="mascotAnimatedWrapper">
-      <!-- SVG Cute Pig Mascot moving dynamically -->
       <svg viewBox="0 0 100 100" width="100%" height="100%">
         <circle cx="50" cy="50" r="42" fill="#FCE7F3" stroke="#F472B6" stroke-width="2.5"/>
         <ellipse cx="50" cy="56" rx="16" ry="11" fill="#F472B6"/>
@@ -374,7 +370,6 @@
         <circle cx="66.5" cy="38.5" r="1.5" fill="#FFF"/>
         <ellipse cx="26" cy="48" rx="5" ry="3" fill="#FB7185" opacity="0.6"/>
         <ellipse cx="74" cy="48" rx="5" ry="3" fill="#FB7185" opacity="0.6"/>
-        <!-- Ears -->
         <path d="M 22 25 Q 12 5 28 15 Z" fill="#FCE7F3" stroke="#F472B6" stroke-width="2"/>
         <path d="M 78 25 Q 88 5 72 15 Z" fill="#FCE7F3" stroke="#F472B6" stroke-width="2"/>
       </svg>
@@ -407,7 +402,7 @@
      <p class="tiny muted" style="margin-top:2px">เงินคงเหลือที่ใช้ได้จริงในปัจจุบัน</p>
     </article>
 
-    <!-- ปรับตามคำขอ: สรุปรายจ่ายให้หลอดพลังงานเป็นงบทั้งหมด (ไม่ใช่ต่อวัน) + เรืองแสง + จุดบอกเป็นรูปดาว -->
+    <!-- สรุปรายจ่ายวงเงินรวม -->
     <article class="glass card">
      <div class="between">
       <div>
@@ -417,7 +412,7 @@
       <b id="totalSpentHeader" class="money" style="font-size:1.35rem;color:#DC2626 !important;">THB 0.00</b>
      </div>
 
-     <!-- Dynamic Energy Gauge Progress Bar + Glow + Star Markers -->
+     <!-- Dynamic Energy Gauge Progress Bar -->
      <div class="energy-gauge-box">
       <div class="star-markers-container">
         <div class="star-marker-item" id="starMarker1"><i data-lucide="star" style="width:12px;height:12px;"></i></div>
@@ -451,7 +446,7 @@
      </div>
     </article>
 
-    <!-- ปรับตามคำขอ: ปุ่มลัดทำธุรกรรม ขอเป็น "วงกลม" แทนสี่เหลี่ยม -->
+    <!-- ปุ่มลัดทำธุรกรรม -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center;margin:4px 0;">
       <div onclick="showScreen('transactions'); setType('expense');" style="cursor:pointer;">
         <div class="circle-btn" style="margin:0 auto 6px;"><i data-lucide="minus" style="color:var(--primary)"></i></div>
@@ -482,7 +477,7 @@
      </div>
     </article>
 
-    <!-- ปรับตามคำขอ: ต้นไม้ออมเงินค่อยๆ โตตามจำนวนเงินที่ออม และออมแล้วหักงบ/เงินคงเหลือทันที -->
+    <!-- ต้นไม้ออมเงิน -->
     <article class="glass card" id="savingPlantSection">
      <div class="between" style="margin-bottom:8px;">
       <div style="display:flex;align-items:center;gap:10px;">
@@ -509,7 +504,7 @@
      <div id="recurringList" style="margin-top:10px;"></div>
     </article>
 
-    <!-- ตั้งค่างบประมาณ & ช่วงวันที่ใช้งาน -->
+    <!-- ตั้งค่างบประมาณรวม -->
     <article class="glass card">
      <h2>ตั้งค่างบประมาณรวม & ช่วงวันที่ใช้งาน</h2>
      <form id="budgetForm" style="margin-top:10px;">
@@ -572,25 +567,24 @@
        <input id="customCatInput" class="input" type="text" placeholder="เช่น ค่าตัดผม, ซื้อของเข้าบ้าน">
       </div>
 
-      <!-- ปรับตามคำขอ: ระบุจำนวนเงินลัดเองได้ด้วย (สามารถกำหนดได้) -->
       <div class="field" style="margin-top:10px;">
        <div class="between">
         <label for="txAmount">จำนวนเงิน (บาท)</label>
         <button type="button" onclick="customizeQuickAmounts()" class="tiny muted" style="text-decoration:underline;">+ กำหนดปุ่มลัดเอง</button>
        </div>
        <input id="txAmount" class="input money" type="number" min="0" step="any" inputmode="decimal" placeholder="0.00" required>
-       <div id="quickAmountButtonsContainer" style="display:flex;gap:6px;margin-top:8px;">
-        <!-- Dynamic quick amount buttons -->
-       </div>
+       <div id="quickAmountButtonsContainer" style="display:flex;gap:6px;margin-top:8px;"></div>
       </div>
 
-      <!-- ปรับตามคำขอ: ตรงวันเวลา เอากรอบเล็กๆ พอ -->
+      <!-- ระบบเลือกวันเวลา กำหนดเรียลไทม์ + ปุ่มเวลาปัจจุบัน/ย้อนหลัง -->
       <div class="field">
-       <label for="txDate">วันที่และเวลา</label>
+       <div class="between" style="margin-bottom:4px;">
+        <label for="txDate" style="margin-bottom:0;">วันที่และเวลาบันทึก</label>
+        <button type="button" onclick="setTxDateNow()" class="secondary" style="padding:2px 8px;font-size:0.75rem;">เวลาปัจจุบัน</button>
+       </div>
        <input id="txDate" class="input compact-date-input" type="datetime-local" required>
       </div>
 
-      <!-- ปรับตามคำขอ: บันทึกให้กรอบเรืองแสง + เอฟเฟกต์การ์ตูน + อัปโหลดไฟล์สลิปบีบอัด -->
       <div class="field">
        <label>บันทึกโน้ต & แนบสลิป</label>
        <div class="glow-box-container">
@@ -615,14 +609,14 @@
     </article>
 
     <article class="glass card">
-     <h2>ประวัติรายการ</h2>
+     <h2>ประวัติรายการย้อนหลัง</h2>
      <div style="position:relative;margin:10px 0 8px 0;">
       <i data-lucide="search" style="position:absolute;left:12px;top:10px;width:18px;height:18px;color:var(--text-muted);"></i>
-      <input id="search" class="input" type="search" placeholder="ค้นหารายการ..." style="padding-left:38px;">
+      <input id="search" class="input" type="search" placeholder="ค้นหารายการ..." style="padding-left:38px;" oninput="renderRecentList()">
      </div>
      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <select id="filterCategory" class="select"><option value="">ทุกหมวดหมู่</option></select>
-      <select id="filterPeriod" class="select">
+      <select id="filterCategory" class="select" onchange="renderRecentList()"><option value="">ทุกหมวดหมู่</option></select>
+      <select id="filterPeriod" class="select" onchange="renderRecentList()">
        <option value="all">ทุกช่วงเวลา</option>
        <option value="week">สัปดาห์นี้</option>
        <option value="month">เดือนนี้</option>
@@ -632,7 +626,7 @@
     </article>
    </section>
 
-   <!-- หน้าวิเคราะห์ (Page 3 - ปรับเป็นวงล้อโดนัท พาสเทลไล่สีน่ารักๆ) -->
+   <!-- หน้าวิเคราะห์ (Page 3) -->
    <section id="analytics" class="screen hidden" aria-label="วิเคราะห์">
     <header class="topbar">
      <div>
@@ -653,18 +647,15 @@
       <strong id="chartSpent" class="money" style="font-size:2.2rem;color:#DC2626 !important;">THB 0.00</strong>
      </div>
 
-     <!-- วงล้อโดนัท SVG Donut Chart สไตล์พาสเทล -->
+     <!-- วงล้อโดนัท SVG Donut Chart -->
      <div style="position:relative;width:200px;height:200px;margin:10px auto;">
-        <svg id="donutChartSvg" viewBox="0 0 100 100" style="width:100%;height:100%;transform:rotate(-90deg);">
-          <!-- Dynamic SVG Donut Slices -->
-        </svg>
+        <svg id="donutChartSvg" viewBox="0 0 100 100" style="width:100%;height:100%;transform:rotate(-90deg);"></svg>
         <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
           <i data-lucide="pie-chart" style="width:24px;height:24px;color:var(--primary);"></i>
           <span class="tiny muted" style="font-size:0.75rem;margin-top:2px;">สัดส่วนรายจ่าย</span>
         </div>
      </div>
 
-     <!-- Donut Legend Display -->
      <div id="donutLegend" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px;"></div>
 
      <div class="stat-grid" style="margin-top:16px;">
@@ -688,7 +679,7 @@
     </article>
    </section>
 
-   <!-- หน้าโปรไฟล์ & ตั้งค่า (Page 4 - ธีมรูปวงกลม, ลบข้อมูลถามก่อน+กู้คืนได้, เครื่องมือหารบิลน่ารัก) -->
+   <!-- หน้าโปรไฟล์ & ตั้งค่า (Page 4) -->
    <section id="profile" class="screen hidden" aria-label="โปรไฟล์">
     <article class="glass card" style="text-align:center;">
      <div class="avatar large" id="profileAvatar">
@@ -707,7 +698,7 @@
      <button class="secondary" type="button" onclick="openProfile()" style="margin-top:8px;">แก้ไขโปรไฟล์</button>
     </article>
 
-    <!-- ปรับตามคำขอ: เลือกธีมพาสเทล ออกแบบเป็น "รูปวงกลม" นุ่มนวลน่ารัก -->
+    <!-- เลือกธีมสีพาสเทล -->
     <article class="glass card">
      <h2>เลือกธีมสีพาสเทล</h2>
      <div style="display:flex;gap:16px;margin-top:12px;justify-content:center;align-items:center;">
@@ -718,7 +709,7 @@
      </div>
     </article>
 
-    <!-- ปรับตามคำขอ: เครื่องมือคำนวณหารค่าบิล ออกแบบให้น่ารักมีชีวิตชีวา ไม่โล่ง -->
+    <!-- เครื่องมือหารบิล -->
     <article class="glass card" style="background:linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(243,232,255,0.6) 100%);">
      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
       <div class="squircle-btn" style="background:#FFF;"><i data-lucide="calculator" style="color:var(--primary);"></i></div>
@@ -731,11 +722,11 @@
      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
       <div>
        <label class="tiny" style="font-weight:600" for="billTotal">ยอดเงินรวม (บาท)</label>
-       <input id="billTotal" class="input money" type="number" min="0" placeholder="0.00">
+       <input id="billTotal" class="input money" type="number" min="0" placeholder="0.00" oninput="calculateBillSplit()">
       </div>
       <div>
        <label class="tiny" style="font-weight:600" for="billPeople">จำนวนคน</label>
-       <input id="billPeople" class="input money" type="number" min="1" value="2">
+       <input id="billPeople" class="input money" type="number" min="1" value="2" oninput="calculateBillSplit()">
       </div>
      </div>
 
@@ -746,7 +737,7 @@
      </div>
     </article>
 
-    <!-- ปรับตามคำขอ: การจัดการข้อมูล ขอลบข้อมูลได้แต่ถามก่อนกันมือโดน + กู้คืนได้ + สำรองข้อมูล -->
+    <!-- การจัดการข้อมูล & ความปลอดภัย -->
     <article class="glass card">
      <h2>ความปลอดภัย & จัดการข้อมูล</h2>
      <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0;padding:10px;background:rgba(255,255,255,0.7);border-radius:12px;">
@@ -784,7 +775,7 @@
   </nav>
 
   <!-- Modals -->
-  <!-- Modals 1: Edit Profile -->
+  <!-- Modal 1: Edit Profile -->
   <div id="profileModal" class="modal">
    <div class="modal-box">
     <h2>แก้ไขโปรไฟล์</h2>
@@ -880,7 +871,7 @@
    </div>
   </div>
 
-  <!-- Modal 6: Clear Confirmation Modal (ถามก่อนกันมือโดน) -->
+  <!-- Modal 6: Clear Confirmation Modal -->
   <div id="clearModal" class="modal">
    <div class="modal-box">
     <div style="text-align:center;margin-bottom:10px;">
@@ -900,7 +891,7 @@
   <!-- Toast & Cartoon Pop-Up Element -->
   <div id="toast" class="toast"><i data-lucide="check-circle" style="width:18px;height:18px;color:#34D399;"></i><span id="toastMsg">บันทึกสำเร็จ</span></div>
 
-  <!-- Pop-Up Cartoon Mascot Effect (แสดงเมื่อบันทึกรายการ) -->
+  <!-- Pop-Up Cartoon Mascot Effect -->
   <div id="popupMascotOverlay" class="popup-mascot-overlay">
     <div class="popup-mascot-card">
       <div style="width:80px;height:80px;margin:0 auto 8px;">
@@ -923,11 +914,117 @@
     </div>
   </div>
 
+  <!-- Canvas สำหรับสร้างเอฟเฟกต์พลุฟรุ้งฟริ้ง Sparkling Confetti -->
+  <canvas id="sparkleCanvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999999;"></canvas>
+
   <!-- Hidden File Input for Restore Backup -->
   <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="handleRestoreFile(event)">
 
-  <!-- JavaScript Logic ครบถ้วน -->
+  <!-- JavaScript Logic ครบถ้วน สมบูรณ์ทุกฟังชันก์ ไม่มีย่อโค้ด -->
   <script>
+    // --- Web Audio Synthesizer (เอฟเฟกต์เสียงน่ารักๆ ตอนกดปุ่ม) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playCuteSound(type = 'click') {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+        osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'pop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+    }
+
+    // ติดตั้งเสียงให้ปุ่มกดทุกปุ่มในระบบ
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button, .circle-btn, .category-chip, .theme-circle-btn, .nav button');
+      if (btn) {
+        playCuteSound('click');
+      }
+    });
+
+    // --- Sparkling Confetti Canvas Effect ---
+    const sparkleCanvas = document.getElementById('sparkleCanvas');
+    const ctxSparkle = sparkleCanvas.getContext('2d');
+    let particles = [];
+
+    function resizeSparkleCanvas() {
+      sparkleCanvas.width = window.innerWidth;
+      sparkleCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeSparkleCanvas);
+    resizeSparkleCanvas();
+
+    function createSparkles(x, y, count = 35) {
+      const colors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#F472B6'];
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x || window.innerWidth / 2,
+          y: y || window.innerHeight / 2,
+          radius: Math.random() * 4 + 2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 12,
+          vy: (Math.random() - 0.5) * 12 - 3,
+          alpha: 1,
+          decay: Math.random() * 0.02 + 0.015
+        });
+      }
+    }
+
+    function animateSparkles() {
+      ctxSparkle.clearRect(0, 0, sparkleCanvas.width, sparkleCanvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15; // gravity
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctxSparkle.beginPath();
+        ctxSparkle.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctxSparkle.fillStyle = p.color;
+        ctxSparkle.globalAlpha = p.alpha;
+        ctxSparkle.fill();
+      }
+      requestAnimationFrame(animateSparkles);
+    }
+    animateSparkles();
+
     // --- State Management ---
     let state = {
       user: { name: 'หมูเด้ง', avatar: '' },
@@ -939,10 +1036,12 @@
       hideMoney: false,
       streak: 1,
       lastCheckinDate: '',
-      quickAmounts: [20, 50, 100, 500], // สามารถกำหนดเองได้
+      quickAmounts: [20, 50, 100, 500],
       transactions: [],
       goals: [],
       recurring: [],
+      pin: '',
+      pinEnabled: false,
       currentType: 'expense',
       selectedCategory: 'อาหาร',
       range: 'week'
@@ -977,6 +1076,7 @@
       applyTheme(state.theme || 'purple');
       renderQuickAmountButtons();
       renderCategoryChips();
+      populateFilterCategoryOptions();
       renderAll();
     }
 
@@ -986,10 +1086,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       loadData();
-      
-      const now = new Date();
-      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-      document.getElementById('txDate').value = now.toISOString().slice(0,16);
+      setTxDateNow();
 
       setTimeout(() => {
         const splash = document.getElementById('app-splash');
@@ -1000,6 +1097,28 @@
         checkPinOnStartup();
       }, 500);
     });
+
+    // กำหนดวันเวลาบันทึกบิลแบบเรียลไทม์
+    function setTxDateNow() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('txDate').value = now.toISOString().slice(0, 16);
+    }
+
+    // Theme Switcher
+    function setTheme(themeName) {
+      state.theme = themeName;
+      applyTheme(themeName);
+      saveData();
+      showToast('เปลี่ยนธีมเรียบร้อยแล้ว!');
+    }
+
+    function applyTheme(themeName) {
+      document.body.className = themeName;
+      document.querySelectorAll('.theme-circle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === themeName);
+      });
+    }
 
     // Navigation
     function showScreen(screenId) {
@@ -1060,7 +1179,6 @@
       renderCategoryChips();
     }
 
-    // ปรับตามคำขอ: ระบุจำนวนเงินลัดเองได้ด้วย (สามารถกำหนดเองได้)
     function renderQuickAmountButtons() {
       const container = document.getElementById('quickAmountButtonsContainer');
       if (!container) return;
@@ -1089,7 +1207,7 @@
       input.value = (parseFloat(input.value) || 0) + amt;
     }
 
-    // --- Check-in Functionality (ปรับแต่งระบบเช็กอิน) ---
+    // --- Check-in Functionality ---
     function doCheckIn() {
       const today = new Date().toDateString();
       if (state.lastCheckinDate === today) {
@@ -1100,6 +1218,8 @@
       state.lastCheckinDate = today;
       saveData();
       renderAll();
+      createSparkles(window.innerWidth / 2, window.innerHeight / 2, 40);
+      playCuteSound('success');
       triggerMascotPopup('เช็กอินสำเร็จ! สะสม ' + state.streak + ' วัน');
     }
 
@@ -1118,6 +1238,9 @@
       document.getElementById('fixed').value = state.fixed || '';
       document.getElementById('periodStart').value = state.budgetPeriod.startDate || '';
       document.getElementById('periodEnd').value = state.budgetPeriod.endDate || '';
+      if (document.getElementById('pinToggle')) {
+        document.getElementById('pinToggle').checked = !!state.pinEnabled;
+      }
 
       // Calculation
       let totalIncome = 0;
@@ -1153,7 +1276,7 @@
       document.getElementById('weekSpent').textContent = 'THB ' + weekSpent.toLocaleString('th-TH', {minimumFractionDigits: 2});
       document.getElementById('monthSpent').textContent = 'THB ' + monthSpent.toLocaleString('th-TH', {minimumFractionDigits: 2});
 
-      // ปรับตามคำขอ: หลอดพลังงานคิดจาก "งบทั้งหมด"
+      // หลอดพลังงาน
       const totalBudget = parseFloat(state.allowance) || 0;
       const percent = totalBudget > 0 ? Math.min(100, Math.round((totalExpense / totalBudget) * 100)) : 0;
       
@@ -1165,7 +1288,7 @@
       document.getElementById('budgetPercent').textContent = percent + '%';
       document.getElementById('budgetUsage').textContent = `ใช้ไป THB ${totalExpense.toLocaleString()} / THB ${totalBudget.toLocaleString()}`;
 
-      // Update Star Markers Glow Status
+      // Star Markers
       document.getElementById('starMarker1').classList.toggle('active', percent >= 25);
       document.getElementById('starMarker2').classList.toggle('active', percent >= 50);
       document.getElementById('starMarker3').classList.toggle('active', percent >= 75);
@@ -1174,7 +1297,7 @@
       if (percent < 40) {
         gaugeEl.className = 'progress-bar green';
         statusText.style.color = '#10B981';
-        statusText.textContent = 'อยู่ในแผนการใช้งบดีเยี่ยม';
+        statusText.textContent = 'อยู่ในแผนการใช้วงเงินดีเยี่ยม';
         mascotMsg.textContent = 'ใช้งบประมาณอย่างคุ้มค่า สู้ๆ นะคะ!';
       } else if (percent < 75) {
         gaugeEl.className = 'progress-bar yellow';
@@ -1193,6 +1316,7 @@
         mascotMsg.textContent = 'ฉุกเฉิน! ใช้วงเงินเกินแผนแล้วนะคะ';
       }
 
+      calculateBillSplit();
       renderRecentList();
       renderGoalsList();
       renderRecurringList();
@@ -1200,7 +1324,16 @@
       if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
-    // --- Handle Slip Image Compress & File Upload (บีบอัดไฟล์สลิป) ---
+    function toggleMoney() {
+      state.hideMoney = !state.hideMoney;
+      saveData();
+      renderAll();
+      document.getElementById('eyeIcon').setAttribute('data-lucide', state.hideMoney ? 'eye-off' : 'eye');
+      document.getElementById('eyeText').textContent = state.hideMoney ? 'แสดงยอด' : 'ซ่อนยอด';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // --- Slip Upload ---
     function handleSlipUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1209,7 +1342,6 @@
       reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-          // Canvas compression
           const canvas = document.createElement('canvas');
           const maxWidth = 500;
           let width = img.width;
@@ -1225,7 +1357,6 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Compress to JPEG with 0.65 quality
           tempCompressedSlip = canvas.toDataURL('image/jpeg', 0.65);
           
           document.getElementById('slipPreviewImg').src = tempCompressedSlip;
@@ -1238,14 +1369,15 @@
       reader.readAsDataURL(file);
     }
 
-    // Trigger Cartoon Pop-up Effect
     function triggerMascotPopup(msg) {
       const overlay = document.getElementById('popupMascotOverlay');
       if (msg) overlay.querySelector('strong').textContent = msg;
       overlay.classList.add('show');
+      createSparkles(window.innerWidth / 2, window.innerHeight / 2, 45);
+      playCuteSound('success');
       setTimeout(() => {
         overlay.classList.remove('show');
-      }, 2000);
+      }, 2200);
     }
 
     // Save Transactions
@@ -1260,6 +1392,7 @@
       if (!amount || amount <= 0) return;
 
       const newTx = {
+        id: Date.now(),
         type: state.currentType,
         category: category,
         amount: amount,
@@ -1270,6 +1403,7 @@
 
       state.transactions.push(newTx);
       saveData();
+      populateFilterCategoryOptions();
       renderAll();
 
       document.getElementById('txForm').reset();
@@ -1278,6 +1412,7 @@
       document.getElementById('slipStatusText').textContent = 'ยังไม่ได้แนบ';
       document.getElementById('slipStatusText').style.color = '';
 
+      setTxDateNow();
       setType('expense');
       triggerMascotPopup('บันทึกรายการสำเร็จ!');
       showScreen('home');
@@ -1290,12 +1425,24 @@
       document.getElementById('txAmount').focus();
     }
 
+    function populateFilterCategoryOptions() {
+      const filterSelect = document.getElementById('filterCategory');
+      if (!filterSelect) return;
+      const cats = new Set();
+      state.transactions.forEach(t => { if (t.category) cats.add(t.category); });
+      let html = '<option value="">ทุกหมวดหมู่</option>';
+      cats.forEach(c => {
+        html += `<option value="${c}">${c}</option>`;
+      });
+      filterSelect.innerHTML = html;
+    }
+
     // Render Recent & Full Transaction List
     function renderRecentList() {
       const recentContainer = document.getElementById('recentList');
       const fullContainer = document.getElementById('txList');
 
-      const sorted = [...state.transactions].reverse();
+      const sorted = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
       let html = '';
 
       if (sorted.length === 0) {
@@ -1309,12 +1456,25 @@
 
       let fullHtml = '';
       const filterCat = document.getElementById('filterCategory')?.value || '';
+      const filterPeriod = document.getElementById('filterPeriod')?.value || 'all';
       const searchQuery = document.getElementById('search')?.value.toLowerCase() || '';
+
+      const now = new Date();
 
       const filtered = sorted.filter(t => {
         const matchCat = !filterCat || t.category === filterCat;
         const matchSearch = !searchQuery || (t.memo && t.memo.toLowerCase().includes(searchQuery)) || t.category.toLowerCase().includes(searchQuery);
-        return matchCat && matchSearch;
+        
+        let matchPeriod = true;
+        const tDate = new Date(t.date);
+        if (filterPeriod === 'week') {
+          const diffDays = Math.ceil(Math.abs(now - tDate) / (1000 * 60 * 60 * 24));
+          matchPeriod = diffDays <= 7;
+        } else if (filterPeriod === 'month') {
+          matchPeriod = tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+        }
+
+        return matchCat && matchSearch && matchPeriod;
       });
 
       if (filtered.length === 0) {
@@ -1323,10 +1483,12 @@
         filtered.forEach(t => fullHtml += createTxHTML(t));
       }
       if (fullContainer) fullContainer.innerHTML = fullHtml;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     function createTxHTML(t) {
       const isInc = t.type === 'income';
+      const formattedDate = new Date(t.date).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
       return `
         <div class="between" style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.04);">
           <div style="display:flex;align-items:center;gap:10px;">
@@ -1335,15 +1497,27 @@
             </div>
             <div>
               <strong style="font-size:0.9rem;display:block;">${t.category} ${t.slip ? '<i data-lucide="paperclip" style="display:inline;width:12px;height:12px;color:var(--primary);"></i>' : ''}</strong>
-              <span class="tiny muted">${t.memo || 'ไม่มีโน้ต'} • ${new Date(t.date).toLocaleDateString('th-TH')}</span>
+              <span class="tiny muted">${t.memo || 'ไม่มีโน้ต'} • ${formattedDate}</span>
             </div>
           </div>
-          <b class="money" style="color:${isInc ? '#10B981' : '#DC2626'} !important;">${isInc ? '+' : '-'}THB ${parseFloat(t.amount).toLocaleString('th-TH', {minimumFractionDigits: 2})}</b>
+          <div style="text-align:right;">
+            <b class="money" style="color:${isInc ? '#10B981' : '#DC2626'} !important;display:block;">${isInc ? '+' : '-'}THB ${parseFloat(t.amount).toLocaleString('th-TH', {minimumFractionDigits: 2})}</b>
+            <button type="button" onclick="deleteTransaction(${t.id || 0})" class="tiny muted" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:0.72rem;padding:0;">ลบรายการ</button>
+          </div>
         </div>
       `;
     }
 
-    // --- ต้นไม้ออมเงิน (Saving Plant) ---
+    function deleteTransaction(id) {
+      if (confirm('คุณต้องการลบรายการนี้ใช่หรือไม่?')) {
+        state.transactions = state.transactions.filter(t => t.id !== id);
+        saveData();
+        renderAll();
+        showToast('ลบรายการสำเร็จ!');
+      }
+    }
+
+    // --- ต้นไม้ออมเงิน ---
     function renderGoalsList() {
       const container = document.getElementById('goalList');
       if (!state.goals || state.goals.length === 0) {
@@ -1364,7 +1538,6 @@
 
         const p = Math.min(100, Math.round((saved / target) * 100));
 
-        // SVG Visual Plant Stages based on saved progress (ไม่มีอิโมจิ)
         let plantStageText = 'ต้นกล้าเริ่มงอกงาม';
         let plantSvgIcon = `<i data-lucide="sprout" style="color:#10B981;width:20px;height:20px;"></i>`;
         
@@ -1386,7 +1559,10 @@
                   <span class="tiny muted" style="display:block;">${plantStageText}</span>
                 </div>
               </div>
-              <button class="secondary" style="padding:4px 10px;font-size:0.8rem" onclick="openDepositModal(${idx})">+ ออมเงิน</button>
+              <div style="display:flex;gap:4px;">
+                <button class="secondary" style="padding:4px 10px;font-size:0.8rem" onclick="openDepositModal(${idx})">+ ออมเงิน</button>
+                <button class="secondary" style="padding:4px 8px;font-size:0.8rem;color:#EF4444;" onclick="deleteGoal(${idx})">ลบ</button>
+              </div>
             </div>
             <div class="progress-container" style="height:10px;margin-top:8px;">
               <div class="progress-bar green" style="width:${p}%"></div>
@@ -1423,13 +1599,21 @@
       showToast('ปลูกต้นไม้ออมเงินสำเร็จ!');
     }
 
+    function deleteGoal(idx) {
+      if (confirm('คุณต้องการลบเป้าหมายการออมนี้ใช่หรือไม่?')) {
+        state.goals.splice(idx, 1);
+        saveData();
+        renderAll();
+        showToast('ลบเป้าหมายเรียบร้อยแล้ว');
+      }
+    }
+
     function openDepositModal(index) {
       activeDepositGoalIndex = index;
       document.getElementById('depositGoalTitle').textContent = `(${state.goals[index].name})`;
       openModal('depositModal');
     }
 
-    // ปรับตามคำขอ: เวลาออม ถ้าเรากรอกเงินออมแต่ละครั้งก็หักออกจากงบ/เงินคงเหลือได้เลย
     function confirmDeposit() {
       const amt = parseFloat(document.getElementById('depositInput').value);
       if (!amt || amt <= 0) return;
@@ -1438,6 +1622,7 @@
         state.goals[activeDepositGoalIndex].saved = (state.goals[activeDepositGoalIndex].saved || 0) + amt;
 
         state.transactions.push({
+          id: Date.now(),
           type: 'expense',
           category: 'ออมเงิน',
           amount: amt,
@@ -1469,7 +1654,10 @@
               <strong style="font-size:0.9rem;display:block">${b.name}</strong>
               <span class="tiny muted">หักทุกวันที่ ${b.day || 1} ของเดือน</span>
             </div>
-            <b class="money" style="color:#DC2626 !important;">THB ${parseFloat(b.amount).toLocaleString()}</b>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <b class="money" style="color:#DC2626 !important;">THB ${parseFloat(b.amount).toLocaleString()}</b>
+              <button type="button" onclick="deleteRecurringBill(${idx})" class="tiny muted" style="background:none;border:none;color:#EF4444;cursor:pointer;">ลบ</button>
+            </div>
           </div>
         `;
       });
@@ -1496,6 +1684,15 @@
       showToast('เพิ่มบิลประจำเรียบร้อย!');
     }
 
+    function deleteRecurringBill(idx) {
+      if (confirm('ต้องการลบบิลประจำรายการนี้ใช่หรือไม่?')) {
+        state.recurring.splice(idx, 1);
+        saveData();
+        renderAll();
+        showToast('ลบบิลประจำเรียบร้อย!');
+      }
+    }
+
     // Budget Form Submit
     document.getElementById('budgetForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -1508,7 +1705,7 @@
       showToast('บันทึกงบประมาณเรียบร้อย!');
     });
 
-    // --- Analytics Donut Chart (วิเคราะห์เป็นวงล้อโดนัท พาสเทลไล่สี) ---
+    // --- Analytics Donut Chart & Ranking ---
     function setRange(range) {
       state.range = range;
       document.querySelectorAll('#analytics .segment button').forEach(b => {
@@ -1519,20 +1716,34 @@
 
     function renderAnalyticsData() {
       renderDonutChart();
+      renderCategoryRankings();
     }
 
     function renderDonutChart() {
       let spent = 0;
       let income = 0;
       const catMap = {};
+      const now = new Date();
 
       state.transactions.forEach(t => {
         const amt = parseFloat(t.amount) || 0;
-        if (t.type === 'income') {
-          income += amt;
-        } else {
-          spent += amt;
-          catMap[t.category] = (catMap[t.category] || 0) + amt;
+        const tDate = new Date(t.date);
+
+        let match = true;
+        if (state.range === 'week') {
+          const diffDays = Math.ceil(Math.abs(now - tDate) / (1000 * 60 * 60 * 24));
+          match = diffDays <= 7;
+        } else if (state.range === 'month') {
+          match = tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+        }
+
+        if (match) {
+          if (t.type === 'income') {
+            income += amt;
+          } else {
+            spent += amt;
+            catMap[t.category] = (catMap[t.category] || 0) + amt;
+          }
         }
       });
 
@@ -1542,85 +1753,112 @@
 
       const svg = document.getElementById('donutChartSvg');
       const legend = document.getElementById('donutLegend');
-      if (!svg || !legend) return;
+      const colors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#6366F1', '#84CC16'];
 
-      const colors = ['#F472B6', '#60A5FA', '#34D399', '#FBBF24', '#A78BFA', '#F43F5E', '#38BDF8'];
+      let svgPathHtml = '';
+      let legendHtml = '';
+      let cumulativePercent = 0;
+
       const entries = Object.entries(catMap).sort((a,b) => b[1] - a[1]);
 
       if (spent === 0 || entries.length === 0) {
-        svg.innerHTML = `<circle cx="50" cy="50" r="38" fill="none" stroke="#E5E7EB" stroke-width="16" />`;
-        legend.innerHTML = '<span class="tiny muted">ยังไม่มีข้อมูลรายจ่าย</span>';
+        svgPathHtml = `<circle cx="50" cy="50" r="38" fill="none" stroke="#E5E7EB" stroke-width="16" />`;
+        legendHtml = '<span class="tiny muted">ไม่มีข้อมูลรายจ่ายในช่วงเวลานี้</span>';
       } else {
-        let svgContent = '';
-        let legendContent = '';
-        let cumulativePercent = 0;
+        entries.forEach(([cat, val], idx) => {
+          const slicePercent = val / spent;
+          const strokeColor = colors[idx % colors.length];
 
-        entries.forEach(([cat, amt], idx) => {
-          const percent = amt / spent;
-          const color = colors[idx % colors.length];
-
-          const strokeDasharray = `${percent * 238.76} 238.76`;
+          const strokeDasharray = `${slicePercent * 238.76} 238.76`;
           const strokeDashoffset = -cumulativePercent * 238.76;
 
-          svgContent += `
-            <circle cx="50" cy="50" r="38" fill="none" stroke="${color}" stroke-width="16"
-                    stroke-dasharray="${strokeDasharray}" stroke-dashoffset="${strokeDashoffset}" />
+          svgPathHtml += `
+            <circle cx="50" cy="50" r="38" fill="none" 
+                    stroke="${strokeColor}" stroke-width="16" 
+                    stroke-dasharray="${strokeDasharray}" 
+                    stroke-dashoffset="${strokeDashoffset}" />
           `;
 
-          legendContent += `
-            <div style="display:flex;align-items:center;gap:4px;font-size:0.78rem;background:#FFF;padding:4px 8px;border-radius:10px;border:1px solid #E5E7EB;">
-              <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;"></span>
-              <span>${cat} (${Math.round(percent * 100)}%)</span>
-            </div>
-          `;
+          cumulativePercent += slicePercent;
 
-          cumulativePercent += percent;
-        });
-
-        svg.innerHTML = svgContent;
-        legend.innerHTML = legendContent;
-      }
-
-      // Rank List
-      const rankContainer = document.getElementById('rankList');
-      let html = '';
-      if (entries.length === 0) {
-        html = '<p class="tiny muted" style="text-align:center;padding:12px;">ยังไม่มีข้อมูลรายจ่าย</p>';
-      } else {
-        entries.forEach(([cat, amt], idx) => {
-          const p = spent > 0 ? Math.round((amt / spent) * 100) : 0;
-          const color = colors[idx % colors.length];
-          html += `
-            <div style="margin-top:8px;">
-              <div class="between" style="font-size:0.88rem;">
-                <strong>${cat}</strong>
-                <span class="money" style="color:#DC2626 !important;">THB ${amt.toLocaleString()} (${p}%)</span>
-              </div>
-              <div class="progress-container" style="height:8px;">
-                <div class="progress-bar" style="width:${p}%;background:${color};box-shadow:none;"></div>
-              </div>
+          legendHtml += `
+            <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;">
+              <span style="width:10px;height:10px;border-radius:50%;background:${strokeColor};display:inline-block;"></span>
+              <span>${cat} (${Math.round(slicePercent * 100)}%)</span>
             </div>
           `;
         });
       }
-      if (rankContainer) rankContainer.innerHTML = html;
+
+      svg.innerHTML = svgPathHtml;
+      legend.innerHTML = legendHtml;
     }
 
-    // --- Bill Splitter Tool ---
-    document.getElementById('billTotal')?.addEventListener('input', calcBill);
-    document.getElementById('billPeople')?.addEventListener('input', calcBill);
+    function renderCategoryRankings() {
+      const container = document.getElementById('rankList');
+      if (!container) return;
 
-    function calcBill() {
+      const catMap = {};
+      let totalSpent = 0;
+      const now = new Date();
+
+      state.transactions.forEach(t => {
+        if (t.type === 'expense') {
+          const amt = parseFloat(t.amount) || 0;
+          const tDate = new Date(t.date);
+
+          let match = true;
+          if (state.range === 'week') {
+            const diffDays = Math.ceil(Math.abs(now - tDate) / (1000 * 60 * 60 * 24));
+            match = diffDays <= 7;
+          } else if (state.range === 'month') {
+            match = tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
+          }
+
+          if (match) {
+            totalSpent += amt;
+            catMap[t.category] = (catMap[t.category] || 0) + amt;
+          }
+        }
+      });
+
+      const sorted = Object.entries(catMap).sort((a,b) => b[1] - a[1]);
+      if (sorted.length === 0) {
+        container.innerHTML = '<p class="tiny muted" style="text-align:center;padding:12px;">ยังไม่มีข้อมูลอันดับรายจ่าย</p>';
+        return;
+      }
+
+      let html = '';
+      sorted.forEach(([cat, amt], idx) => {
+        const pct = totalSpent > 0 ? Math.round((amt / totalSpent) * 100) : 0;
+        html += `
+          <div style="margin-bottom:10px;">
+            <div class="between tiny" style="margin-bottom:4px;font-weight:600;">
+              <span>#${idx+1} ${cat}</span>
+              <span class="money">THB ${amt.toLocaleString()} (${pct}%)</span>
+            </div>
+            <div class="progress-container" style="height:8px;">
+              <div class="progress-bar green" style="width:${pct}%;background:var(--primary);"></div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // --- Split Bill Calculator ---
+    function calculateBillSplit() {
       const total = parseFloat(document.getElementById('billTotal').value) || 0;
       const people = parseInt(document.getElementById('billPeople').value) || 1;
-      const each = people > 0 ? total / people : 0;
+      const each = total / Math.max(1, people);
+
       document.getElementById('billEach').textContent = 'THB ' + each.toLocaleString('th-TH', {minimumFractionDigits: 2});
-      document.getElementById('billSubDetail').textContent = `หาร ${people} คน ตกคนละพอดีๆ น้า`;
+      document.getElementById('billSubDetail').textContent = `หาร ${people} คน เฉลี่ยลงตัวพอดีๆ น้า`;
     }
 
-    // Profile & Theme Settings
+    // --- Profile & PIN Management ---
     function openProfile() {
-      document.getElementById('nameInput').value = state.user.name || '';
+      document.getElementById('nameInput').value = state.user.name || 'หมูเด้ง';
       openModal('profileModal');
     }
 
@@ -1636,92 +1874,70 @@
           saveData();
           renderAll();
           closeModal('profileModal');
-          showToast('บันทึกโปรไฟล์สำเร็จ!');
+          showToast('แก้ไขโปรไฟล์เรียบร้อย!');
         };
         reader.readAsDataURL(fileInput.files[0]);
       } else {
         saveData();
         renderAll();
         closeModal('profileModal');
-        showToast('บันทึกโปรไฟล์สำเร็จ!');
+        showToast('แก้ไขโปรไฟล์เรียบร้อย!');
       }
     }
 
-    function setTheme(t) {
-      state.theme = t;
-      applyTheme(t);
-      saveData();
-      showToast('เปลี่ยนธีมสีพาสเทลเรียบร้อย!');
-    }
-
-    function applyTheme(t) {
-      document.body.className = t;
-      document.querySelectorAll('.theme-circle-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.theme === t);
-      });
-    }
-
-    function toggleMoney() {
-      state.hideMoney = !state.hideMoney;
-      document.getElementById('eyeText').textContent = state.hideMoney ? 'แสดงยอด' : 'ซ่อนยอด';
-      renderAll();
-    }
-
-    // Security PIN
     function togglePinSecurity(enabled) {
-      const savedPin = localStorage.getItem('user_pin');
-      if (enabled && !savedPin) {
-        alert('กรุณาตั้งรหัส PIN 4 หลักก่อนเปิดใช้งานค่ะ');
-        document.getElementById('pinToggle').checked = false;
+      if (enabled && !state.pin) {
         openModal('pinModal');
-        return;
+      } else {
+        state.pinEnabled = enabled;
+        saveData();
+        showToast(enabled ? 'เปิดใช้งาน PIN แล้ว' : 'ปิดการใช้ PIN แล้ว');
       }
-      localStorage.setItem('pin_enabled', enabled ? 'true' : 'false');
     }
 
     function savePinFromModal() {
-      const pinVal = document.getElementById('pinInput').value;
-      if (pinVal && pinVal.length === 4) {
-        localStorage.setItem('user_pin', pinVal);
-        localStorage.setItem('pin_enabled', 'true');
-        document.getElementById('pinToggle').checked = true;
-        closeModal('pinModal');
-        document.getElementById('pinInput').value = '';
-        showToast('ตั้งรหัส PIN เรียบร้อย!');
-      } else {
+      const pin = document.getElementById('pinInput').value.trim();
+      if (pin.length !== 4) {
         alert('กรุณากรอกรหัส PIN เป็นตัวเลข 4 หลัก');
+        return;
       }
+      state.pin = pin;
+      state.pinEnabled = true;
+      saveData();
+      closeModal('pinModal');
+      showToast('ตั้งรหัส PIN เรียบร้อยแล้ว!');
+      renderAll();
     }
 
     function checkPinOnStartup() {
-      const isPinEnabled = localStorage.getItem('pin_enabled') === 'true';
-      const savedPin = localStorage.getItem('user_pin');
-      if (isPinEnabled && savedPin) {
+      if (state.pinEnabled && state.pin) {
         document.getElementById('pin-lock-screen').style.display = 'flex';
       }
     }
 
     function verifyAppPin() {
-      const inputVal = document.getElementById('unlockPinInput').value;
-      if (inputVal === localStorage.getItem('user_pin')) {
+      const input = document.getElementById('unlockPinInput').value.trim();
+      if (input === state.pin) {
         document.getElementById('pin-lock-screen').style.display = 'none';
         document.getElementById('unlockPinInput').value = '';
+        showToast('ปลดล็อกเข้าสู่ระบบสำเร็จ');
+        playCuteSound('success');
       } else {
-        alert('รหัส PIN ไม่ถูกต้อง');
+        alert('รหัส PIN ไม่ถูกต้อง!');
         document.getElementById('unlockPinInput').value = '';
       }
     }
 
-    // --- Data Management: Backup & Restore & Safe Delete (ปรับตามคำขอ) ---
+    // --- Backup & Restore & Clear Data ---
     function exportBackup() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-      const dl = document.createElement('a');
-      dl.setAttribute("href", dataStr);
-      dl.setAttribute("download", "moodeng_budget_backup.json");
-      document.body.appendChild(dl);
-      dl.click();
-      dl.remove();
-      showToast('สำรองข้อมูลเรียบร้อย!');
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `moodeng_budget_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('สำรองข้อมูล JSON เรียบร้อยแล้ว!');
     }
 
     function restoreBackupFromFile() {
@@ -1740,10 +1956,12 @@
             state = Object.assign(state, restoredState);
             saveData();
             renderAll();
-            showToast('กู้คืนข้อมูลสำเร็จแล้ว!');
+            applyTheme(state.theme || 'purple');
+            showToast('กู้คืนข้อมูลสำเร็จ!');
+            playCuteSound('success');
           }
-        } catch (err) {
-          alert('ไฟล์สำรองข้อมูลไม่ถูกต้อง');
+        } catch(err) {
+          alert('ไฟล์กู้คืนข้อมูลไม่ถูกต้อง!');
         }
       };
       reader.readAsText(file);
@@ -1755,37 +1973,66 @@
 
     function confirmClearAll() {
       localStorage.removeItem('moodeng_budget_state_v3');
+      state = {
+        user: { name: 'หมูเด้ง', avatar: '' },
+        theme: 'purple',
+        currency: 'THB',
+        allowance: 0,
+        fixed: 0,
+        budgetPeriod: { startDate: '', endDate: '' },
+        hideMoney: false,
+        streak: 1,
+        lastCheckinDate: '',
+        quickAmounts: [20, 50, 100, 500],
+        transactions: [],
+        goals: [],
+        recurring: [],
+        pin: '',
+        pinEnabled: false,
+        currentType: 'expense',
+        selectedCategory: 'อาหาร',
+        range: 'week'
+      };
       closeModal('clearModal');
-      location.reload();
+      saveData();
+      renderAll();
+      showToast('ลบข้อมูลทั้งหมดแล้ว');
     }
 
     function exportCSV() {
-      let csv = "Type,Category,Amount,Date,Memo\r\n";
+      if (!state.transactions || state.transactions.length === 0) {
+        showToast('ไม่มีรายการให้ส่งออก');
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      csvContent += "Type,Category,Amount,Date,Memo\n";
+
       state.transactions.forEach(t => {
-        csv += `"${t.type}","${t.category}",${t.amount},"${t.date}","${t.memo || ''}"\r\n`;
+        csvContent += `"${t.type}","${t.category}","${t.amount}","${t.date}","${t.memo || ''}"\n`;
       });
+
+      const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
-      link.setAttribute("href", encodeURI("data:text/csv;charset=utf-8," + csv));
-      link.setAttribute("download", "moodeng_transactions.csv");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `moodeng_transactions_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-      showToast('ส่งออก CSV เรียบร้อย!');
+      showToast('ส่งออกไฟล์ CSV เรียบร้อย!');
     }
 
+    // Modal Helpers
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
+    // Toast Helper
     function showToast(msg) {
-      const toast = document.getElementById('toast');
+      const t = document.getElementById('toast');
       document.getElementById('toastMsg').textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2400);
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
     }
-
-    document.getElementById('search')?.addEventListener('input', renderRecentList);
-    document.getElementById('filterCategory')?.addEventListener('change', renderRecentList);
-    document.getElementById('filterPeriod')?.addEventListener('change', renderRecentList);
   </script>
  </body>
 </html>
+```eof
