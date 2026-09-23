@@ -20,7 +20,7 @@ const storageKey = () => KEY + '_' + deviceUserId;
 const categoryIcons = {
   'อาหาร':'utensils', 'เดินทาง':'bus-front', 'เครื่องดื่ม':'coffee', 'ช้อปปิ้ง':'shopping-bag', 
   'การศึกษา':'book-open', 'บันเทิง':'music', 'อื่น ๆ':'circle-dot', 
-  'เงินเดือนประจำ':'briefcase', 'ทำงาน':'laptop', 'รายรับอื่นๆ':'wallet'
+  'เงินเดือนประจำ':'briefcase', 'ทำงาน':'laptop', 'รายรับอื่นๆ':'wallet', 'ค่าใช้จ่ายประจำ':'repeat'
 };
 
 let state = { 
@@ -66,7 +66,7 @@ function dailyCheckIn() {
 }
 
 function sparklePop() {
-  ['<svg viewBox="0 0 24 24"><path d="M12 2l1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8Z" fill="#FFDAC1"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" stroke="#B5EAD7" stroke-width="3" stroke-linecap="round"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 20S4 15 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 11-8 11Z" fill="#FF9AA2"/></svg>'].forEach((mark, i) => {
+  ['<svg viewBox="0 0 24 24"><path d="M12 2l1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8Z" fill="#FFDAC1"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" stroke="#B5EAD7" stroke-width="3" stroke-linecap="round"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 20S4 15 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 11-8 11Z" fill="#FF9AA2"/></svg>'].forEach((mark) => {
     let el = document.createElement('span');
     el.className = 'sparkle';
     el.innerHTML = mark;
@@ -192,20 +192,26 @@ function getCycleRange() {
   return { remainingDays, start, end };
 }
 
-// ต้นไม้ออมเงินโตตามสัดส่วนเงินออมจริง (ข้อ 2)
-function renderSavingPlant(balance) {
-  let goal = state.goals[0];
-  let pc = goal && Number(goal.amount) > 0 ? Math.min(100, Math.max(0, (Number(goal.saved) || 0) / Number(goal.amount) * 100)) : 0;
-  let level = pc < 35 ? 'sprout' : pc < 80 ? 'bush' : 'bloom';
+// ต้นไม้ออมเงินค่อยๆ โตและออกดอกตามสัดส่วนเงินออมจริงแบบราบรื่น (ข้อ 2)
+function renderSavingPlant() {
+  let totalSaved = state.goals.reduce((acc, g) => acc + (Number(g.saved) || 0), 0);
+  let totalTarget = state.goals.reduce((acc, g) => acc + (Number(g.amount) || 1), 0);
+  let pc = totalTarget > 0 ? Math.min(100, Math.max(0, (totalSaved / totalTarget) * 100)) : 0;
   
-  let art = level === 'sprout' 
-    ? '<path d="M32 58V38M32 45c-8 0-13-4-13-11 7 0 13 4 13 11Zm0-6c0-8 5-13 13-13 0 8-5 13-13 13Z" fill="#B5EAD7" stroke="#149C78" stroke-width="3"/>' 
-    : level === 'bush' 
-    ? '<path d="M32 58V30M32 42c-13 0-19-7-19-17 11 0 19 6 19 17Zm0-8c0-12 8-20 19-20 0 11-7 20-19 20Z" fill="#B5EAD7" stroke="#149C78" stroke-width="3"/>' 
-    : '<path d="M32 58V31M32 38c-12-8-11-18-5-24 7 5 8 14 5 24Zm0 0c12-8 11-18 5-24-7 5-8 14-5 24Z" fill="#FFB7B2" stroke="#D9538D" stroke-width="3"/><circle cx="15" cy="20" r="3" fill="#C7CEEA"/><circle cx="49" cy="17" r="3" fill="#E2F0CB"/>';
+  // แบ่งขั้นการเติบโตตามเปอร์เซ็นต์แบบสมูท
+  let art = '';
+  if (pc < 20) {
+    art = '<path d="M32 58V44M32 50c-5 0-8-3-8-7 4 0 8 3 8 7Z" fill="#B5EAD7" stroke="#149C78" stroke-width="2.5"/>';
+  } else if (pc < 50) {
+    art = '<path d="M32 58V36M32 44c-9 0-13-4-13-10 7 0 13 4 13 10Zm0-6c0-7 5-11 12-11 0 7-5 11-12 11Z" fill="#B5EAD7" stroke="#149C78" stroke-width="2.5"/>';
+  } else if (pc < 90) {
+    art = '<path d="M32 58V28M32 40c-12 0-17-6-17-15 10 0 17 5 17 15Zm0-7c0-11 7-18 17-18 0 10-7 18-17 18Z" fill="#B5EAD7" stroke="#149C78" stroke-width="2.5"/>';
+  } else {
+    art = '<path d="M32 58V28M32 35c-11-7-10-16-5-21 6 5 7 13 5 21Zm0 0c11-7 10-16 5-21-6 5-7 13-5 21Z" fill="#FFB7B2" stroke="#D9538D" stroke-width="2.5"/><circle cx="16" cy="18" r="3.5" fill="#C7CEEA"/><circle cx="48" cy="15" r="3.5" fill="#E2F0CB"/><circle cx="32" cy="10" r="3.5" fill="#FFDAC1"/>';
+  }
   
   if ($('savingPlant')) $('savingPlant').innerHTML = '<svg viewBox="0 0 64 64" width="44" height="44">' + art + '</svg>';
-  if ($('savingPlantText')) $('savingPlantText').textContent = level === 'bloom' ? 'ดอกไม้งอกงามเต็มที่แล้ว ยอดเยี่ยม!' : level === 'bush' ? 'น้องกำลังโตขึ้นเรื่อยๆ ตามเงินออม' : 'เริ่มออมทีละนิด ต้นไม้กำลังเติบโต';
+  if ($('savingPlantText')) $('savingPlantText').textContent = pc >= 100 ? 'ยอดเยี่ยม! ต้นไม้ออกดอกเต็มที่แล้ว' : 'ความคืบหน้าการออม ' + Math.round(pc) + '% น้องกำลังเติบโต';
 }
 
 const signed = (n, t) => (t === 'income' ? '+' : '-') + money(n);
@@ -246,7 +252,7 @@ document.addEventListener('pointerdown', unlockAudio, { once: true, passive: tru
 document.addEventListener('click', e => { if (e.target.closest('button,[role="button"],select')) playClick(); }, { passive: true });
 
 function icons() { if (window.lucide) lucide.createIcons(); }
-function toast(message) { $('toast').textContent = message; $('toast').classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2400); }
+function toast(message) { $('toast').textContent = message; $('toast'].classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2400); }
 function setNow() { let d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); $('txDate').value = d.toISOString().slice(0, 16); }
 
 function txMarkup(x) {
@@ -265,19 +271,10 @@ function renderHome() {
   let statusText = status === 'over' ? 'ใช้เกินงบแล้ว' : status === 'low' ? 'เงินใกล้หมด' : status === 'near' ? 'ใกล้ถึงงบ' : 'อยู่ในแผน';
 
   countTo($('balanceValue'), bal);
-  countTo($('dailyValue'), Math.max(0, bal - Number(state.fixed || 0)) / cycle.remainingDays);
   countTo($('weekSpent'), -week);
   countTo($('monthSpent'), -month);
-  renderSavingPlant(bal);
+  renderSavingPlant();
 
-  if ($('gauge')) {
-    $('gauge').style.width = Math.min(100, Math.max(0, percent)) + '%';
-    $('gauge').className = 'status-' + status;
-  }
-  if ($('budgetStatus')) $('budgetStatus').className = 'budget-status ' + status;
-  if ($('budgetStatusText')) $('budgetStatusText').textContent = statusText;
-  if ($('budgetPercent')) $('budgetPercent').textContent = Math.round(percent) + '%';
-  if ($('budgetUsage')) $('budgetUsage').textContent = 'ใช้ไป ' + money(used) + ' / ' + money(budget);
   if ($('homeName')) $('homeName').textContent = state.name;
   if ($('profileName')) $('profileName').textContent = state.name;
   if ($('homeAvatar')) $('homeAvatar').innerHTML = avatar();
@@ -295,20 +292,24 @@ function renderTransactions() {
   icons();
 }
 
+// ปรับวงล้อให้สวยงาม ทันสมัย ชัดเจนขึ้น (ข้อ 8)
 function renderAnalytics() {
   let data = state.transactions.filter(x => within(x, range)), t = total(data), categories = {};
   data.filter(x => x.type === 'expense').forEach(x => categories[x.category] = (categories[x.category] || 0) + Number(x.amount));
   let ranks = Object.entries(categories).sort((a, b) => b[1] - a[1]), sum = t.expense || 1;
-  let colors = ['#818cf8', '#34d399', '#fbbf24', '#f43f5e', '#a855f7', '#38bdf8', '#fb923c', '#e879f9'];
+  let colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#f97316', '#d946ef'];
   let cursor = 0, stops = ranks.map(([, v], i) => { 
     let s = cursor; cursor += v / sum * 100; 
     return colors[i % colors.length] + ' ' + s + '% ' + cursor + '%'; 
   });
-  if ($('donut')) $('donut').style.background = ranks.length ? 'conic-gradient(' + stops.join(',') + ')' : '#E8EDF2';
+  if ($('donut')) {
+    $('donut').style.background = ranks.length ? 'conic-gradient(' + stops.join(',') + ')' : '#e2e8f0';
+    $('donut').style.boxShadow = 'inset 0 0 0 16px rgba(255,255,255,0.8), 0 10px 25px -5px rgba(0,0,0,0.08)';
+  }
   if ($('chartSpent')) $('chartSpent').textContent = signed(t.expense, 'expense');
   if ($('chartIncome')) $('chartIncome').textContent = signed(t.income, 'income');
   if ($('chartNet')) $('chartNet').textContent = money(t.income - t.expense);
-  if ($('rankList')) $('rankList').innerHTML = ranks.length ? ranks.map(([n, v]) => '<div class="rank"><div class="cat-icon"><i data-lucide="' + (categoryIcons[n] || 'circle-dot') + '"></i></div><b class="rank-name">' + esc(n) + '</b><div class="rank-track"><span style="width:' + (v / sum * 100) + '%"></span></div><b class="money tiny expense">' + signed(v, 'expense') + '</b></div>').join('') : '<div class="empty"><i data-lucide="chart-no-axes-combined"></i><p>ยังไม่มีรายจ่าย</p></div>';
+  if ($('rankList')) $('rankList').innerHTML = ranks.length ? ranks.map(([n, v]) => '<div class="rank"><div class="cat-icon"><i data-lucide="' + (categoryIcons[n] || 'circle-dot') + '"></i></div><b class="rank-name">' + esc(n) + '</b><div class="rank-track"><span style="width:' + (v / sum * 100) + '%; background:' + colors[ranks.findIndex(x => x[0] === n) % colors.length] + '"></span></div><b class="money tiny expense">' + signed(v, 'expense') + '</b></div>').join('') : '<div class="empty"><i data-lucide="chart-no-axes-combined"></i><p>ยังไม่มีรายจ่าย</p></div>';
   icons();
 }
 
@@ -412,7 +413,7 @@ function setType(next) {
   }
 }
 
-// ปุ่มเพิ่มจำนวนเงินด่วน (ข้อ 3)
+// ปุ่มเพิ่มจำนวนเงินด่วนแบบกำหนดเอง (ข้อ 3)
 function addQuickAmount(val) {
   let input = $('txAmount');
   if (!input) return;
@@ -454,7 +455,7 @@ function deleteTx(txid) {
   toast('ลบรายการแล้ว');
 }
 
-// บันทึกงบและรอบการเงินจากหน้าการตั้งค่า
+// บันทื่องบและรอบการเงินจากหน้าการตั้งค่า (ข้อ 7)
 function saveBudgetSettings() {
   let allowance = parseFloat($('allowance')?.value.replace(/,/g, '')) || 0;
   let fixed = parseFloat($('fixed')?.value.replace(/,/g, '')) || 0;
