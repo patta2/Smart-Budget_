@@ -165,7 +165,7 @@
       align-items: center;
       gap: 4px;
       color: var(--muted);
-      font-size: 0.75srem;
+      font-size: 0.75rem;
       cursor: pointer;
     }
     .nav button.active { color: var(--primary); font-weight: 700; }
@@ -266,20 +266,10 @@
      </div>
     </article>
 
-    <article class="glass card saving-plant-card" aria-label="กระถางต้นไม้ออมเงิน">
-     <div class="saving-plant-header" style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
-      <div style="font-size:2.5rem;">🌱</div>
-      <div>
-       <strong>ต้นไม้ออมเงิน</strong>
-       <p class="tiny muted" id="savingPlantText">เริ่มออมวันนี้ แล้วดูน้องเติบโตนะ</p>
-      </div>
-     </div>
-     <div id="goalList" class="w-full"></div>
-    </article>
-
-    <article class="glass balance card">
+    <!-- กรอบสรุปรายจ่าย & เงินคงเหลือ (ย้ายขึ้นมาข้างบนตามต้องการ) -->
+    <article class="glass balance card" style="border: 2px solid var(--primary);">
      <div class="between">
-      <p class="muted" style="font-weight:800">เงินคงเหลือ</p>
+      <p class="muted" style="font-weight:800">เงินคงเหลือ & สรุปรายจ่าย</p>
       <button type="button" class="icon-btn" onclick="toggleMoney()" aria-label="ซ่อนหรือแสดงยอดเงิน"><i id="eyeIcon" data-lucide="eye"></i></button>
      </div>
      <div class="between" style="align-items:flex-end;margin-top:4px">
@@ -313,6 +303,18 @@
        <span class="tiny muted">เดือนนี้ใช้ไป</span><br><b id="monthSpent" class="money expense">฿0.00</b>
       </div>
      </div>
+    </article>
+
+    <!-- กรอบออมเงิน (ย้ายลงมาข้างล่างตามต้องการ) -->
+    <article class="glass card saving-plant-card" aria-label="กระถางต้นไม้ออมเงิน">
+     <div class="saving-plant-header" style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
+      <div style="font-size:2.5rem;">🌱</div>
+      <div>
+       <strong>ต้นไม้ออมเงิน</strong>
+       <p class="tiny muted" id="savingPlantText">เริ่มออมวันนี้ แล้วดูน้องเติบโตนะ</p>
+      </div>
+     </div>
+     <div id="goalList" class="w-full"></div>
     </article>
 
     <!-- KPlus Style Shortcuts -->
@@ -397,25 +399,19 @@
       </div>
       <div class="field">
        <label for="txCategory">หมวดหมู่</label>
-       <select id="txCategory" class="select">
-        <option>อาหาร</option>
-        <option>เดินทาง</option>
-        <option>เครื่องดื่ม</option>
-        <option>ช้อปปิ้ง</option>
-        <option>การศึกษา</option>
-        <option>บันเทิง</option>
-        <option>อื่น ๆ</option>
-        <option>รายรับ</option>
+       <select id="txCategory" class="select" onchange="checkCategoryChange(this)">
+        <!-- หมวดหมู่จะเปลี่ยนอัปเดตตามปุ่มรายรับ/รายจ่ายอัตโนมัติ -->
        </select>
       </div>
       <div class="field">
        <label for="txAmount">จำนวนเงิน</label>
        <input id="txAmount" class="input money" type="number" min="0" step="any" inputmode="decimal" placeholder="0.00" required>
+       <!-- เพิ่มปุ่มเลือกจำนวนเงินด่วนตามความต้องการ -->
        <div style="display: flex; gap: 8px; margin-top: 8px;">
         <button type="button" class="secondary" onclick="addQuickAmount(20)" style="flex:1">+20</button>
+        <button type="button" class="secondary" onclick="addQuickAmount(30)" style="flex:1">+30</button>
         <button type="button" class="secondary" onclick="addQuickAmount(50)" style="flex:1">+50</button>
         <button type="button" class="secondary" onclick="addQuickAmount(100)" style="flex:1">+100</button>
-        <button type="button" class="secondary" onclick="addQuickAmount(500)" style="flex:1">+500</button>
        </div>
       </div>
       <div class="field">
@@ -450,7 +446,8 @@
        <option>การศึกษา</option>
        <option>บันเทิง</option>
        <option>อื่น ๆ</option>
-       <option>รายรับ</option>
+       <option>ทำงาน</option>
+       <option>เงินเดือนประจำ</option>
       </select>
       <select id="filterPeriod" class="select" onchange="renderTransactions()">
        <option value="all">ทุกช่วงเวลา</option>
@@ -732,6 +729,9 @@
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       document.getElementById('txDate').value = now.toISOString().slice(0, 16);
 
+      // ตั้งค่าหมวดหมู่เริ่มต้นตามประเภทปัจจุบัน
+      setType(currentType);
+
       renderDashboard();
       renderTransactions();
       renderGoals();
@@ -778,7 +778,7 @@
 
       // Week & Month spent
       const now = new Date();
-      const weekSpent = db.transactions.filter(t => t.type === 'expense' && new Date(t.date) >= new Date(now.setDate(now.getDate() - 7))).reduce((sum, t) => sum + t.amount, 0);
+      const weekSpent = db.transactions.filter(t => t.type === 'expense' && new Date(t.date) >= new Date(new Date().setDate(now.getDate() - 7))).reduce((sum, t) => sum + t.amount, 0);
       const monthSpent = db.transactions.filter(t => t.type === 'expense' && new Date(t.date).getMonth() === new Date().getMonth()).reduce((sum, t) => sum + t.amount, 0);
       
       document.getElementById('weekSpent').innerText = formatMoney(weekSpent);
@@ -819,17 +819,49 @@
       showToast('บันทึกงบประมาณสำเร็จ');
     }
 
-    // Transactions
+    // Transactions - แยกประเภทหมวดหมู่ รายรับ/รายจ่าย และรองรับ "ระบุเอง"
     function setType(type) {
       currentType = type;
+      const catSelect = document.getElementById('txCategory');
+      catSelect.innerHTML = '';
+
       if (type === 'expense') {
         document.getElementById('expenseTab').classList.add('active');
         document.getElementById('incomeTab').classList.remove('active');
-        document.getElementById('txCategory').value = 'อาหาร';
+        
+        const expenseCats = ['อาหาร', 'เดินทาง', 'เครื่องดื่ม', 'ช้อปปิ้ง', 'การศึกษา', 'บันเทิง', 'อื่น ๆ'];
+        expenseCats.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat;
+          opt.innerText = cat;
+          catSelect.appendChild(opt);
+        });
       } else {
         document.getElementById('incomeTab').classList.add('active');
         document.getElementById('expenseTab').classList.remove('active');
-        document.getElementById('txCategory').value = 'รายรับ';
+        
+        const incomeCats = ['ทำงาน', 'เงินเดือนประจำ', 'รายรับอื่นๆ', 'ระบุเอง...'];
+        incomeCats.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat;
+          opt.innerText = cat;
+          catSelect.appendChild(opt);
+        });
+      }
+    }
+
+    function checkCategoryChange(selectElem) {
+      if (selectElem.value === 'ระบุเอง...') {
+        const customCat = prompt('ระบุชื่อหมวดหมู่รายรับของคุณ:');
+        if (customCat && customCat.trim() !== '') {
+          const opt = document.createElement('option');
+          opt.value = customCat.trim();
+          opt.innerText = customCat.trim();
+          selectElem.insertBefore(opt, selectElem.firstChild);
+          selectElem.value = customCat.trim();
+        } else {
+          selectElem.selectedIndex = 0;
+        }
       }
     }
 
@@ -871,6 +903,7 @@
       saveData();
       initApp();
       document.getElementById('txForm').reset();
+      setType(currentType); // รีเซ็ตฟอร์มเลือกหมวดหมู่ให้ตรงกับประเภทปัจจุบัน
       tempReceiptBase64 = '';
       document.getElementById('receiptPreview').style.display = 'none';
       showToast('บันทึกรายการสำเร็จ');
@@ -880,6 +913,7 @@
     function quickAdd(category) {
       currentType = 'expense';
       showScreen('transactions');
+      setType('expense');
       document.getElementById('txCategory').value = category;
       document.getElementById('txAmount').focus();
     }
@@ -900,7 +934,7 @@
       }
       if (period === 'week') {
         const now = new Date();
-        filtered = filtered.filter(t => new Date(t.date) >= new Date(now.setDate(now.getDate() - 7)));
+        filtered = filtered.filter(t => new Date(t.date) >= new Date(new Date().setDate(now.getDate() - 7)));
       } else if (period === 'month') {
         const currentMonth = new Date().getMonth();
         filtered = filtered.filter(t => new Date(t.date).getMonth() === currentMonth);
