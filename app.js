@@ -1,659 +1,533 @@
-let db = {
-  profile: { name: 'หมูเด้ง', avatar: '' },
-  budget: { allowance: 0, fixed: 0, startDate: '', endDate: '' },
-  transactions: [],
-  goals: [],
-  recurring: [],
-  settings: { theme: 'purple', currency: 'THB', pinEnabled: false, pin: '' }
+const KEY = 'moodeng_data';
+const USER_KEY = 'moodeng_user_id';
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzipfw42JYxH_O48lPyUEMw0MM9QCu-v6VugkzjiYTr_d3yOLSNWCPe6LzMOVDKNIPh/exec";
+
+const $ = id => document.getElementById(id);
+
+let deviceUserId = (() => {
+  try {
+    let value = localStorage.getItem(USER_KEY);
+    if (!value) {
+      value = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+      localStorage.setItem(USER_KEY, value);
+    }
+    return value;
+  } catch (e) { return 'device-' + Date.now().toString(36); }
+})();
+
+const storageKey = () => KEY + '_' + deviceUserId;
+
+const categoryIcons = {
+  'อาหาร':'utensils', 'เดินทาง':'bus-front', 'เครื่องดื่ม':'coffee', 'ช้อปปิ้ง':'shopping-bag', 
+  'การศึกษา':'book-open', 'บันเทิง':'music', 'อื่น ๆ':'circle-dot', 
+  'เงินเดือนประจำ':'briefcase', 'ทำงาน':'laptop', 'รายรับอื่นๆ':'wallet', 'ค่าใช้จ่ายประจำ':'repeat'
 };
 
-let currentType = 'expense';
-let analyticsRange = 'week';
-let tempReceiptBase64 = '';
-let tempAvatarBase64 = '';
-
-const categoriesConfig = {
-  expense: [
-    { name: 'อาหาร', icon: 'utensils' },
-    { name: 'เดินทาง', icon: 'bus-front' },
-    { name: 'เครื่องดื่ม', icon: 'coffee' },
-    { name: 'ช้อปปิ้ง', icon: 'shopping-bag' },
-    { name: 'การศึกษา', icon: 'graduation-cap' },
-    { name: 'บันเทิง', icon: 'tv' },
-    { name: 'อื่น ๆ', icon: 'grid' }
-  ],
-  income: [
-    { name: 'เงินเดือน', icon: 'wallet' },
-    { name: 'โบนัส', icon: 'gift' },
-    { name: 'ลงทุน', icon: 'trending-up' },
-    { name: 'ธุรกิจส่วนตัว', icon: 'briefcase' },
-    { name: 'อื่น ๆ', icon: 'grid' }
-  ]
+let state = { 
+  user_id: deviceUserId, name: 'ผู้ใช้งาน', photo: '', theme: 'purple', currency: 'THB', 
+  hidden: false, pin: '', allowance: 0, fixed: 0, cycleType: 'month', cycleStartDay: 1, 
+  autoPayRecurring: true, transactions: [], goals: [], recurring: [] 
 };
 
-window.addEventListener('DOMContentLoaded', () => {
-  loadData();
-  initApp();
-  lucide.createIcons();
-  
-  setTimeout(() => {
-    const splash = document.getElementById('app-splash');
-    if (splash) { splash.style.opacity = '0'; splash.style.visibility = 'hidden'; }
-  }, 500);
+let type = 'expense', pending = null, range = 'week';
+const cheers = ['วันนี้เก่งมาก!', 'ออมเงินเก่งสุดๆ!', 'หมูเด้งภูมิใจในตัวเธอ!', 'ทีละนิดก็พิชิตเป้าหมายได้!'];
 
-  if (db.settings.pinEnabled && db.settings.pin) {
-    document.getElementById('pin-lock-screen').style.display = 'flex';
-  }
-});
-
-function loadData() {
-  const saved = localStorage.getItem('smart_budget_data');
-  if (saved) {
-    try { db = JSON.parse(saved); } catch(e) { console.error(e); }
-  }
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const img = new Image();
+    img.onload = function () {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 400;
+      const scaleSize = MAX_WIDTH / img.width;
+      canvas.width = MAX_WIDTH;
+      canvas.height = img.height * scaleSize;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      callback(canvas.toDataURL('image/jpeg', 0.7));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
-function saveData() {
-  localStorage.setItem('smart_budget_data', JSON.stringify(db));
+function dailyCheckIn() {
+  let today = new Date().toLocaleDateString('sv-SE'), last = state.check_in_date;
+  if (last !== today) {
+    let yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    let yesterdayStr = yesterday.toLocaleDateString('sv-SE');
+    state.check_in_streak = last === yesterdayStr ? (Number(state.check_in_streak) || 0) + 1 : 1;
+    state.check_in_date = today;
+    save();
+  }
+  if ($('streakCount')) $('streakCount').textContent = Number(state.check_in_streak) || 0;
+  if ($('dailyCheer')) $('dailyCheer').textContent = cheers[(Math.abs(Number(state.check_in_streak)) || 0) % cheers.length];
 }
 
-function initApp() {
-  setTheme(db.settings.theme || 'purple');
-  document.getElementById('currency').value = db.settings.currency || 'THB';
-  document.getElementById('pinToggle').checked = db.settings.pinEnabled;
-  
-  document.getElementById('homeName').innerText = db.profile.name;
-  document.getElementById('profileName').innerText = db.profile.name;
-  
-  if (db.profile.avatar) {
-    document.getElementById('homeAvatar').innerHTML = `<img src="${db.profile.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
-    document.getElementById('profileAvatar').innerHTML = `<img src="${db.profile.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
+function sparklePop() {
+  ['<svg viewBox="0 0 24 24"><path d="M12 2l1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8Z" fill="#FFDAC1"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18" stroke="#B5EAD7" stroke-width="3" stroke-linecap="round"/></svg>', '<svg viewBox="0 0 24 24"><path d="M12 20S4 15 4 9a4 4 0 0 1 8-1 4 4 0 0 1 8 1c0 6-8 11-8 11Z" fill="#FF9AA2"/></svg>'].forEach((mark) => {
+    let el = document.createElement('span');
+    el.className = 'sparkle';
+    el.innerHTML = mark;
+    el.querySelector('svg').style.width = '20px';
+    el.querySelector('svg').style.height = '20px';
+    el.style.left = (45 + Math.random() * 10) + '%';
+    el.style.top = (38 + Math.random() * 18) + '%';
+    el.style.setProperty('--dx', ((Math.random() - .5) * 150) + 'px');
+    el.style.setProperty('--dy', (-30 - Math.random() * 80) + 'px');
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  });
+}
+
+const id = () => crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+const save = () => {
+  try {
+    state.user_id = deviceUserId;
+    const snapshot = { userId: deviceUserId, data: JSON.parse(JSON.stringify(state)), savedAt: new Date().toISOString() };
+    localStorage.setItem(storageKey(), JSON.stringify(snapshot));
+    localStorage.setItem(KEY, JSON.stringify(snapshot));
+  } catch (e) { toast('บันทึกข้อมูลไม่สำเร็จ'); }
+};
+
+function applySaved(saved) {
+  if (saved && typeof saved === 'object') {
+    let savedUserId = saved.userId || saved.user_id;
+    let savedData = saved.data || saved;
+    if (savedUserId && savedUserId !== deviceUserId) return;
+    state = { ...state, ...savedData, user_id: deviceUserId };
+    try {
+      state.transactions = typeof savedData.transactions === 'string' ? JSON.parse(savedData.transactions) : savedData.transactions;
+      state.goals = typeof savedData.goals === 'string' ? JSON.parse(savedData.goals) : savedData.goals;
+      state.recurring = typeof savedData.recurring === 'string' ? JSON.parse(savedData.recurring) : savedData.recurring;
+    } catch (e) {}
+  }
+  state.user_id = deviceUserId;
+  state.name = state.name || 'ผู้ใช้งาน';
+  state.transactions = Array.isArray(state.transactions) ? state.transactions : [];
+  state.goals = Array.isArray(state.goals) ? state.goals : [];
+  state.recurring = Array.isArray(state.recurring) ? state.recurring : [];
+  if ($('currency')) $('currency').value = state.currency || 'THB';
+  checkAutoRecurringDeduction();
+  setTheme(state.theme || 'purple', false);
+}
+
+function checkAutoRecurringDeduction() {
+  if (state.autoPayRecurring === false) return;
+  let today = new Date();
+  let currentMonth = today.toISOString().slice(0, 7);
+  let currentDay = today.getDate();
+  let updated = false;
+
+  state.recurring.forEach(b => {
+    let dueDay = Number(b.day) || 1;
+    if (b.paidMonth !== currentMonth && currentDay >= dueDay) {
+      b.paidMonth = currentMonth;
+      state.transactions.push({
+        id: id(), type: 'expense', category: 'ค่าใช้จ่ายประจำ',
+        amount: Number(b.amount), date: new Date().toISOString(),
+        memo: b.name + ' (หักอัตโนมัติ)', receipt: ''
+      });
+      updated = true;
+    }
+  });
+  if (updated) save();
+}
+
+function avatar() {
+  return state.photo ? '<img src="' + state.photo + '" alt="รูปโปรไฟล์">' : '<svg viewBox="0 0 64 64" fill="none"><path d="M11 22c0-3 2-5 5-5h32c3 0 5 2 5 5v27c0 3-2 5-5 5H16c-3 0-5-2-5-5V22Z" fill="#FFF5C2" stroke="currentColor" stroke-width="3"/><circle cx="43" cy="31" r="2.5" fill="currentColor"/></svg>';
+}
+
+function money(value) {
+  if (state.hidden) return '••••••';
+  let c = $('currency')?.value || state.currency || 'THB';
+  return new Intl.NumberFormat(c === 'THB' ? 'th-TH' : 'en-US', { style: 'currency', currency: c, minimumFractionDigits: c === 'JPY' ? 0 : 2 }).format(Number(value) || 0);
+}
+
+function countTo(el, value) {
+  if (!el) return;
+  let target = Number(value) || 0, start = Number(el.dataset.count || 0), begin = performance.now();
+  el.dataset.count = target;
+  function tick(now) {
+    let p = Math.min(1, (now - begin) / 380), ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = money(start + (target - start) * ease);
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function getCycleRange() {
+  let now = new Date();
+  let type = state.cycleType || 'month';
+  let startVal = Number(state.cycleStartDay) || 1;
+  let start = new Date(now), end = new Date(now);
+
+  if (type === 'month') {
+    let targetDay = Math.min(28, Math.max(1, startVal));
+    if (now.getDate() < targetDay) start.setMonth(now.getMonth() - 1, targetDay);
+    else start.setMonth(now.getMonth(), targetDay);
+    start.setHours(0, 0, 0, 0);
+
+    end = new Date(start);
+    end.setMonth(end.getMonth() + 1);
+    end.setDate(end.getDate() - 1);
+    end.setHours(23, 59, 59, 999);
   } else {
-    const defaultAvatarHtml = `<img src="icon.png" style="width:100%; height:100%; object-fit:cover;">`;
-    document.getElementById('homeAvatar').innerHTML = defaultAvatarHtml;
-    document.getElementById('profileAvatar').innerHTML = defaultAvatarHtml;
+    let dayOfWeek = now.getDay();
+    let diff = (dayOfWeek < startVal ? 7 : 0) + (dayOfWeek - startVal);
+    start.setDate(now.getDate() - diff);
+    start.setHours(0, 0, 0, 0);
+    end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
   }
+  let remainingDays = Math.max(1, Math.round((end - now) / (1000 * 60 * 60 * 24)) + 1);
+  return { remainingDays, start, end };
+}
 
-  document.getElementById('allowance').value = db.budget.allowance || '';
-  document.getElementById('fixed').value = db.budget.fixed || '';
-  document.getElementById('budgetStart').value = db.budget.startDate || '';
-  document.getElementById('budgetEnd').value = db.budget.endDate || '';
+function renderSavingPlant() {
+  let totalSaved = state.goals.reduce((acc, g) => acc + (Number(g.saved) || 0), 0);
+  let totalTarget = state.goals.reduce((acc, g) => acc + (Number(g.amount) || 1), 0);
+  let pc = totalTarget > 0 ? Math.min(100, Math.max(0, (totalSaved / totalTarget) * 100)) : 0;
+  
+  let art = '';
+  if (pc < 20) {
+    art = '<path d="M32 58V44M32 50c-5 0-8-3-8-7 4 0 8 3 8 7Z" fill="#B5EAD7" stroke="#149C78" stroke-width="2.5"/>';
+  } else if (pc < 50) {
+    art = '<path d="M32 58V36M32 44c-9 0-13-4-13-10 7 0 13 4 13 10Zm0-6c0-7 5-11 12-11 0 7-5 11-12 11Z" fill="#B5EAD7" stroke="#149C78" stroke-width="2.5"/>';
+  } else if (pc < 90) {
+    art = '<path d="M32 58V28M32 40c-12 0-17-6-17-15 10 0 17 5 17 15Zm0-7c0-11 7-18 17-18 0 10-7 18-17 18Z" fill="#B5EAD7" stroke="#149C78" stroke-width="2.5"/>';
+  } else {
+    art = '<path d="M32 58V28M32 35c-11-7-10-16-5-21 6 5 7 13 5 21Zm0 0c11-7 10-16 5-21-6 5-7 13-5 21Z" fill="#FFB7B2" stroke="#D9538D" stroke-width="2.5"/><circle cx="16" cy="18" r="3.5" fill="#C7CEEA"/><circle cx="48" cy="15" r="3.5" fill="#E2F0CB"/><circle cx="32" cy="10" r="3.5" fill="#FFDAC1"/>';
+  }
+  
+  if ($('savingPlant')) $('savingPlant').innerHTML = '<svg viewBox="0 0 64 64" width="44" height="44">' + art + '</svg>';
+  if ($('savingPlantText')) $('savingPlantText').textContent = pc >= 100 ? 'ยอดเยี่ยม! ต้นไม้ออกดอกเต็มที่แล้ว' : 'ความคืบหน้าการออม ' + Math.round(pc) + '% น้องกำลังเติบโต';
+}
 
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  document.getElementById('txDate').value = now.toISOString().slice(0, 16);
+const signed = (n, t) => (t === 'income' ? '+' : '-') + money(n);
+function total(items = state.transactions) { return items.reduce((a, x) => { a[x.type] += (Number(x.amount) || 0); return a; }, { income: 0, expense: 0 }); }
 
-  renderCategorySelector(currentType);
-  renderDashboard();
+function within(tx, period) {
+  const d = new Date(tx.date), now = new Date();
+  if (isNaN(d)) return false;
+  if (period === 'all') return true;
+  if (period === 'month') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  if (period === 'year') return d.getFullYear() === now.getFullYear();
+  let start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  return d >= start;
+}
+
+function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c])); }
+
+let audioContext = null;
+function unlockAudio() { if (!audioContext) { const AudioCtor = window.AudioContext || window.webkitAudioContext; if (!AudioCtor) return; audioContext = new AudioCtor(); } if (audioContext.state === 'suspended') audioContext.resume(); }
+function playClick() {
+  unlockAudio();
+  if (!audioContext) return;
+  const now = audioContext.currentTime, osc = audioContext.createOscillator(), gain = audioContext.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(520, now);
+  osc.frequency.exponentialRampToValueAtTime(760, now + .06);
+  gain.gain.setValueAtTime(.0001, now);
+  gain.gain.exponentialRampToValueAtTime(.035, now + .01);
+  gain.gain.exponentialRampToValueAtTime(.0001, now + .07);
+  osc.connect(gain);
+  gain.connect(audioContext.destination);
+  osc.start(now);
+  osc.stop(now + .08);
+}
+document.addEventListener('pointerdown', unlockAudio, { once: true, passive: true });
+document.addEventListener('click', e => { if (e.target.closest('button,[role="button"],select')) playClick(); }, { passive: true });
+
+function icons() { if (window.lucide) lucide.createIcons(); }
+function toast(message) { $('toast').textContent = message; $('toast').classList.add('show'); clearTimeout(window.toastTimer); window.toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2400); }
+function setNow() { let d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); $('txDate').value = d.toISOString().slice(0, 16); }
+
+function txMarkup(x) {
+  let d = new Date(x.date);
+  return '<div class="list-item"><div class="cat-icon"><i data-lucide="' + (categoryIcons[x.category] || 'circle-dot') + '"></i></div><div class="list-main"><b>' + esc(x.category) + '</b><p class="tiny muted">' + esc(x.memo || 'ไม่มีบันทึก') + ' · ' + (isNaN(d) ? '' : d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })) + '</p></div><div style="text-align:right"><b class="money ' + x.type + '">' + signed(x.amount, x.type) + '</b><button class="delete" type="button" onclick="deleteTx(\'' + x.id + '\')">ลบ</button></div></div>';
+}
+
+function renderHome() {
+  let t = total(), bal = Number(state.allowance) + t.income - t.expense;
+  let week = total(state.transactions.filter(x => within(x, 'week'))).expense;
+  let month = total(state.transactions.filter(x => within(x, 'month'))).expense;
+
+  countTo($('balanceValue'), bal);
+  countTo($('weekSpent'), -week);
+  countTo($('monthSpent'), -month);
+  renderSavingPlant();
+
+  if ($('homeName')) $('homeName').textContent = state.name;
+  if ($('profileName')) $('profileName').textContent = state.name;
+  if ($('homeAvatar')) $('homeAvatar').innerHTML = avatar();
+  if ($('profileAvatar')) $('profileAvatar').innerHTML = avatar();
+
+  let recent = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+  if ($('recentList')) $('recentList').innerHTML = recent.length ? recent.map(txMarkup).join('') : '<div class="empty"><i data-lucide="wallet-cards"></i><p>ยังไม่มีรายการ</p></div>';
+  icons();
+}
+
+function renderTransactions() {
+  let q = $('search')?.value.toLowerCase() || '', cat = $('filterCategory')?.value || '', p = $('filterPeriod')?.value || 'all';
+  let data = [...state.transactions].filter(x => (!q || (x.category + ' ' + x.memo).toLowerCase().includes(q)) && (!cat || x.category === cat) && within(x, p)).sort((a, b) => new Date(b.date) - new Date(a.date));
+  if ($('txList')) $('txList').innerHTML = data.length ? data.map(txMarkup).join('') : '<div class="empty"><i data-lucide="search-x"></i><p>ไม่พบรายการ</p></div>';
+  icons();
+}
+
+function renderAnalytics() {
+  let data = state.transactions.filter(x => within(x, range)), t = total(data), categories = {};
+  data.filter(x => x.type === 'expense').forEach(x => categories[x.category] = (categories[x.category] || 0) + Number(x.amount));
+  let ranks = Object.entries(categories).sort((a, b) => b[1] - a[1]), sum = t.expense || 1;
+  let colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#f97316', '#d946ef'];
+  let cursor = 0, stops = ranks.map(([, v], i) => { 
+    let s = cursor; cursor += v / sum * 100; 
+    return colors[i % colors.length] + ' ' + s + '% ' + cursor + '%'; 
+  });
+  if ($('donut')) {
+    $('donut').style.background = ranks.length ? 'conic-gradient(' + stops.join(',') + ')' : '#e2e8f0';
+    $('donut').style.boxShadow = 'inset 0 0 0 16px rgba(255,255,255,0.8), 0 10px 25px -5px rgba(0,0,0,0.08)';
+  }
+  if ($('chartSpent')) $('chartSpent').textContent = signed(t.expense, 'expense');
+  if ($('chartIncome')) $('chartIncome').textContent = signed(t.income, 'income');
+  if ($('chartNet')) $('chartNet').textContent = money(t.income - t.expense);
+  if ($('rankList')) $('rankList').innerHTML = ranks.length ? ranks.map(([n, v]) => '<div class="rank" style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><div class="cat-icon"><i data-lucide="' + (categoryIcons[n] || 'circle-dot') + '"></i></div><b class="rank-name" style="width:90px;font-size:0.85rem;">' + esc(n) + '</b><div class="rank-track" style="flex:1;background:var(--bg);height:8px;border-radius:4px;overflow:hidden;"><span style="display:block;height:100%;width:' + (v / sum * 100) + '%; background:' + colors[ranks.findIndex(x => x[0] === n) % colors.length] + '"></span></div><b class="money tiny expense">' + signed(v, 'expense') + '</b></div>').join('') : '<div class="empty"><i data-lucide="chart-no-axes-combined"></i><p>ยังไม่มีรายจ่าย</p></div>';
+  icons();
+}
+
+function renderRecurring() {
+  let month = new Date().toISOString().slice(0, 7);
+  if ($('recurringList')) {
+    $('recurringList').innerHTML = state.recurring.length ? state.recurring.map((b, i) => { 
+      let paid = b.paidMonth === month; 
+      return '<div class="list-item"><div class="cat-icon"><i data-lucide="repeat"></i></div><div class="list-main"><b>' + esc(b.name) + '</b><p class="tiny muted money">' + money(b.amount) + ' (วันที่ ' + (b.day || 1) + ')' + (paid ? ' · ชำระแล้ว' : '') + '</p></div><button class="btn ' + (paid ? 'secondary' : 'primary') + ' tiny" type="button" ' + (paid ? 'disabled' : 'onclick="payRecurring(' + i + ')"') + '>' + (paid ? 'ชำระแล้ว' : 'จ่าย') + '</button></div>'; 
+    }).join('') : '<div class="empty"><i data-lucide="calendar-clock"></i><p>ยังไม่มีรายจ่ายประจำ</p></div>';
+  }
+  icons();
+}
+
+function addRecurringBill() {
+  let list = $('recurringList');
+  if (!list) return;
+  list.innerHTML = '<form id="recurringForm" class="field" style="margin-bottom:12px;"><label class="tiny muted">ชื่อบิลรายจ่าย</label><input id="recName" class="input" required placeholder="ค่าเน็ต" style="margin:4px 0 8px 0"><label class="tiny muted">จำนวนเงิน</label><input id="recAmount" class="input" type="number" step="any" placeholder="300" style="margin:4px 0 8px 0"><label class="tiny muted">วันที่ต้องจ่ายประจำทุกเดือน (1-31)</label><input id="recDay" class="input" type="number" min="1" max="31" value="1" style="margin:4px 0 8px 0"><button class="btn primary full" type="submit">บันทึกบิล</button></form>' + list.innerHTML;
+  $('recurringForm').addEventListener('submit', e => {
+    e.preventDefault();
+    let name = $('recName').value.trim(), amount = parseFloat($('recAmount').value), day = parseInt($('recDay').value) || 1;
+    if (!name || isNaN(amount) || amount <= 0) return toast('กรุณากรอกข้อมูลให้ถูกต้อง');
+    state.recurring.push({ id: id(), name, amount, day, paidMonth: '' });
+    save();
+    renderRecurring();
+    toast('เพิ่มรายจ่ายประจำแล้ว');
+  });
+}
+
+function payRecurring(index) {
+  let b = state.recurring[index], month = new Date().toISOString().slice(0, 7);
+  if (!b || b.paidMonth === month) return;
+  b.paidMonth = month;
+  state.transactions.push({ id: id(), type: 'expense', category: 'ค่าใช้จ่ายประจำ', amount: Number(b.amount), date: new Date().toISOString(), memo: b.name, receipt: '' });
+  save();
+  renderAll();
+  toast('ชำระ ' + b.name + ' แล้ว');
+}
+
+function renderGoals() {
+  let list = $('goalList');
+  if (!list) return;
+  list.innerHTML = state.goals.length ? state.goals.map(g => {
+    let pc = Math.min(100, g.saved / g.amount * 100);
+    return '<div class="goal card" style="padding:12px; margin-bottom:8px;"><div class="between"><b>' + esc(g.name) + '</b><button class="delete" type="button" onclick="deleteGoal(\'' + g.id + '\')">ลบ</button></div><div class="between tiny muted" style="margin-top:3px"><span class="money">' + money(g.saved) + ' / ' + money(g.amount) + '</span><span>' + Math.round(pc) + '%</span></div><div class="progress" style="background:var(--bg);height:6px;border-radius:3px;margin:6px 0;overflow:hidden;"><span style="display:block;height:100%;background:var(--primary);width:' + pc + '%"></span></div><button class="btn primary full tiny" type="button" onclick="openDeposit(\'' + g.id + '\')">+ ฝากเงินออม</button></div>';
+  }).join('') : '<div class="empty"><i data-lucide="piggy-bank"></i><p>ยังไม่มีเป้าหมาย</p></div>';
+  icons();
+}
+
+let depositGoalId = null;
+function openDeposit(goalId) {
+  depositGoalId = goalId;
+  $('depositField')?.classList.remove('hidden');
+  $('depositSave')?.classList.remove('hidden');
+  openModal('goalModal');
+}
+
+function depositToGoal() {
+  let goal = state.goals.find(g => g.id === depositGoalId), amount = Number($('depositAmount').value);
+  if (!goal || !Number.isFinite(amount) || amount <= 0) return toast('กรุณากรอกจำนวนเงิน');
+  goal.saved = Math.min(Number(goal.amount), Number(goal.saved) + amount);
+  save();
+  closeModal('goalModal');
+  if ($('depositAmount')) $('depositAmount').value = '';
+  depositGoalId = null;
+  renderAll();
+  sparklePop();
+  toast('ฝากเงินออมสำเร็จ');
+}
+
+function renderAll(persist = true) {
+  if (persist) save();
+  renderHome();
   renderTransactions();
+  renderAnalytics();
   renderGoals();
   renderRecurring();
-  renderAnalytics();
 }
 
-function showScreen(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  document.getElementById(screenId).classList.remove('hidden');
-  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-  const navBtn = document.getElementById('nav-' + screenId);
-  if (navBtn) navBtn.classList.add('active');
-  window.scrollTo(0, 0);
+function showScreen(screen) {
+  document.querySelectorAll('.screen').forEach(x => x.classList.toggle('hidden', x.id !== screen));
+  document.querySelectorAll('.nav button').forEach(x => x.classList.toggle('active', x.dataset.screen === screen));
+  if (screen === 'transactions') renderTransactions();
+  if (screen === 'analytics') renderAnalytics();
+  if (screen === 'profile') renderGoals();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.innerText = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-function formatMoney(amount) {
-  const curr = db.settings.currency || 'THB';
-  const symbol = curr === 'USD' ? '$' : curr === 'EUR' ? '€' : curr === 'JPY' ? '¥' : '฿';
-  return symbol + Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function renderCategorySelector(type) {
-  currentType = type;
-  const categories = categoriesConfig[type];
-  const container = document.getElementById('categoryPicker');
-  document.getElementById('txCategory').value = categories[0].name;
-
-  container.innerHTML = categories.map((cat, idx) => `
-    <div class="category-card ${idx === 0 ? 'selected' : ''}" onclick="selectCategory('${cat.name}', this)">
-      <i data-lucide="${cat.icon}"></i>
-      <span>${cat.name}</span>
-    </div>
-  `).join('');
-  setTimeout(() => lucide.createIcons(), 10);
-}
-
-function selectCategory(categoryName, element) {
-  document.getElementById('txCategory').value = categoryName;
-  document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
-  element.classList.add('selected');
-}
-
-function renderDashboard() {
-  const totalIncome = db.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpense = db.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-  const balance = (Number(db.budget.allowance) + totalIncome) - (Number(db.budget.fixed) + totalExpense);
-  
-  document.getElementById('balanceValue').innerText = formatMoney(balance);
-
-  const now = new Date();
-  let start = db.budget.startDate ? new Date(db.budget.startDate) : new Date(now.getFullYear(), now.getMonth(), 1);
-  let end = db.budget.endDate ? new Date(db.budget.endDate) : new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  end.setHours(23, 59, 59, 999);
-
-  const daysLeft = Math.max(1, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
-  const dailyBudget = Math.max(0, balance / daysLeft);
-  document.getElementById('dailyValue').innerText = formatMoney(dailyBudget);
-
-  document.getElementById('periodRangeText').innerText = `รอบงบ: ${start.toLocaleDateString('th-TH')} ถึง ${end.toLocaleDateString('th-TH')}`;
-
-  const periodSpent = db.transactions.filter(t => {
-    const d = new Date(t.date);
-    return t.type === 'expense' && d >= start && d <= end;
-  }).reduce((sum, t) => sum + t.amount, 0);
-
-  const weekSpent = db.transactions.filter(t => t.type === 'expense' && new Date(t.date) >= new Date(new Date().setDate(now.getDate() - 7))).reduce((sum, t) => sum + t.amount, 0);
-  
-  document.getElementById('weekSpent').innerText = formatMoney(weekSpent);
-  document.getElementById('monthSpent').innerText = formatMoney(periodSpent);
-
-  const totalBudget = Number(db.budget.allowance) || 1;
-  const spentPercent = Math.min(100, Math.round((periodSpent / totalBudget) * 100));
-  document.getElementById('gauge').style.width = spentPercent + '%';
-  document.getElementById('budgetPercent').innerText = spentPercent + '%';
-  document.getElementById('budgetUsage').innerText = `ใช้ไป ${formatMoney(periodSpent)} / ${formatMoney(db.budget.allowance)}`;
-
-  const recentList = document.getElementById('recentList');
-  const recent = [...db.transactions].reverse().slice(0, 3);
-  if (recent.length === 0) {
-    recentList.innerHTML = '<p class="tiny muted" style="text-align:center; padding:12px;">ยังไม่มีรายการเควสการเงิน</p>';
-  } else {
-    recentList.innerHTML = recent.map(t => `
-      <div class="between" style="padding:10px 0; border-bottom:1px solid rgba(233,213,255,0.6);">
-        <div>
-          <strong>${t.category}</strong><br>
-          <span class="tiny muted">${new Date(t.date).toLocaleDateString('th-TH')} • ${t.memo || '-'}</span>
-        </div>
-        <b class="money ${t.type === 'income' ? 'income' : 'expense'} game-font">${t.type === 'income' ? '+' : '-'}${formatMoney(t.amount)}</b>
-      </div>
-    `).join('');
+function setType(next) {
+  type = next;
+  $('expenseTab')?.classList.toggle('active', next === 'expense');
+  $('incomeTab')?.classList.toggle('active', next === 'income');
+  let catSelect = $('txCategory');
+  if (catSelect) {
+    if (next === 'income') {
+      catSelect.innerHTML = '<option value="เงินเดือนประจำ">เงินเดือนประจำ</option><option value="ทำงาน">ทำงาน</option><option value="รายรับอื่นๆ">รายรับอื่นๆ</option><option value="อื่น ๆ">อื่น ๆ</option>';
+    } else {
+      catSelect.innerHTML = '<option value="อาหาร">อาหาร</option><option value="เดินทาง">เดินทาง</option><option value="เครื่องดื่ม">เครื่องดื่ม</option><option value="ช้อปปิ้ง">ช้อปปิ้ง</option><option value="การศึกษา">การศึกษา</option><option value="บันเทิง">บันเทิง</option><option value="อื่น ๆ">อื่น ๆ</option>';
+    }
   }
-  setTimeout(() => lucide.createIcons(), 10);
-}
-
-function saveBudgetSettings(e) {
-  e.preventDefault();
-  db.budget.allowance = parseFloat(document.getElementById('allowance').value) || 0;
-  db.budget.fixed = parseFloat(document.getElementById('fixed').value) || 0;
-  db.budget.startDate = document.getElementById('budgetStart').value;
-  db.budget.endDate = document.getElementById('budgetEnd').value;
-  saveData();
-  renderDashboard();
-  showToast('อัปเดตงบประมาณสำเร็จ');
-}
-
-function setType(type) {
-  currentType = type;
-  if (type === 'expense') {
-    document.getElementById('expenseTab').classList.add('active');
-    document.getElementById('incomeTab').classList.remove('active');
-  } else {
-    document.getElementById('incomeTab').classList.add('active');
-    document.getElementById('expenseTab').classList.remove('active');
-  }
-  renderCategorySelector(type);
 }
 
 function addQuickAmount(val) {
-  const amtInput = document.getElementById('txAmount');
-  amtInput.value = (parseFloat(amtInput.value) || 0) + val;
-}
-
-function previewReceipt(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      tempReceiptBase64 = e.target.result;
-      const preview = document.getElementById('receiptPreview');
-      preview.src = tempReceiptBase64;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-function handleTxSubmit(e) {
-  e.preventDefault();
-  const amount = parseFloat(document.getElementById('txAmount').value);
-  if (!amount || amount <= 0) return;
-
-  const newTx = {
-    id: Date.now(),
-    type: currentType,
-    category: document.getElementById('txCategory').value,
-    amount: amount,
-    date: document.getElementById('txDate').value,
-    memo: document.getElementById('txMemo').value,
-    receipt: tempReceiptBase64
-  };
-
-  db.transactions.push(newTx);
-  saveData();
-  initApp();
-  document.getElementById('txForm').reset();
-  tempReceiptBase64 = '';
-  document.getElementById('receiptPreview').style.display = 'none';
-  showToast('บันทึกเควสสำเร็จ');
-  showScreen('home');
+  let input = $('txAmount');
+  if (!input) return;
+  let current = parseFloat(input.value.replace(/,/g, '')) || 0;
+  input.value = current + val;
 }
 
 function quickAdd(category) {
   showScreen('transactions');
   setType('expense');
-  document.getElementById('txCategory').value = category;
-  document.querySelectorAll('.category-card').forEach(c => {
-    if(c.innerText.trim() === category) c.classList.add('selected');
-    else c.classList.remove('selected');
-  });
-  document.getElementById('txAmount').focus();
+  if ($('txCategory')) $('txCategory').value = category;
+  if ($('txAmount')) $('txAmount').focus();
 }
 
-function renderTransactions() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const cat = document.getElementById('filterCategory').value;
-  const period = document.getElementById('filterPeriod').value;
-  const listContainer = document.getElementById('txList');
+$('txForm')?.addEventListener('submit', e => {
+  e.preventDefault();
+  let amount = parseFloat($('txAmount').value.replace(/,/g, ''));
+  if (isNaN(amount) || amount <= 0) return toast('กรุณากรอกจำนวนเงินให้ถูกต้อง');
+  pending = { id: id(), type, category: $('txCategory').value, amount, date: $('txDate').value, memo: $('txMemo').value.trim(), receipt: '' };
+  if (type === 'expense' && amount > 400) openModal('impulseModal');
+  else saveTransaction();
+});
 
-  let filtered = [...db.transactions].reverse();
-
-  if (search) {
-    filtered = filtered.filter(t => t.category.toLowerCase().includes(search) || (t.memo && t.memo.toLowerCase().includes(search)));
-  }
-  if (cat) {
-    filtered = filtered.filter(t => t.category === cat);
-  }
-  if (period === 'week') {
-    const now = new Date();
-    filtered = filtered.filter(t => new Date(t.date) >= new Date(new Date().setDate(now.getDate() - 7)));
-  } else if (period === 'month' && db.budget.startDate && db.budget.endDate) {
-    const start = new Date(db.budget.startDate);
-    const end = new Date(db.budget.endDate);
-    end.setHours(23,59,59);
-    filtered = filtered.filter(t => {
-      const d = new Date(t.date);
-      return d >= start && d <= end;
-    });
-  }
-
-  if (filtered.length === 0) {
-    listContainer.innerHTML = '<p class="tiny muted" style="text-align:center; padding:15px;">ไม่พบประวัติเควส</p>';
-    return;
-  }
-
-  listContainer.innerHTML = filtered.map(t => `
-    <div class="between" style="padding:12px 0; border-bottom:1px solid rgba(233,213,255,0.6); align-items:flex-start;">
-      <div>
-        <strong>${t.category}</strong> ${t.receipt ? '<i data-lucide="paperclip" style="width:14px; height:14px; display:inline; color:var(--primary);"></i>' : ''}<br>
-        <span class="tiny muted">${new Date(t.date).toLocaleString('th-TH')}</span><br>
-        <span class="tiny">${t.memo || ''}</span>
-      </div>
-      <div style="text-align:right;">
-        <b class="money game-font ${t.type === 'income' ? 'income' : 'expense'}">${t.type === 'income' ? '+' : '-'}${formatMoney(t.amount)}</b><br>
-        <button onclick="deleteTransaction(${t.id})" style="background:none; border:none; color:var(--danger); font-size:0.75rem; cursor:pointer; margin-top:4px; font-weight:700;">ลบ</button>
-      </div>
-    </div>
-  `).join('');
-  setTimeout(() => lucide.createIcons(), 10);
+function saveTransaction() {
+  if (!pending) return;
+  state.transactions.push(pending);
+  pending = null;
+  closeModal('impulseModal');
+  sparklePop();
+  $('txForm')?.reset();
+  setNow();
+  renderAll();
+  toast('บันทึกรายการแล้ว');
 }
 
-function deleteTransaction(id) {
-  db.transactions = db.transactions.filter(t => t.id !== id);
-  saveData();
-  initApp();
-  showToast('ลบรายการสำเร็จ');
+function deleteTx(txid) {
+  state.transactions = state.transactions.filter(x => x.id !== txid);
+  renderAll();
+  toast('ลบรายการแล้ว');
 }
 
-function saveGoal() {
-  const name = document.getElementById('goalName').value;
-  const amount = parseFloat(document.getElementById('goalAmount').value);
-  const saved = parseFloat(document.getElementById('goalSaved').value) || 0;
-  if (!name || !amount) return;
-
-  db.goals.push({ id: Date.now(), name, amount, saved });
-  saveData();
-  closeModal('goalModal');
-  renderGoals();
-  showToast('ปลูกต้นไม้ออมเงินสำเร็จ');
+function saveBudgetSettings() {
+  let allowance = parseFloat($('allowance')?.value.replace(/,/g, '')) || 0;
+  let fixed = parseFloat($('fixed')?.value.replace(/,/g, '')) || 0;
+  state.allowance = allowance;
+  state.fixed = fixed;
+  if ($('cycleType')) state.cycleType = $('cycleType').value;
+  if ($('cycleStartDay')) state.cycleStartDay = parseInt($('cycleStartDay').value) || 1;
+  save();
+  renderAll();
+  toast('บันทึกงบประมาณเรียบร้อย');
 }
 
-function renderGoals() {
-  const container = document.getElementById('goalList');
-  if (db.goals.length === 0) {
-    container.innerHTML = `
-      <div style="text-align:center; padding:10px 0;">
-        <p class="tiny muted">ยังไม่มีต้นไม้ กดปุ่ม + เพื่อปลูกต้นไม้กันเลย</p>
-      </div>
-    `;
-    document.getElementById('plantTitle').innerText = 'ต้นไม้ออมเงิน (พร้อมปลูก)';
-    document.getElementById('plantIconBox').innerHTML = `<i data-lucide="sprout" style="width: 26px; height: 26px;"></i>`;
-    return;
-  }
-
-  container.innerHTML = db.goals.map(g => {
-    const pct = Math.min(100, Math.round((g.saved / g.amount) * 100));
-    let plantStateIcon = 'sprout';
-    let plantStateText = 'ต้นกล้ากำลังงอก';
-    if (pct >= 100) {
-      plantStateIcon = 'flower-2';
-      plantStateText = 'เย้! ออกดอกบานสะพรั่งแล้ว';
-    } else if (pct >= 50) {
-      plantStateIcon = 'tree-pine';
-      plantStateText = 'ต้นไม้โตไว ใกล้ถึงเป้าแล้ว';
-    }
-
-    document.getElementById('plantTitle').innerText = g.name;
-    document.getElementById('plantIconBox').innerHTML = `<i data-lucide="${plantStateIcon}" style="width: 26px; height: 26px;"></i>`;
-    document.getElementById('savingPlantText').innerText = plantStateText;
-
-    return `
-      <div style="margin-bottom:8px;">
-        <div class="between">
-          <span class="tiny muted">ความคืบหน้า</span>
-          <span class="tiny muted game-font">${formatMoney(g.saved)} / ${formatMoney(g.amount)} (${pct}%)</span>
-        </div>
-        <div class="progress" style="margin-top:6px;"><span style="width:${pct}%"></span></div>
-        <div class="between" style="margin-top:8px;">
-          <button class="secondary" style="font-size:0.75rem; padding:6px 12px;" onclick="waterPlant(${g.id})">+ รดน้ำ (หยอดกระปุก)</button>
-          <button onclick="deleteGoal(${g.id})" style="background:none; border:none; color:var(--danger); font-size:0.75rem; cursor:pointer; font-weight:700;">ถอนต้นไม้</button>
-        </div>
-      </div>
-    `;
-  }).join('');
-  setTimeout(() => lucide.createIcons(), 10);
-}
-
-function waterPlant(id) {
-  const addAmount = parseFloat(prompt('ยอดเงินที่ต้องการหยอดกระปุกเพิ่มเพื่อรดน้ำต้นไม้:'));
-  if (addAmount && addAmount > 0) {
-    const goal = db.goals.find(g => g.id === id);
-    if (goal) {
-      goal.saved += addAmount;
-      saveData();
-      renderGoals();
-      showToast('รดน้ำต้นไม้สำเร็จ');
-    }
-  }
-}
-
-function deleteGoal(id) {
-  db.goals = db.goals.filter(g => g.id !== id);
-  saveData();
-  renderGoals();
-  showToast('ลบเป้าหมายสำเร็จ');
-}
-
-function addRecurringBill() {
-  const name = prompt('ชื่อรายจ่ายประจำ (เช่น ค่าเน็ต, ค่าห้อง):');
-  const amount = parseFloat(prompt('จำนวนเงิน:'));
-  const day = prompt('ต้องหักทุกวันที่เท่าไหร่ของเดือน (เช่น 5):', '1');
-  if (name && amount) {
-    db.recurring.push({ name, amount, day: day || '1' });
-    saveData();
-    renderRecurring();
-    showToast('เพิ่มบิลประจำสำเร็จ');
-  }
-}
-
-function renderRecurring() {
-  const container = document.getElementById('recurringList');
-  if (db.recurring.length === 0) {
-    container.innerHTML = '<p class="tiny muted">ไม่มีรายจ่ายประจำ</p>';
-    return;
-  }
-  container.innerHTML = db.recurring.map((r, i) => `
-    <div class="between" style="padding:10px 0; border-bottom:1px solid rgba(233,213,255,0.6);">
-      <div>
-        <span class="tiny" style="font-weight:700;">${r.name}</span><br>
-        <span class="tiny muted">หักทุกวันที่ ${r.day} ของเดือน</span>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <b class="money expense game-font" style="font-size:0.95rem;">${formatMoney(r.amount)}</b>
-        <button onclick="deleteRecurring(${i})" style="background:none; border:none; color:var(--danger); font-size:0.75rem; cursor:pointer; font-weight:700;">ลบ</button>
-      </div>
-    </div>
-  `).join('');
-  setTimeout(() => lucide.createIcons(), 10);
-}
-
-function deleteRecurring(index) {
-  db.recurring.splice(index, 1);
-  saveData();
-  renderRecurring();
-  showToast('ลบบิลประจำสำเร็จ');
-}
-
-function setRange(range) {
-  analyticsRange = range;
-  if (range === 'week') {
-    document.getElementById('rangeWeek').classList.add('active');
-    document.getElementById('rangeMonth').classList.remove('active');
-  } else {
-    document.getElementById('rangeMonth').classList.add('active');
-    document.getElementById('rangeWeek').classList.remove('active');
-  }
+function setRange(next) {
+  range = next;
+  document.querySelectorAll('[data-range]').forEach(x => x.classList.toggle('active', x.dataset.range === next));
   renderAnalytics();
 }
 
-function renderAnalytics() {
-  const now = new Date();
-  let txs = db.transactions;
-  if (analyticsRange === 'week') {
-    txs = txs.filter(t => new Date(t.date) >= new Date(new Date().setDate(now.getDate() - 7)));
-  } else if (db.budget.startDate && db.budget.endDate) {
-    const start = new Date(db.budget.startDate);
-    const end = new Date(db.budget.endDate);
-    end.setHours(23,59,59);
-    txs = txs.filter(t => {
-      const d = new Date(t.date);
-      return d >= start && d <= end;
-    });
-  }
+function openModal(mid) { $(mid)?.classList.add('show'); }
+function closeModal(mid) { $(mid)?.classList.remove('show'); }
 
-  const income = txs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const expense = txs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-  const net = income - expense;
-
-  document.getElementById('chartSpent').innerText = formatMoney(expense);
-  document.getElementById('chartIncome').innerText = formatMoney(income);
-  document.getElementById('chartNet').innerText = formatMoney(net);
-
-  const cats = {};
-  txs.filter(t => t.type === 'expense').forEach(t => {
-    cats[t.category] = (cats[t.category] || 0) + t.amount;
-  });
-
-  const pastelColors = ['#FFB7B2', '#FFDAC1', '#B5EAD7', '#C7CEEA', '#FFF1C1', '#F3C6FF', '#FF9AA2'];
-  const sortedCats = Object.entries(cats).sort((a,b) => b[1] - a[1]);
-
-  const svg = document.getElementById('donutSvg');
-  const legend = document.getElementById('donutLegend');
-
-  if (expense === 0 || sortedCats.length === 0) {
-    svg.innerHTML = '<circle cx="50" cy="50" r="38" fill="none" stroke="#F3E8FF" stroke-width="16" />';
-    legend.innerHTML = '<p class="tiny muted">ยังไม่มีข้อมูลรายจ่ายในช่วงเวลานี้</p>';
-  } else {
-    let cumulativePercent = 0;
-    let svgContent = '';
-    let legendContent = '';
-
-    sortedCats.forEach(([cat, amt], index) => {
-      const percent = (amt / expense) * 100;
-      const color = pastelColors[index % pastelColors.length];
-      const strokeDasharray = `${percent} ${100 - percent}`;
-      const strokeDashoffset = -cumulativePercent;
-
-      svgContent += `
-        <circle cx="50" cy="50" r="38" fill="none" stroke="${color}" stroke-width="16"
-          stroke-dasharray="${strokeDasharray}" stroke-dashoffset="${strokeDashoffset}" pathLength="100" />
-      `;
-
-      legendContent += `
-        <div style="display:flex; align-items:center; gap:6px; font-size:0.75rem;">
-          <span style="width:10px; height:10px; border-radius:50%; background:${color}; display:inline-block;"></span>
-          <span>${cat} (${Math.round(percent)}%)</span>
-        </div>
-      `;
-      cumulativePercent += percent;
-    });
-
-    svg.innerHTML = svgContent;
-    legend.innerHTML = legendContent;
-  }
-
-  const rankList = document.getElementById('rankList');
-  if (sortedCats.length === 0) {
-    rankList.innerHTML = '<p class="tiny muted" style="text-align:center; padding:10px;">ยังไม่มีข้อมูลรายจ่ายในช่วงนี้</p>';
-  } else {
-    rankList.innerHTML = sortedCats.map(([cat, amt]) => `
-      <div class="between" style="padding:10px 0; border-bottom:1px solid rgba(233,213,255,0.6);">
-        <span class="tiny" style="display:flex; align-items:center; gap:8px;"><i data-lucide="tag" style="width:14px; height:14px; color:var(--primary);"></i>${cat}</span>
-        <b class="money expense game-font">${formatMoney(amt)}</b>
-      </div>
-    `).join('');
-  }
-  setTimeout(() => lucide.createIcons(), 10);
+function saveGoal() {
+  let name = $('goalName').value.trim(), amount = Number($('goalAmount').value), saved = Number($('goalSaved').value) || 0, date = $('goalDate').value;
+  if (!name || !amount || !date) return toast('กรอกข้อมูลให้ครบถ้วน');
+  state.goals.push({ id: id(), name, amount, saved, date });
+  save();
+  closeModal('goalModal');
+  renderGoals();
+  toast('เพิ่มเป้าหมายแล้ว');
 }
 
-function openProfile() {
-  document.getElementById('nameInput').value = db.profile.name;
-  openModal('profileModal');
+function deleteGoal(gid) {
+  state.goals = state.goals.filter(g => g.id !== gid);
+  save();
+  renderGoals();
+  toast('ลบเป้าหมายแล้ว');
 }
 
-function previewAvatar(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      tempAvatarBase64 = evt.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-function saveProfile() {
-  const name = document.getElementById('nameInput').value;
-  if (name) db.profile.name = name;
-  if (tempAvatarBase64) db.profile.avatar = tempAvatarBase64;
-  saveData();
-  closeModal('profileModal');
-  initApp();
-  showToast('บันทึกโปรไฟล์สำเร็จ');
-}
-
-function setTheme(theme) {
-  db.settings.theme = theme;
+function setTheme(theme, store = true) {
   document.body.className = theme;
-  saveData();
+  state.theme = theme;
+  document.querySelectorAll('.theme-btn').forEach(x => x.classList.toggle('active', x.dataset.theme === theme));
+  if (store) save();
 }
 
-function updateCurrency() {
-  db.settings.currency = document.getElementById('currency').value;
-  saveData();
-  initApp();
-}
-
-function calculateBill() {
-  const total = parseFloat(document.getElementById('billTotal').value) || 0;
-  const people = parseInt(document.getElementById('billPeople').value) || 1;
-  document.getElementById('billEach').innerText = formatMoney(total / people);
-}
-
-function togglePinSecurity(enabled) {
-  if (enabled && !db.settings.pin) {
-    alert('กรุณาตั้งรหัส PIN ก่อนเปิดใช้งานระบบล็อก');
-    document.getElementById('pinToggle').checked = false;
-    openModal('pinModal');
-    return;
-  }
-  db.settings.pinEnabled = enabled;
-  saveData();
-}
-
-function savePin() {
-  const pin = document.getElementById('pinInput').value;
-  if (pin && pin.length === 4) {
-    db.settings.pin = pin;
-    db.settings.pinEnabled = true;
-    saveData();
-    closeModal('pinModal');
-    document.getElementById('pinToggle').checked = true;
-    showToast('ตั้งรหัส PIN สำเร็จ');
-  } else {
-    alert('กรุณากรอกรหัส PIN เป็นตัวเลข 4 หลัก');
-  }
-}
-
-function verifyAppPin() {
-  const val = document.getElementById('unlockPinInput').value;
-  if (val === db.settings.pin) {
-    document.getElementById('pin-lock-screen').style.display = 'none';
-    document.getElementById('unlockPinInput').value = '';
-  } else {
-    alert('รหัส PIN ไม่ถูกต้อง');
-    document.getElementById('unlockPinInput').value = '';
-  }
-}
-
-function exportCSV() {
-  let csv = 'Type,Category,Amount,Date,Memo\n';
-  db.transactions.forEach(t => {
-    csv += `${t.type},${t.category},${t.amount},${t.date},"${t.memo || ''}"\n`;
-  });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'smart_budget_transactions.csv';
-  a.click();
+function toggleMoney() {
+  state.hidden = !state.hidden;
+  save();
+  renderAll();
 }
 
 function exportBackup() {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-  const a = document.createElement('a');
-  a.href = dataStr;
-  a.download = 'smart_budget_backup.json';
+  let blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  let a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'moodeng-backup.json';
   a.click();
+  toast('สำรองข้อมูลแล้ว');
 }
 
-function restoreBackup(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      try {
-        db = JSON.parse(evt.target.result);
-        saveData();
-        initApp();
-        showToast('โหลดเซฟเกมสำเร็จ');
-      } catch(err) {
-        alert('ไฟล์เซฟไม่ถูกต้อง');
-      }
-    };
-    reader.readAsText(file);
+function clearAll() {
+  state = { user_id: deviceUserId, name: 'ผู้ใช้งาน', photo: '', theme: state.theme, currency: state.currency, hidden: false, pin: '', allowance: 0, fixed: 0, cycleType: 'month', cycleStartDay: 1, transactions: [], goals: [], recurring: [] };
+  localStorage.removeItem(storageKey());
+  closeModal('clearModal');
+  renderAll(false);
+  toast('ล้างข้อมูลทั้งหมดแล้ว');
+}
+
+function initLocal() {
+  try {
+    let local = localStorage.getItem(storageKey()) || localStorage.getItem(KEY);
+    if (local) applySaved(JSON.parse(local));
+  } catch (e) {}
+  setNow();
+  renderAll(false);
+  dailyCheckIn();
+  setType('expense');
+  icons();
+}
+
+initLocal();
+
+// เปิดแอปปุ๊บ ซ่อนหน้าจอ Splash Screen ทันทีแบบไม่ติดบั๊ก
+setTimeout(() => {
+  const splash = document.getElementById('splash-screen');
+  if (splash) { 
+    splash.style.opacity = '0'; 
+    splash.style.visibility = 'hidden'; 
+    setTimeout(() => splash.remove(), 400); 
   }
-}
-
-function clearAllData() {
-  localStorage.removeItem('smart_budget_data');
-  location.reload();
-}
-
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function toggleMoney() {}
+}, 1200);
