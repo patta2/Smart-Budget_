@@ -1,3 +1,21 @@
+// บังคับเคลียร์หน้าจอโหลดทันที ป้องกันค้าง 100%
+(function() {
+  const killSplash = () => {
+    ['splash-screen', 'splash', 'loading', 'loading-screen'].forEach(id => {
+      let el = document.getElementById(id);
+      if (el) el.remove();
+    });
+    document.querySelectorAll('.splash-screen, .loading-screen, #splash-screen').forEach(el => el.remove());
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', killSplash);
+  } else {
+    killSplash();
+  }
+  window.addEventListener('load', killSplash);
+  setTimeout(killSplash, 300);
+})();
+
 const KEY = 'moodeng_data';
 const USER_KEY = 'moodeng_user_id';
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzipfw42JYxH_O48lPyUEMw0MM9QCu-v6VugkzjiYTr_d3yOLSNWCPe6LzMOVDKNIPh/exec";
@@ -156,35 +174,6 @@ function countTo(el, value) {
     if (p < 1) requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
-}
-
-function getCycleRange() {
-  let now = new Date();
-  let type = state.cycleType || 'month';
-  let startVal = Number(state.cycleStartDay) || 1;
-  let start = new Date(now), end = new Date(now);
-
-  if (type === 'month') {
-    let targetDay = Math.min(28, Math.max(1, startVal));
-    if (now.getDate() < targetDay) start.setMonth(now.getMonth() - 1, targetDay);
-    else start.setMonth(now.getMonth(), targetDay);
-    start.setHours(0, 0, 0, 0);
-
-    end = new Date(start);
-    end.setMonth(end.getMonth() + 1);
-    end.setDate(end.getDate() - 1);
-    end.setHours(23, 59, 59, 999);
-  } else {
-    let dayOfWeek = now.getDay();
-    let diff = (dayOfWeek < startVal ? 7 : 0) + (dayOfWeek - startVal);
-    start.setDate(now.getDate() - diff);
-    start.setHours(0, 0, 0, 0);
-    end = new Date(start);
-    end.setDate(end.getDate() + 6);
-    end.setHours(23, 59, 59, 999);
-  }
-  let remainingDays = Math.max(1, Math.round((end - now) / (1000 * 60 * 60 * 24)) + 1);
-  return { remainingDays, start, end };
 }
 
 function renderSavingPlant() {
@@ -521,13 +510,3 @@ function initLocal() {
 }
 
 initLocal();
-
-// เปิดแอปปุ๊บ ซ่อนหน้าจอ Splash Screen ทันทีแบบไม่ติดบั๊ก
-setTimeout(() => {
-  const splash = document.getElementById('splash-screen');
-  if (splash) { 
-    splash.style.opacity = '0'; 
-    splash.style.visibility = 'hidden'; 
-    setTimeout(() => splash.remove(), 400); 
-  }
-}, 1200);
