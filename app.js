@@ -247,9 +247,27 @@ function renderHome() {
   let week = total(state.transactions.filter(x => within(x, 'week'))).expense;
   let month = total(state.transactions.filter(x => within(x, 'month'))).expense;
 
+  // === (1) เพิ่มส่วนคำนวณงบรายวันตรงนี้ ===
+  let now = new Date();
+  let daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  let currentDay = now.getDate();
+  let remainingDays = Math.max(1, daysInMonth - currentDay + 1); 
+  let dailyAllowed = bal > 0 ? bal / remainingDays : 0;
+  // ===================================
+
   countTo($('balanceValue'), bal);
   countTo($('weekSpent'), -week);
   countTo($('monthSpent'), -month);
+
+  // === (2) เพิ่มบรรทัดส่งค่าไปแสดงผลที่หน้าจอตรงนี้ ===
+  if ($('recommendedDailySpent')) {
+    countTo($('recommendedDailySpent'), dailyAllowed);
+  }
+  if ($('remainingDaysText')) {
+    $('remainingDaysText').textContent = 'เหลือ ' + remainingDays + ' วัน';
+  }
+  // ============================================
+
   renderSavingPlant();
 
   if ($('homeName')) $('homeName').textContent = state.name;
