@@ -393,38 +393,34 @@
      </div>
     </article>
 
-    <!-- กรอบสรุปเงินคงเหลือสุทธิ -->
-    <article class="glass card">
-     <div class="between">
-      <span class="muted" style="font-weight:600;font-size:0.9rem">เงินคงเหลือสุทธิ</span>
-      <button type="button" class="flat-eye-btn" onclick="toggleMoney()" aria-label="ซ่อนหรือแสดงยอดเงิน">
-        <i id="eyeIcon" data-lucide="eye" style="width:16px;height:16px;"></i>
-        <span id="eyeText">ซ่อนยอด</span>
-      </button>
-     </div>
-     <div class="between" style="align-items:flex-end;margin-top:6px">
-      <strong id="balanceValue" class="money" style="font-size:2.1rem;color:#111827;">THB 0.00</strong>
-      <select id="currency" class="currency" aria-label="เลือกสกุลเงิน"><option>THB</option><option>USD</option><option>EUR</option><option>JPY</option></select>
-     </div>
-     <p class="tiny muted" style="margin-top:2px">เงินคงเหลือที่ใช้ได้จริงในปัจจุบัน</p>
-    </article>
+    <!-- กรอบสรุปเงินคงเหลือสุทธิ + งบรายวัน (แบบมินิมอล เรียบร้อย สบายตา) -->
+<article class="glass card" style="background: linear-gradient(135deg, rgba(254, 243, 199, 0.3) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(224, 242, 254, 0.3) 100%); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03); position: relative; overflow: hidden;">
+ 
+ <div class="between" style="align-items: center;">
+  <span class="muted" style="font-weight: 700; font-size: 0.9rem; color: #78350F;">เงินคงเหลือสุทธิ</span>
+  <button type="button" class="flat-eye-btn" onclick="toggleMoney()" aria-label="ซ่อนหรือแสดงยอดเงิน" style="background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 10px;">
+    <i id="eyeIcon" data-lucide="eye" style="width:14px;height:14px;"></i>
+    <span id="eyeText" style="font-size: 0.75rem;">ซ่อนยอด</span>
+  </button>
+ </div>
 
-    <!-- 3. เพิ่มฟังก์ชันเงินที่ควรใช้ในแต่ละวัน -->
-    <article class="glass card" style="background: linear-gradient(135deg, rgba(240,253,244,0.95) 0%, rgba(255,255,255,0.95) 100%); border-color: #A7F3D0;">
-     <div class="between">
-      <div style="display: flex; align-items: center; gap: 8px;">
-       <div class="squircle-btn" style="width: 38px; height: 38px; background: #D1FAE5;"><i data-lucide="coins" style="width: 18px; height: 18px; color: #059669;"></i></div>
-       <div>
-        <strong style="font-size: 0.95rem; color: #065F46;">เงินที่ควรใช้ในแต่ละวัน</strong>
-        <p class="tiny muted" id="dailyBudgetSub">คำนวณจากยอดที่เหลือและวันคงเหลือ</p>
-       </div>
-      </div>
-     </div>
-     <div class="between" style="margin-top: 10px; align-items: baseline;">
-      <strong id="recommendedDailySpent" class="money" style="font-size: 1.8rem; color: #059669 !important;">THB 0.00</strong>
-      <span class="tiny muted" id="remainingDaysText">เหลือ 0 วันในงบนี้</span>
-     </div>
-    </article>
+ <div class="between" style="align-items: flex-end; margin-top: 4px;">
+  <strong id="balanceValue" class="money" style="font-size: 2.2rem; color: #1E293B; letter-spacing: -0.5px;">THB 0.00</strong>
+  <select id="currency" class="currency" aria-label="เลือกสกุลเงิน" style="background: rgba(255,255,255,0.8); border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); padding: 2px 6px; font-size: 0.8rem;"><option>THB</option><option>USD</option><option>EUR</option><option>JPY</option></select>
+ </div>
+ 
+ <!-- ส่วนงบรายวัน (ดีไซน์เรียบหรู ดูสะอาดตา ไม่มีอิโมจิ) -->
+ <div class="between" style="margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed rgba(245, 158, 11, 0.2); align-items: center;">
+  <div>
+   <span class="tiny muted" style="color: #065F46; font-weight: 500;">ควรใช้ไม่เกิน: </span>
+   <strong id="recommendedDailySpent" class="money" style="font-size: 1.15rem; color: #059669 !important;">THB 0.00</strong>
+   <span class="tiny muted" style="color: #059669;"> / วัน</span>
+  </div>
+  <div style="background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.15);">
+   <span class="tiny muted" id="remainingDaysText" style="font-size: 0.75rem; color: #047857; font-weight: 600;">เหลือ 0 วัน</span>
+  </div>
+ </div>
+</article>
 
     <!-- สรุปรายจ่ายวงเงินรวม -->
     <article class="glass card">
