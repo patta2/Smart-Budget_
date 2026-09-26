@@ -1,13 +1,12 @@
-const CACHE_NAME = 'moodeng-smart-budget-v1';
+const CACHE_NAME = 'moodeng-smart-budget-v2'; // เปลี่ยนเวอร์ชันเพื่อบังคับอัปเดต
+
+// เก็บเฉพาะไฟล์หลักที่เป็นของเราเอง
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './styles.css',
   './app.js',
-  './manifest.json',
-  'https://cdn.tailwindcss.com/3.4.17',
-  'https://fonts.googleapis.com/css2?family=Krub:wght@500;600;700&family=Sarabun:wght@400;500;700&display=swap',
-  'https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js'
+  './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -37,13 +36,15 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
+      // ถ้าเจอในแคช เอาจากแคชก่อนทันที
       if (cachedResponse) {
         return cachedResponse;
       }
+      // ถ้าไม่เจอ ให้ลองดึงจากเน็ต (รวมถึง CDN ภายนอกด้วย)
       return fetch(event.request).catch(() => {
-        // คืนค่าสำรองหาก offline และไม่มี cache อยู่
+        // กรณีออฟไลน์และไม่มีในแคช
+        console.log('Offline fetch failed for:', event.request.url);
       });
     })
   );
 });
-
