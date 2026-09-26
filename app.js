@@ -247,29 +247,48 @@ function renderHome() {
   let week = total(state.transactions.filter(x => within(x, 'week'))).expense;
   let month = total(state.transactions.filter(x => within(x, 'month'))).expense;
 
-  // === (1) เพิ่มส่วนคำนวณงบรายวันตรงนี้ ===
+  // === คำนวณวันและงบรายวันตามรอบงบประมาณที่ผู้ใช้ตั้งค่า (cycleStartDay) ===
   let now = new Date();
-  let daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
   let currentDay = now.getDate();
-  let remainingDays = Math.max(1, daysInMonth - currentDay + 1); 
+  let currentMonth = now.getMonth();
+  let currentYear = now.getFullYear();
+  
+  let startDay = Number(state.cycleStartDay) || 1; // วันที่เริ่มรอบงบ (เช่น เริ่มวันที่ 25)
+  
+  let cycleStart = new Date(currentYear, currentMonth, startDay);
+  let cycleEnd = new Date(currentYear, currentMonth + 1, startDay - 1); // วันสิ้นสุดรอบงบ
+  
+  // ถ้าวันนี้ยังไม่ถึงวันเริ่มรอบของเดือนนี้ แสดงว่าเรายังอยู่ในรอบของเดือนที่แล้ว
+  if (currentDay < startDay) {
+    cycleStart = new Date(currentYear, currentMonth - 1, startDay);
+    cycleEnd = new Date(currentYear, currentMonth, startDay - 1);
+  }
+
+  // คำนวณหาจำนวนวันทั้งหมดในรอบนี้ และจำนวนวันที่เหลืออยู่
+  let oneDayTime = 24 * 60 * 60 * 1000;
+  let totalCycleDays = Math.round((cycleEnd - cycleStart) / oneDayTime) + 1;
+  let remainingDays = Math.round((cycleEnd - now) / oneDayTime) + 1;
+  
+  // ป้องกันค่าติดลบหรือเกินจริง
+  remainingDays = Math.max(1, Math.min(remainingDays, totalCycleDays));
   let dailyAllowed = bal > 0 ? bal / remainingDays : 0;
-  // ===================================
+  // =================================================================
 
   countTo($('balanceValue'), bal);
   countTo($('weekSpent'), -week);
   countTo($('monthSpent'), -month);
 
-  // === (2) เพิ่มบรรทัดส่งค่าไปแสดงผลที่หน้าจอตรงนี้ ===
+  // ส่งค่าไปแสดงผลที่หน้าจอ
   if ($('recommendedDailySpent')) {
     countTo($('recommendedDailySpent'), dailyAllowed);
   }
   if ($('remainingDaysText')) {
     $('remainingDaysText').textContent = 'เหลือ ' + remainingDays + ' วัน';
   }
-  // ============================================
 
   renderSavingPlant();
 
+  if ($('homeName')) $('homeName'.textContent = state.name; // แก้ไขให้ถูกต้องตามต้นฉบับ
   if ($('homeName')) $('homeName').textContent = state.name;
   if ($('profileName')) $('profileName').textContent = state.name;
   if ($('homeAvatar')) $('homeAvatar').innerHTML = avatar();
