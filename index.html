@@ -888,6 +888,20 @@
    </div>
   </div>
 
+  <!-- Modal 7: View Slip Modal -->
+  <div id="viewSlipModal" class="modal">
+   <div class="modal-box" style="text-align:center;">
+    <h2>สลิปหลักฐานการทำรายการ</h2>
+    <p class="tiny muted" id="viewSlipInfo" style="margin-top:2px;"></p>
+    <div style="margin:14px 0;max-height:300px;overflow-y:auto;">
+      <img id="viewSlipImg" src="" alt="Slip Image" style="max-width:100%;border-radius:14px;border:1px solid #DDD;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    </div>
+    <div class="modal-actions">
+     <button class="primary" type="button" onclick="closeModal('viewSlipModal')">ปิดหน้าต่าง</button>
+    </div>
+   </div>
+  </div>
+
   <!-- Toast & Cartoon Pop-Up Element -->
   <div id="toast" class="toast"><i data-lucide="check-circle" style="width:18px;height:18px;color:#34D399;"></i><span id="toastMsg">บันทึกสำเร็จ</span></div>
 
@@ -1489,6 +1503,12 @@
     function createTxHTML(t) {
       const isInc = t.type === 'income';
       const formattedDate = new Date(t.date).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+      
+      let slipBtnHtml = '';
+      if (t.slip) {
+        slipBtnHtml = `<button type="button" onclick="viewTransactionSlip(${t.id})" class="secondary" style="padding:2px 8px;font-size:0.72rem;margin-top:2px;color:var(--primary);display:inline-flex;align-items:center;gap:3px;"><i data-lucide="image" style="width:12px;height:12px;"></i>ดูสลิป</button>`;
+      }
+
       return `
         <div class="between" style="padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.04);">
           <div style="display:flex;align-items:center;gap:10px;">
@@ -1496,16 +1516,27 @@
               <i data-lucide="${isInc ? 'arrow-down-left' : 'arrow-up-right'}" style="width:18px;height:18px;color:var(--primary);"></i>
             </div>
             <div>
-              <strong style="font-size:0.9rem;display:block;">${t.category} ${t.slip ? '<i data-lucide="paperclip" style="display:inline;width:12px;height:12px;color:var(--primary);"></i>' : ''}</strong>
+              <strong style="font-size:0.9rem;display:block;">${t.category}</strong>
               <span class="tiny muted">${t.memo || 'ไม่มีโน้ต'} • ${formattedDate}</span>
+              ${slipBtnHtml}
             </div>
           </div>
           <div style="text-align:right;">
             <b class="money" style="color:${isInc ? '#10B981' : '#DC2626'} !important;display:block;">${isInc ? '+' : '-'}THB ${parseFloat(t.amount).toLocaleString('th-TH', {minimumFractionDigits: 2})}</b>
-            <button type="button" onclick="deleteTransaction(${t.id || 0})" class="tiny muted" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:0.72rem;padding:0;">ลบรายการ</button>
+            <button type="button" onclick="deleteTransaction(${t.id || 0})" class="tiny muted" style="background:none;border:none;color:#EF4444;cursor:pointer;font-size:0.72rem;padding:0;margin-top:2px;">ลบรายการ</button>
           </div>
         </div>
       `;
+    }
+
+    function viewTransactionSlip(id) {
+      const tx = state.transactions.find(t => t.id === id);
+      if (tx && tx.slip) {
+        document.getElementById('viewSlipImg').src = tx.slip;
+        const formattedDate = new Date(tx.date).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+        document.getElementById('viewSlipInfo').textContent = `${tx.category} • THB ${parseFloat(tx.amount).toLocaleString()} (${formattedDate})`;
+        openModal('viewSlipModal');
+      }
     }
 
     function deleteTransaction(id) {
@@ -2035,4 +2066,3 @@
   </script>
  </body>
 </html>
-```eof
