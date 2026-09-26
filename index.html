@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="th">
  <head>
+  <link rel="apple-touch-icon" href="path/to/icon.png">
   <!-- Google Fonts: Krub, Sarabun, Prompt -->
   <link href="https://fonts.googleapis.com/css2?family=Krub:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
   <meta name="theme-color" content="#F8F6FF">
-  <title>หมูเด้ง Smart Budget - Minimal Pastel Edition</title>
+  <title>Smart Budget - Minimal Pastel Edition</title>
 
   <!-- External CDNs & Icons -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -350,8 +351,8 @@
         </svg>
       </span>
       <span>
-       <span class="tiny muted" style="display:block">สวัสดีวันใหม่</span>
-       <strong id="homeName" class="profile-name" style="font-size:1.05rem">หมูเด้ง</strong>
+       <span class="tiny muted" style="display:block">สวัสดี</span>
+       <strong id="homeName" class="profile-name" style="font-size:1.05rem">ผู้ใช้งาน</strong>
       </span>
      </button>
      <button type="button" class="squircle-btn" style="width:40px;height:40px;" onclick="openProfile()" aria-label="ตั้งค่าโปรไฟล์"><i data-lucide="settings" style="width:20px;height:20px;color:var(--primary);"></i></button>
@@ -379,9 +380,9 @@
         <strong id="dailyCheer" style="font-size:0.98rem;color:#111827;">เช็กอินประจำวัน</strong>
         <button type="button" onclick="doCheckIn()" class="secondary" style="padding:3px 10px;font-size:0.78rem;background:var(--primary);color:#FFF;border:none;">เช็กอินเลย</button>
       </div>
-      <span class="tiny muted" id="mascotMessage">ค่อยๆ เก็บออมวันละนิดนะ</span>
+      <span class="tiny muted" id="mascotMessage">ใช้ไปเท่าไหร่แล้วนะ</span>
       <div style="display:flex;align-items:center;gap:6px;margin-top:4px;color:#D97706;font-size:0.8rem;font-weight:600;">
-       <i data-lucide="sparkles" style="width:14px;height:14px;"></i><span>เช็กอิน <b id="streakCount">1</b> วันต่อเนื่อง</span>
+       <span>เช็กอิน <b id="streakCount">1</b> วันต่อเนื่อง</span>
       </div>
      </div>
     </article>
