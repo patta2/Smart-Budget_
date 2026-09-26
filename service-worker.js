@@ -1,4 +1,4 @@
-const CACHE_NAME = 'moodeng-smart-budget-v2'; // เปลี่ยนเวอร์ชันเพื่อบังคับอัปเดต
+const CACHE_NAME = 'moodeng-smart-budget-v3'; // เปลี่ยนเวอร์ชันเพื่อบังคับอัปเดต
 
 // เก็บเฉพาะไฟล์หลักที่เป็นของเราเอง
 const ASSETS_TO_CACHE = [
@@ -34,15 +34,34 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // ถ้าเป็นการขอหน้า index.html หรือ root ให้ใช้กลยุทธ์ Network First (ลองโหลดจากเน็ตก่อน ถ้าไม่ได้ค่อยเอาจากแคช)
+  if (url.pathname.endsWith('/') || url.pathname.endsWith('/index.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          // ถ้าโหลดจากเน็ตได้ อัปเดตเก็บลงแคชใหม่ด้วย
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        })
+        .catch(() => {
+          // ถ้าเน็ตหลุด ให้ดึงจากแคชแทน
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // สำหรับไฟล์อื่นๆ (CSS, JS, ฯลฯ) ใช้ Cache First ตามเดิม
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // ถ้าเจอในแคช เอาจากแคชก่อนทันที
       if (cachedResponse) {
         return cachedResponse;
       }
-      // ถ้าไม่เจอ ให้ลองดึงจากเน็ต (รวมถึง CDN ภายนอกด้วย)
       return fetch(event.request).catch(() => {
-        // กรณีออฟไลน์และไม่มีในแคช
         console.log('Offline fetch failed for:', event.request.url);
       });
     })
