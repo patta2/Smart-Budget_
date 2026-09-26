@@ -1,11 +1,13 @@
 {
-  "short_name": "หมูเด้ง",
+  "id": "/",
   "name": "หมูเด้ง Smart Budget",
+  "short_name": "หมูเด้ง",
+  "description": "แอปพลิเคชันบริหารจัดการงบประมาณและการเงินส่วนบุคคล",
   "icons": [
     {
       "src": "icon.png",
-      "type": "image/png",
       "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
@@ -16,8 +18,11 @@
     }
   ],
   "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#F7F5FF",
   "theme_color": "#7056D9",
-  "display": "standalone",
-  "orientation": "portrait"
+  "categories": ["finance", "productivity"],
+  "lang": "th"
 }
