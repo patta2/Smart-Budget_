@@ -505,37 +505,37 @@
     </article>
 
     <!-- ปุ่มลัดทำธุรกรรม -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center;margin:4px 0;">
-  
-  <div onclick="showScreen('transactions'); setType('expense');" style="cursor:pointer;">
-    <div class="circle-btn" style="margin:0 auto 4px;">
-      <i data-lucide="minus" style="color:var(--primary)"></i>
-    </div>
-    <div style="font-size:12px;font-weight:600;">จ่ายออก</div>
-  </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center;margin:4px 0;">
+      
+      <div onclick="showScreen('transactions'); setType('expense');" style="cursor:pointer;">
+        <div class="circle-btn" style="margin:0 auto 4px;">
+          <i data-lucide="minus" style="color:var(--primary)"></i>
+        </div>
+        <div style="font-size:12px;font-weight:600;">จ่ายออก</div>
+      </div>
 
-  <div onclick="showScreen('transactions'); setType('income');" style="cursor:pointer;">
-    <div class="circle-btn" style="margin:0 auto 4px;">
-      <i data-lucide="plus" style="color:var(--primary)"></i>
-    </div>
-    <div style="font-size:12px;font-weight:600;">รับเข้า</div>
-  </div>
+      <div onclick="showScreen('transactions'); setType('income');" style="cursor:pointer;">
+        <div class="circle-btn" style="margin:0 auto 4px;">
+          <i data-lucide="plus" style="color:var(--primary)"></i>
+        </div>
+        <div style="font-size:12px;font-weight:600;">รับเข้า</div>
+      </div>
 
-  <div onclick="showScreen('home'); scrollToSavingPlant();" style="cursor:pointer;">
-    <div class="circle-btn" style="margin:0 auto 4px;">
-      <i data-lucide="sprout" style="color:#10B981"></i>
-    </div>
-    <div style="font-size:12px;font-weight:600;">ออมเงิน</div>
-  </div>
+      <div onclick="showScreen('home'); scrollToSavingPlant();" style="cursor:pointer;">
+        <div class="circle-btn" style="margin:0 auto 4px;">
+          <i data-lucide="sprout" style="color:#10B981"></i>
+        </div>
+        <div style="font-size:12px;font-weight:600;">ออมเงิน</div>
+      </div>
 
-  <div onclick="showScreen('analytics');" style="cursor:pointer;">
-    <div class="circle-btn" style="margin:0 auto 4px;">
-      <i data-lucide="pie-chart" style="color:var(--primary)"></i>
-    </div>
-    <div style="font-size:12px;font-weight:600;">วิเคราะห์</div>
-  </div>
+      <div onclick="showScreen('analytics');" style="cursor:pointer;">
+        <div class="circle-btn" style="margin:0 auto 4px;">
+          <i data-lucide="pie-chart" style="color:var(--primary)"></i>
+        </div>
+        <div style="font-size:12px;font-weight:600;">วิเคราะห์</div>
+      </div>
 
-</div>
+    </div>
 
     <!-- บันทึกด่วน -->
     <article class="glass card">
@@ -1061,7 +1061,7 @@
     // ติดตั้งเสียงให้ปุ่มกดทุกปุ่มในระบบ
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('button, .circle-btn, .category-chip, .theme-circle-btn, .nav button');
-      if (const strokeColor = categoryColors[cat] || '#9CA3AF';
+      if (btn) {
         playCuteSound('click');
       }
     });
@@ -1928,14 +1928,14 @@
       const svg = document.getElementById('donutChartSvg');
       const legend = document.getElementById('donutLegend');
       const categoryColors = {
-  'อาหาร': '#F4B207',
-  'เครื่องดื่ม': '#8CC8A3',
-  'เดินทาง': '#5BA8D6',
-  'ช็อปปิ้ง': '#DA6C81',
-  'บันเทิง': '#8B6BBE',
-  'การศึกษา': '#DAC2EB',
-  'ระบุเอง': '#9CA3AF'
-};
+        'อาหาร': '#F4B207',
+        'เครื่องดื่ม': '#8CC8A3',
+        'เดินทาง': '#5BA8D6',
+        'ช้อปปิ้ง': '#DA6C81',
+        'บันเทิง': '#8B6BBE',
+        'การศึกษา': '#DAC2EB',
+        'ระบุเอง': '#9CA3AF'
+      };
 
       let svgPathHtml = '';
       let legendHtml = '';
@@ -1949,7 +1949,7 @@
       } else {
         entries.forEach(([cat, val], idx) => {
           const slicePercent = val / spent;
-const strokeColor = categoryColors[cat] || '#9CA3AF';
+          const strokeColor = categoryColors[cat] || '#9CA3AF';
 
           const strokeDasharray = `${slicePercent * 238.76} 238.76`;
           const strokeDashoffset = -cumulativePercent * 238.76;
