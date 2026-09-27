@@ -247,38 +247,42 @@ function renderHome() {
   let week = total(state.transactions.filter(x => within(x, 'week'))).expense;
   let month = total(state.transactions.filter(x => within(x, 'month'))).expense;
 
-  // === คำนวณวันและงบรายวันตามรอบงบประมาณที่ผู้ใช้ตั้งค่า (cycleStartDay) ===
+  // === คำนวณวันและงบรายวันตามรอบงบประมาณ (cycleStartDay) ===
   let now = new Date();
   let currentDay = now.getDate();
   let currentMonth = now.getMonth();
   let currentYear = now.getFullYear();
   
-  let startDay = Number(state.cycleStartDay) || 1; // วันที่เริ่มรอบงบ (เช่น เริ่มวันที่ 25)
-  
+  let startDay = Number(state.cycleStartDay) || 1;
   let cycleStart = new Date(currentYear, currentMonth, startDay);
-  let cycleEnd = new Date(currentYear, currentMonth + 1, startDay - 1); // วันสิ้นสุดรอบงบ
+  let cycleEnd = new Date(currentYear, currentMonth + 1, startDay - 1);
   
-  // ถ้าวันนี้ยังไม่ถึงวันเริ่มรอบของเดือนนี้ แสดงว่าเรายังอยู่ในรอบของเดือนที่แล้ว
   if (currentDay < startDay) {
     cycleStart = new Date(currentYear, currentMonth - 1, startDay);
     cycleEnd = new Date(currentYear, currentMonth, startDay - 1);
   }
 
-  // คำนวณหาจำนวนวันทั้งหมดในรอบนี้ และจำนวนวันที่เหลืออยู่
   let oneDayTime = 24 * 60 * 60 * 1000;
   let totalCycleDays = Math.round((cycleEnd - cycleStart) / oneDayTime) + 1;
   let remainingDays = Math.round((cycleEnd - now) / oneDayTime) + 1;
   
-  // ป้องกันค่าติดลบหรือเกินจริง
   remainingDays = Math.max(1, Math.min(remainingDays, totalCycleDays));
   let dailyAllowed = bal > 0 ? bal / remainingDays : 0;
   // =================================================================
+
+  // === ฟังก์ชันคำนวณและเช็คการใช้เงินเกินต่อวัน ===
+  let todayStr = new Date().toLocaleDateString('sv-SE');
+  let todaySpent = state.transactions
+    .filter(x => x.type === 'expense' && new Date(x.date).toLocaleDateString('sv-SE') === todayStr)
+    .reduce((sum, x) => sum + Number(x.amount), 0);
+
+  // ตรวจสอบว่าวันนี้ใช้เงินเกินงบรายวันที่ควรจะเป็นหรือไม่
+  let isOverDailyBudget = dailyAllowed > 0 && todaySpent > dailyAllowed;
 
   countTo($('balanceValue'), bal);
   countTo($('weekSpent'), -week);
   countTo($('monthSpent'), -month);
 
-  // ส่งค่าไปแสดงผลที่หน้าจอ
   if ($('recommendedDailySpent')) {
     countTo($('recommendedDailySpent'), dailyAllowed);
   }
@@ -286,9 +290,20 @@ function renderHome() {
     $('remainingDaysText').textContent = 'เหลือ ' + remainingDays + ' วัน';
   }
 
+  // แสดงผลแจ้งเตือนบนหน้าจอ (ถ้ามี Element สำหรับเตือน)
+  let alertBanner = $('dailyAlertBanner');
+  if (alertBanner) {
+    if (isOverDailyBudget) {
+      alertBanner.style.display = 'block';
+      alertBanner.innerHTML = '⚠️ <b>เตือนภัย!</b> วันนี้คุณใช้เงินไปแล้ว ' + money(todaySpent) + ' (เกินงบรายวันที่แนะนำ ' + money(dailyAllowed) + ')';
+    } else {
+      alertBanner.style.display = 'none';
+    }
+  }
+  // ===========================================
+
   renderSavingPlant();
 
-  if ($('homeName')) $('homeName'.textContent = state.name; // แก้ไขให้ถูกต้องตามต้นฉบับ
   if ($('homeName')) $('homeName').textContent = state.name;
   if ($('profileName')) $('profileName').textContent = state.name;
   if ($('homeAvatar')) $('homeAvatar').innerHTML = avatar();
@@ -443,7 +458,36 @@ $('txForm')?.addEventListener('submit', e => {
   e.preventDefault();
   let amount = parseFloat($('txAmount').value.replace(/,/g, ''));
   if (isNaN(amount) || amount <= 0) return toast('กรุณากรอกจำนวนเงินให้ถูกต้อง');
+  
   pending = { id: id(), type, category: $('txCategory').value, amount, date: $('txDate').value, memo: $('txMemo').value.trim(), receipt: '' };
+  
+  // เช็คเตือนทันทีเมื่อเพิ่มรายการจ่ายแล้วยอดวันนี้ทะลุเพดานรายวัน
+  if (type === 'expense') {
+    let now = new Date();
+    let startDay = Number(state.cycleStartDay) || 1;
+    let cycleStart = new Date(now.getFullYear(), now.getMonth(), startDay);
+    let cycleEnd = new Date(now.getFullYear(), now.getMonth() + 1, startDay - 1);
+    if (now.getDate() < startDay) {
+      cycleStart = new Date(now.getFullYear(), now.getMonth() - 1, startDay);
+      cycleEnd = new Date(now.getFullYear(), now.getMonth(), startDay - 1);
+    }
+    let oneDayTime = 24 * 60 * 60 * 1000;
+    let totalCycleDays = Math.round((cycleEnd - cycleStart) / oneDayTime) + 1;
+    let remainingDays = Math.max(1, Math.min(Math.round((cycleEnd - now) / oneDayTime) + 1, totalCycleDays));
+    let t = total();
+    let bal = Number(state.allowance) + t.income - t.expense;
+    let dailyAllowed = bal > 0 ? bal / remainingDays : 0;
+
+    let todayStr = new Date().toLocaleDateString('sv-SE');
+    let todaySpentBefore = state.transactions
+      .filter(x => x.type === 'expense' && new Date(x.date).toLocaleDateString('sv-SE') === todayStr)
+      .reduce((sum, x) => sum + Number(x.amount), 0);
+
+    if (dailyAllowed > 0 && (todaySpentBefore + amount) > dailyAllowed) {
+      toast('⚠️ เตือน: รายจ่ายนี้ทำให้คุณใช้เงินเกินงบรายวันแล้ว!');
+    }
+  }
+
   if (type === 'expense' && amount > 400) openModal('impulseModal');
   else saveTransaction();
 });
@@ -504,11 +548,13 @@ function deleteGoal(gid) {
   toast('ลบเป้าหมายแล้ว');
 }
 
+// === ฟังก์ชันปรับเปลี่ยนธีม (Theme Switcher) สมบูรณ์แบบ ===
 function setTheme(theme, store = true) {
   document.body.className = theme;
   state.theme = theme;
   document.querySelectorAll('.theme-btn').forEach(x => x.classList.toggle('active', x.dataset.theme === theme));
   if (store) save();
+  toast('เปลี่ยนธีมเป็น ' + theme + ' แล้ว');
 }
 
 function toggleMoney() {
