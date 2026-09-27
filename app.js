@@ -50,23 +50,41 @@ let state = {
 let type = 'expense', pending = null, range = 'week';
 const cheers = ['วันนี้เก่งมาก!', 'ออมเงินเก่งสุดๆ!', 'หมูเด้งภูมิใจในตัวเธอ!', 'ทีละนิดก็พิชิตเป้าหมายได้!'];
 
-function compressImage(file, callback) {
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const img = new Image();
-    img.onload = function () {
-      const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 400;
-      const scaleSize = MAX_WIDTH / img.width;
-      canvas.width = MAX_WIDTH;
-      canvas.height = img.height * scaleSize;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      callback(canvas.toDataURL('image/jpeg', 0.7));
+// ฟังก์ชันบีบอัดรูปภาพ (ใช้ Promise สะดวกต่อการนำไปใช้งานร่วมกับ async/await)
+function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = error => reject(error);
+      img.src = e.target.result;
     };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
+  });
 }
 
 function dailyCheckIn() {
@@ -160,7 +178,7 @@ function avatar() {
 
 function money(value) {
   if (state.hidden) return '••••••';
-  let c = $('currency')?.value || state.currency || 'THB';
+  let c = state.currency || $('currency')?.value || 'THB';
   return new Intl.NumberFormat(c === 'THB' ? 'th-TH' : 'en-US', { style: 'currency', currency: c, minimumFractionDigits: c === 'JPY' ? 0 : 2 }).format(Number(value) || 0);
 }
 
@@ -247,7 +265,6 @@ function renderHome() {
   let week = total(state.transactions.filter(x => within(x, 'week'))).expense;
   let month = total(state.transactions.filter(x => within(x, 'month'))).expense;
 
-  // === คำนวณวันและงบรายวันตามรอบงบประมาณ (cycleStartDay) ===
   let now = new Date();
   let currentDay = now.getDate();
   let currentMonth = now.getMonth();
@@ -268,15 +285,12 @@ function renderHome() {
   
   remainingDays = Math.max(1, Math.min(remainingDays, totalCycleDays));
   let dailyAllowed = bal > 0 ? bal / remainingDays : 0;
-  // =================================================================
 
-  // === ฟังก์ชันคำนวณและเช็คการใช้เงินเกินต่อวัน ===
   let todayStr = new Date().toLocaleDateString('sv-SE');
   let todaySpent = state.transactions
     .filter(x => x.type === 'expense' && new Date(x.date).toLocaleDateString('sv-SE') === todayStr)
     .reduce((sum, x) => sum + Number(x.amount), 0);
 
-  // ตรวจสอบว่าวันนี้ใช้เงินเกินงบรายวันที่ควรจะเป็นหรือไม่
   let isOverDailyBudget = dailyAllowed > 0 && todaySpent > dailyAllowed;
 
   countTo($('balanceValue'), bal);
@@ -290,7 +304,6 @@ function renderHome() {
     $('remainingDaysText').textContent = 'เหลือ ' + remainingDays + ' วัน';
   }
 
-  // แสดงผลแจ้งเตือนบนหน้าจอ (ถ้ามี Element สำหรับเตือน)
   let alertBanner = $('dailyAlertBanner');
   if (alertBanner) {
     if (isOverDailyBudget) {
@@ -300,7 +313,6 @@ function renderHome() {
       alertBanner.style.display = 'none';
     }
   }
-  // ===========================================
 
   renderSavingPlant();
 
@@ -461,7 +473,6 @@ $('txForm')?.addEventListener('submit', e => {
   
   pending = { id: id(), type, category: $('txCategory').value, amount, date: $('txDate').value, memo: $('txMemo').value.trim(), receipt: '' };
   
-  // เช็คเตือนทันทีเมื่อเพิ่มรายการจ่ายแล้วยอดวันนี้ทะลุเพดานรายวัน
   if (type === 'expense') {
     let now = new Date();
     let startDay = Number(state.cycleStartDay) || 1;
@@ -548,7 +559,6 @@ function deleteGoal(gid) {
   toast('ลบเป้าหมายแล้ว');
 }
 
-// === ฟังก์ชันปรับเปลี่ยนธีม (Theme Switcher) สมบูรณ์แบบ ===
 function setTheme(theme, store = true) {
   document.body.className = theme;
   state.theme = theme;
