@@ -20,23 +20,62 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
 
-  <!-- Custom Styles & Minimal Pastel Theme -->
+  <!-- Custom Styles & Korean Café Color Themes -->
   <style>
     :root {
-      --primary: #8B5CF6;
-      --primary-light: #F3E8FF;
-      --accent-glow: rgba(139, 92, 246, 0.35);
-      --bg-gradient: linear-gradient(135deg, #F8F6FF 0%, #FFF5F8 50%, #F0FDF4 100%);
-      --card-bg: rgba(255, 255, 255, 0.92);
-      --text-main: #111827;
+      --bg: #FEFAE0;
+      --card: #FFFFFF;
+      --secondary: #F8EDAD;
+      --primary: #9CB200;
+      --primary-light: rgba(156, 178, 0, 0.15);
+      --accent-glow: rgba(156, 178, 0, 0.25);
+      --bg-gradient: linear-gradient(135deg, #FEFAE0 0%, #FFFDF0 50%, #F5F2D0 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --text-main: #2C2C2C;
       --text-muted: #6B7280;
-      --border-color: rgba(229, 231, 235, 0.8);
+      --border-color: rgba(0, 0, 0, 0.06);
     }
 
-    body.purple { --primary: #8B5CF6; --primary-light: #F3E8FF; --accent-glow: rgba(139, 92, 246, 0.35); }
-    body.green { --primary: #10B981; --primary-light: #ECFDF5; --accent-glow: rgba(16, 185, 129, 0.35); }
-    body.orange { --primary: #F59E0B; --primary-light: #FEF3C7; --accent-glow: rgba(245, 158, 11, 0.35); }
-    body.pink { --primary: #EC4899; --primary-light: #FCE7F3; --accent-glow: rgba(236, 72, 153, 0.35); }
+    /* 4 Themes: Matcha, Strawberry Cake, Blueberry, Butter */
+    body.matcha {
+      --bg: #FEFAE0;
+      --card: #FFFFFF;
+      --secondary: #F8EDAD;
+      --primary: #9CB200;
+      --primary-light: rgba(156, 178, 0, 0.15);
+      --accent-glow: rgba(156, 178, 0, 0.25);
+      --bg-gradient: linear-gradient(135deg, #FEFAE0 0%, #FFFDF0 50%, #F3EFC2 100%);
+    }
+
+    body.strawberry {
+      --bg: #FFFEF3;
+      --card: #FFFFFF;
+      --secondary: #DA6C81;
+      --primary: #850F37;
+      --primary-light: rgba(133, 15, 55, 0.12);
+      --accent-glow: rgba(133, 15, 55, 0.2);
+      --bg-gradient: linear-gradient(135deg, #FFFEF3 0%, #FFF5F7 50%, #FCE8EC 100%);
+    }
+
+    body.blueberry {
+      --bg: #E8ECEF;
+      --card: #FFFFFF;
+      --secondary: #D4EEF8;
+      --primary: #DAC2EB;
+      --primary-light: rgba(218, 194, 235, 0.25);
+      --accent-glow: rgba(218, 194, 235, 0.35);
+      --bg-gradient: linear-gradient(135deg, #E8ECEF 0%, #F2F5F8 50%, #DEE6EC 100%);
+    }
+
+    body.butter {
+      --bg: #FFF192;
+      --card: #FFFFFF;
+      --secondary: #FFD54F;
+      --primary: #F4B207;
+      --primary-light: rgba(244, 178, 7, 0.2);
+      --accent-glow: rgba(244, 178, 7, 0.3);
+      --bg-gradient: linear-gradient(135deg, #FFF192 0%, #FFF7C2 50%, #FFE066 100%);
+    }
 
     /* Font Hierarchy */
     body {
@@ -70,12 +109,12 @@
 
     /* Soft Glass Card Styling */
     .glass {
-      background: var(--card-bg);
+      background: var(--card);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid var(--border-color);
       border-radius: 24px;
-      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.06);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
       transition: all 0.25s ease;
     }
 
@@ -91,7 +130,7 @@
       justify-content: center;
       transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       cursor: pointer;
-      border: 2px solid var(--primary-light);
+      border: 2px solid var(--secondary);
     }
     .circle-btn:hover {
       transform: translateY(-3px) scale(1.05);
@@ -103,7 +142,7 @@
       width: 44px;
       height: 44px;
       border-radius: 14px;
-      background: var(--primary-light);
+      background: var(--secondary);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -139,12 +178,12 @@
     
     .topbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
     .profile-trigger { display: flex; align-items: center; gap: 12px; background: none; border: none; cursor: pointer; text-align: left; }
-    .avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--primary-light); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--primary); }
+    .avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--secondary); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--primary); }
     .avatar.large { width: 84px; height: 84px; margin: 0 auto 10px; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
     /* Animated Mascot & Cheer Card */
-    .cheer-card { display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #FFF9E6 0%, #F3E8FF 100%); position: relative; overflow: hidden; }
+    .cheer-card { display: flex; align-items: center; gap: 14px; background: var(--card); position: relative; overflow: hidden; }
     
     .mascot-svg-wrapper {
       width: 60px;
@@ -223,7 +262,7 @@
 
     /* Form Controls & Glowing Input Box */
     .glow-box-container {
-      border: 2px solid var(--primary-light);
+      border: 2px solid var(--secondary);
       border-radius: 18px;
       padding: 12px;
       background: rgba(255, 255, 255, 0.95);
@@ -315,10 +354,10 @@
     .hidden { display: none !important; }
   </style>
  </head>
- <body class="purple">
+ <body class="matcha">
 
   <!-- 1. Splash Screen -->
-  <div id="app-splash" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:#F8F6FF;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999999;transition:opacity 0.4s ease, visibility 0.4s ease;">
+  <div id="app-splash" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:#FEFAE0;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999999;transition:opacity 0.4s ease, visibility 0.4s ease;">
     <div class="circle-btn" style="width:76px;height:76px;margin-bottom:12px;">
       <i data-lucide="piggy-bank" style="width:40px;height:40px;color:var(--primary);"></i>
     </div>
@@ -327,7 +366,7 @@
   </div>
 
   <!-- 2. PIN Lock Screen -->
-  <div id="pin-lock-screen" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:#F8F6FF;display:none;flex-direction:column;justify-content:center;align-items:center;z-index:999998;font-family:'Krub',sans-serif;">
+  <div id="pin-lock-screen" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:#FEFAE0;display:none;flex-direction:column;justify-content:center;align-items:center;z-index:999998;font-family:'Krub',sans-serif;">
     <div class="glass card" style="text-align:center;width:90%;max-width:320px;">
       <div style="display:flex;justify-content:center;margin-bottom:10px;">
         <div class="circle-btn" style="width:56px;height:56px;"><i data-lucide="lock" style="color:var(--primary);"></i></div>
@@ -393,34 +432,33 @@
      </div>
     </article>
 
-    <!-- กรอบสรุปเงินคงเหลือสุทธิ + งบรายวัน (แบบมินิมอล เรียบร้อย สบายตา) -->
-<article class="glass card" style="background: linear-gradient(135deg, rgba(254, 243, 199, 0.3) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(224, 242, 254, 0.3) 100%); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03); position: relative; overflow: hidden;">
- 
- <div class="between" style="align-items: center;">
-  <span class="muted" style="font-weight: 700; font-size: 0.9rem; color: #78350F;">เงินคงเหลือสุทธิ</span>
-  <button type="button" class="flat-eye-btn" onclick="toggleMoney()" aria-label="ซ่อนหรือแสดงยอดเงิน" style="background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 10px;">
-    <i id="eyeIcon" data-lucide="eye" style="width:14px;height:14px;"></i>
-    <span id="eyeText" style="font-size: 0.75rem;">ซ่อนยอด</span>
-  </button>
- </div>
+    <!-- กรอบสรุปเงินคงเหลือสุทธิ + งบรายวัน -->
+    <article class="glass card" style="background: var(--card); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03); position: relative; overflow: hidden;">
+     <div class="between" style="align-items: center;">
+      <span class="muted" style="font-weight: 700; font-size: 0.9rem;">เงินคงเหลือสุทธิ</span>
+      <button type="button" class="flat-eye-btn" onclick="toggleMoney()" aria-label="ซ่อนหรือแสดงยอดเงิน" style="background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 10px;">
+        <i id="eyeIcon" data-lucide="eye" style="width:14px;height:14px;"></i>
+        <span id="eyeText" style="font-size: 0.75rem;">ซ่อนยอด</span>
+      </button>
+     </div>
 
- <div class="between" style="align-items: flex-end; margin-top: 4px;">
-  <strong id="balanceValue" class="money" style="font-size: 2.2rem; color: #1E293B; letter-spacing: -0.5px;">THB 0.00</strong>
-  <select id="currency" class="currency" aria-label="เลือกสกุลเงิน" style="background: rgba(255,255,255,0.8); border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); padding: 2px 6px; font-size: 0.8rem;"><option>THB</option><option>USD</option><option>EUR</option><option>JPY</option></select>
- </div>
- 
- <!-- ส่วนงบรายวัน (ดีไซน์เรียบหรู ดูสะอาดตา ไม่มีอิโมจิ) -->
- <div class="between" style="margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed rgba(245, 158, 11, 0.2); align-items: center;">
-  <div>
-   <span class="tiny muted" style="color: #065F46; font-weight: 500;">ควรใช้ไม่เกิน: </span>
-   <strong id="recommendedDailySpent" class="money" style="font-size: 1.15rem; color: #059669 !important;">THB 0.00</strong>
-   <span class="tiny muted" style="color: #059669;"> / วัน</span>
-  </div>
-  <div style="background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.15);">
-   <span class="tiny muted" id="remainingDaysText" style="font-size: 0.75rem; color: #047857; font-weight: 600;">เหลือ 0 วัน</span>
-  </div>
- </div>
-</article>
+     <div class="between" style="align-items: flex-end; margin-top: 4px;">
+      <strong id="balanceValue" class="money" style="font-size: 2.2rem; color: #1E293B; letter-spacing: -0.5px;">THB 0.00</strong>
+      <select id="currency" class="currency" aria-label="เลือกสกุลเงิน" style="background: rgba(255,255,255,0.8); border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); padding: 2px 6px; font-size: 0.8rem;"><option>THB</option><option>USD</option><option>EUR</option><option>JPY</option></select>
+     </div>
+     
+     <!-- ส่วนงบรายวัน -->
+     <div class="between" style="margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed var(--secondary); align-items: center;">
+      <div>
+       <span class="tiny muted" style="font-weight: 500;">ควรใช้ไม่เกิน: </span>
+       <strong id="recommendedDailySpent" class="money" style="font-size: 1.15rem; color: var(--primary) !important;">THB 0.00</strong>
+       <span class="tiny muted"> / วัน</span>
+      </div>
+      <div style="background: var(--primary-light); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--secondary);">
+       <span class="tiny muted" id="remainingDaysText" style="font-size: 0.75rem; font-weight: 600;">เหลือ 0 วัน</span>
+      </div>
+     </div>
+    </article>
 
     <!-- สรุปรายจ่ายวงเงินรวม -->
     <article class="glass card">
@@ -501,7 +539,7 @@
     <article class="glass card" id="savingPlantSection">
      <div class="between" style="margin-bottom:8px;">
       <div style="display:flex;align-items:center;gap:10px;">
-       <div class="squircle-btn" style="width:40px;height:40px;background:#ECFDF5;"><i data-lucide="sprout" style="color:#10B981"></i></div>
+       <div class="squircle-btn" style="width:40px;height:40px;"><i data-lucide="sprout" style="color:#10B981"></i></div>
        <div>
         <strong style="font-size:1rem;display:block">ต้นไม้ออมเงิน</strong>
         <p class="tiny muted" id="savingPlantText">รดน้ำความฝันด้วยการออมเงินนะ</p>
@@ -722,15 +760,15 @@
     <article class="glass card">
      <h2>เลือกธีมสีพาสเทล</h2>
      <div style="display:flex;gap:16px;margin-top:12px;justify-content:center;align-items:center;">
-      <button class="theme-circle-btn" style="background:linear-gradient(135deg, #A78BFA, #8B5CF6);" data-theme="purple" type="button" onclick="setTheme('purple')"></button>
-      <button class="theme-circle-btn" style="background:linear-gradient(135deg, #34D399, #10B981);" data-theme="green" type="button" onclick="setTheme('green')"></button>
-      <button class="theme-circle-btn" style="background:linear-gradient(135deg, #FBBF24, #F59E0B);" data-theme="orange" type="button" onclick="setTheme('orange')"></button>
-      <button class="theme-circle-btn" style="background:linear-gradient(135deg, #F472B6, #EC4899);" data-theme="pink" type="button" onclick="setTheme('pink')"></button>
+      <button class="theme-circle-btn" style="background:linear-gradient(135deg, #FEFAE0, #9CB200);" data-theme="matcha" type="button" onclick="setTheme('matcha')"></button>
+      <button class="theme-circle-btn" style="background:linear-gradient(135deg, #FFFEF3, #850F37);" data-theme="strawberry" type="button" onclick="setTheme('strawberry')"></button>
+      <button class="theme-circle-btn" style="background:linear-gradient(135deg, #E8ECEF, #DAC2EB);" data-theme="blueberry" type="button" onclick="setTheme('blueberry')"></button>
+      <button class="theme-circle-btn" style="background:linear-gradient(135deg, #FFF192, #F4B207);" data-theme="butter" type="button" onclick="setTheme('butter')"></button>
      </div>
     </article>
 
     <!-- เครื่องมือหารบิล -->
-    <article class="glass card" style="background:linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(243,232,255,0.6) 100%);">
+    <article class="glass card">
      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
       <div class="squircle-btn" style="background:#FFF;"><i data-lucide="calculator" style="color:var(--primary);"></i></div>
       <div>
@@ -750,7 +788,7 @@
       </div>
      </div>
 
-     <div style="background:#FFF;padding:14px;border-radius:18px;margin-top:12px;text-align:center;border:1.5px dashed var(--primary-light);box-shadow:0 4px 12px var(--accent-glow);">
+     <div style="background:#FFF;padding:14px;border-radius:18px;margin-top:12px;text-align:center;border:1.5px dashed var(--secondary);box-shadow:0 4px 12px var(--accent-glow);">
       <span class="tiny muted" style="display:block;">เฉลี่ยตกคนละประมาณ</span>
       <b id="billEach" class="money" style="font-size:1.6rem;display:block;color:var(--primary);margin:2px 0;">THB 0.00</b>
       <span class="tiny muted" id="billSubDetail">หาร 2 คน พอดีๆ น้า</span>
@@ -922,7 +960,7 @@
    </div>
   </div>
 
-  <!-- Toast & Cartoon Pop-Up Element -->
+  <!-- Toast Notification -->
   <div id="toast" class="toast"><i data-lucide="check-circle" style="width:18px;height:18px;color:#34D399;"></i><span id="toastMsg">บันทึกสำเร็จ</span></div>
 
   <!-- Pop-Up Cartoon Mascot Effect -->
@@ -943,8 +981,8 @@
           <path d="M 38 68 Q 50 76 62 68" fill="none" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <strong style="font-size:1.1rem;color:var(--primary);display:block;">บันทึกเรียบร้อย!</strong>
-      <span class="tiny muted">เก่งมาก ออมเงินสม่ำเสมอนะ</span>
+      <strong id="popupTitleText" style="font-size:1.1rem;color:var(--primary);display:block;">บันทึกเรียบร้อย!</strong>
+      <span id="popupSubText" class="tiny muted">เก่งมาก ออมเงินสม่ำเสมอนะ</span>
     </div>
   </div>
 
@@ -988,6 +1026,14 @@
         gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
         osc.start(now);
         osc.stop(now + 0.35);
+      } else if (type === 'warning') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(350, now);
+        osc.frequency.setValueAtTime(250, now + 0.1);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
       } else if (type === 'pop') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(400, now);
@@ -1020,7 +1066,7 @@
     resizeSparkleCanvas();
 
     function createSparkles(x, y, count = 35) {
-      const colors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#F472B6'];
+      const colors = ['#9CB200', '#DA6C81', '#F4B207', '#DAC2EB', '#34D399'];
       for (let i = 0; i < count; i++) {
         particles.push({
           x: x || window.innerWidth / 2,
@@ -1062,7 +1108,7 @@
     // --- State Management ---
     let state = {
       user: { name: 'หมูเด้ง', avatar: '' },
-      theme: 'purple',
+      theme: 'matcha',
       currency: 'THB',
       allowance: 0,
       fixed: 0,
@@ -1107,7 +1153,7 @@
       if (saved) {
         try { state = Object.assign(state, JSON.parse(saved)); } catch(e) {}
       }
-      applyTheme(state.theme || 'purple');
+      applyTheme(state.theme || 'matcha');
       renderQuickAmountButtons();
       renderCategoryChips();
       populateFilterCategoryOptions();
@@ -1254,7 +1300,7 @@
       renderAll();
       createSparkles(window.innerWidth / 2, window.innerHeight / 2, 40);
       playCuteSound('success');
-      triggerMascotPopup('เช็กอินสำเร็จ! สะสม ' + state.streak + ' วัน');
+      triggerMascotPopup('เช็กอินสำเร็จ!', 'สะสม ' + state.streak + ' วันต่อเนื่อง');
     }
 
     // --- Render Main Dashboard ---
@@ -1310,7 +1356,7 @@
       document.getElementById('weekSpent').textContent = 'THB ' + weekSpent.toLocaleString('th-TH', {minimumFractionDigits: 2});
       document.getElementById('monthSpent').textContent = 'THB ' + monthSpent.toLocaleString('th-TH', {minimumFractionDigits: 2});
 
-      // คำนวณเงินที่ควรใช้ในแต่ละวัน (จากเงินที่เหลือ และจำนวนวันที่เหลือในรอบงบประมาณ)
+      // คำนวณเงินที่ควรใช้ในแต่ละวัน
       let remainingDays = 1;
       if (state.budgetPeriod && state.budgetPeriod.endDate) {
         const endDate = new Date(state.budgetPeriod.endDate);
@@ -1318,7 +1364,6 @@
         const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
         remainingDays = days > 0 ? days : 1;
       } else {
-        // หากไม่ได้ตั้งค่าวันสิ้นสุด ให้คำนวณวันสิ้นเดือนปัจจุบัน
         const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
         remainingDays = Math.max(1, lastDayOfMonth - now.getDate() + 1);
       }
@@ -1420,18 +1465,18 @@
       reader.readAsDataURL(file);
     }
 
-    function triggerMascotPopup(msg) {
+    function triggerMascotPopup(title, msg) {
       const overlay = document.getElementById('popupMascotOverlay');
-      if (msg) overlay.querySelector('strong').textContent = msg;
+      if (title) overlay.querySelector('strong').textContent = title;
+      if (msg) overlay.querySelector('span').textContent = msg;
       overlay.classList.add('show');
       createSparkles(window.innerWidth / 2, window.innerHeight / 2, 45);
-      playCuteSound('success');
       setTimeout(() => {
         overlay.classList.remove('show');
-      }, 2200);
+      }, 2500);
     }
 
-    // Save Transactions
+    // Save Transactions (พร้อมตรวจสอบงบรายวันและแจ้งเตือน)
     document.getElementById('txForm').addEventListener('submit', function(e) {
       e.preventDefault();
       let category = state.selectedCategory;
@@ -1442,12 +1487,52 @@
       const amount = parseFloat(document.getElementById('txAmount').value);
       if (!amount || amount <= 0) return;
 
+      const txDateInput = document.getElementById('txDate').value || new Date().toISOString();
+
+      // ตรวจสอบรายจ่ายวันนี้เทียบกับงบรายวัน (Recommended Daily Budget)
+      let isDailyExceeded = false;
+      if (state.currentType === 'expense') {
+        const targetDateStr = new Date(txDateInput).toDateString();
+        let todayExpenseSum = 0;
+        state.transactions.forEach(t => {
+          if (t.type === 'expense' && new Date(t.date).toDateString() === targetDateStr) {
+            todayExpenseSum += parseFloat(t.amount) || 0;
+          }
+        });
+
+        // คำนวณงบรายวันปัจจุบัน
+        let totalIncome = 0;
+        let totalExpenseAll = 0;
+        state.transactions.forEach(t => {
+          if (t.type === 'income') totalIncome += parseFloat(t.amount) || 0;
+          if (t.type === 'expense') totalExpenseAll += parseFloat(t.amount) || 0;
+        });
+        const netBalance = (parseFloat(state.allowance) || 0) + totalIncome - totalExpenseAll - (parseFloat(state.fixed) || 0);
+        
+        let remainingDays = 1;
+        const now = new Date();
+        if (state.budgetPeriod && state.budgetPeriod.endDate) {
+          const endDate = new Date(state.budgetPeriod.endDate);
+          const timeDiff = endDate - now;
+          const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+          remainingDays = days > 0 ? days : 1;
+        } else {
+          const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+          remainingDays = Math.max(1, lastDayOfMonth - now.getDate() + 1);
+        }
+        const recommendedDaily = netBalance > 0 ? netBalance / remainingDays : 0;
+
+        if (recommendedDaily > 0 && (todayExpenseSum + amount) > recommendedDaily) {
+          isDailyExceeded = true;
+        }
+      }
+
       const newTx = {
         id: Date.now(),
         type: state.currentType,
         category: category,
         amount: amount,
-        date: document.getElementById('txDate').value || new Date().toISOString(),
+        date: txDateInput,
         memo: document.getElementById('txMemo').value,
         slip: tempCompressedSlip || ''
       };
@@ -1465,7 +1550,15 @@
 
       setTxDateNow();
       setType('expense');
-      triggerMascotPopup('บันทึกรายการสำเร็จ!');
+
+      if (isDailyExceeded) {
+        playCuteSound('warning');
+        triggerMascotPopup('⚠️ แจ้งเตือน: รายจ่ายเกินงบรายวัน!', 'วันนี้คุณใช้จ่ายเกินงบเฉลี่ยต่อวันที่คำนวณไว้แล้ว ระวังน้า!');
+      } else {
+        playCuteSound('success');
+        triggerMascotPopup('บันทึกรายการสำเร็จ!', 'เก่งมาก ออมเงินสม่ำเสมอนะ');
+      }
+
       showScreen('home');
     });
 
@@ -1702,7 +1795,7 @@
         renderAll();
         closeModal('depositModal');
         document.getElementById('depositInput').value = '';
-        triggerMascotPopup('ออมเงินและหักยอดเรียบร้อย!');
+        triggerMascotPopup('ออมเงินสำเร็จ!', 'รดน้ำต้นไม้เรียบร้อยแล้ว');
       }
     }
 
@@ -1821,7 +1914,7 @@
 
       const svg = document.getElementById('donutChartSvg');
       const legend = document.getElementById('donutLegend');
-      const colors = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#6366F1', '#84CC16'];
+      const colors = ['#9CB200', '#DA6C81', '#F4B207', '#DAC2EB', '#34D399', '#6366F1', '#84CC16'];
 
       let svgPathHtml = '';
       let legendHtml = '';
@@ -2024,7 +2117,7 @@
             state = Object.assign(state, restoredState);
             saveData();
             renderAll();
-            applyTheme(state.theme || 'purple');
+            applyTheme(state.theme || 'matcha');
             showToast('กู้คืนข้อมูลสำเร็จ!');
             playCuteSound('success');
           }
@@ -2043,7 +2136,7 @@
       localStorage.removeItem('moodeng_budget_state_v3');
       state = {
         user: { name: 'หมูเด้ง', avatar: '' },
-        theme: 'purple',
+        theme: 'matcha',
         currency: 'THB',
         allowance: 0,
         fixed: 0,
