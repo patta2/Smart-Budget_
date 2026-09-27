@@ -37,7 +37,7 @@
     }
 
     /* 4 Themes: Matcha, Strawberry Cake, Blueberry, Butter */
-    body.matcha {
+    body.purple {
       --bg: #FEFAE0;
       --card: #FFFFFF;
       --secondary: #F8EDAD;
@@ -354,14 +354,14 @@
     .hidden { display: none !important; }
   </style>
  </head>
- <body class="matcha">
+ <body class="purple">
 
   <!-- 1. Splash Screen -->
   <div id="app-splash" style="position:fixed;top:0;left:0;width:100%;height:100vh;background:#FEFAE0;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999999;transition:opacity 0.4s ease, visibility 0.4s ease;">
     <div class="circle-btn" style="width:76px;height:76px;margin-bottom:12px;">
       <i data-lucide="piggy-bank" style="width:40px;height:40px;color:var(--primary);"></i>
     </div>
-    <h2 style="font-size:1.45rem;color:var(--primary);font-weight:700;">หมูเด้ง Smart Budget</h2>
+    <h2 style="font-size:1.45rem;color:var(--primary);font-weight:700;">Smart Budget</h2>
     <p class="tiny muted" style="margin-top:2px;">บันทึกการเงิน พาสเทลมินิมอลน่ารัก</p>
   </div>
 
@@ -372,8 +372,8 @@
         <div class="circle-btn" style="width:56px;height:56px;"><i data-lucide="lock" style="color:var(--primary);"></i></div>
       </div>
       <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:4px;">กรอกรหัส PIN</h3>
-      <p class="tiny muted" style="margin-bottom:16px;">เพื่อเข้าใช้งาน หมูเด้ง Smart Budget</p>
-      <input type="password" id="unlockPinInput" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="****" style="font-size:1.8rem;text-align:center;width:150px;padding:8px;border:2px solid #DDD;border-radius:14px;letter-spacing:10px;outline:none;margin-bottom:16px;">
+      <p class="tiny muted" style="margin-bottom:16px;">เพื่อเข้าใช้งาน Smart Budget</p>
+      <input type="password" id="unlockPinInput" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="••••" style="font-size:1.8rem;text-align:center;width:150px;padding:8px;border:2px solid #DDD;border-radius:14px;letter-spacing:10px;outline:none;margin-bottom:16px;">
       <button type="button" onclick="verifyAppPin()" class="primary" style="font-size:0.95rem;padding:10px;">ปลดล็อก</button>
     </div>
   </div>
@@ -505,24 +505,37 @@
     </article>
 
     <!-- ปุ่มลัดทำธุรกรรม -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center;margin:4px 0;">
-      <div onclick="showScreen('transactions'); setType('expense');" style="cursor:pointer;">
-        <div class="circle-btn" style="margin:0 auto 6px;"><i data-lucide="minus" style="color:var(--primary)"></i></div>
-        <span class="tiny" style="font-weight:600;">จ่ายออก</span>
-      </div>
-      <div onclick="showScreen('transactions'); setType('income');" style="cursor:pointer;">
-        <div class="circle-btn" style="margin:0 auto 6px;"><i data-lucide="plus" style="color:var(--primary)"></i></div>
-        <span class="tiny" style="font-weight:600;">รับเข้า</span>
-      </div>
-      <div onclick="showScreen('home'); scrollToSavingPlant();" style="cursor:pointer;">
-        <div class="circle-btn" style="margin:0 auto 6px;"><i data-lucide="sprout" style="color:#10B981"></i></div>
-        <span class="tiny" style="font-weight:600;">ออมเงิน</span>
-      </div>
-      <div onclick="showScreen('analytics');" style="cursor:pointer;">
-        <div class="circle-btn" style="margin:0 auto 6px;"><i data-lucide="pie-chart" style="color:var(--primary)"></i></div>
-        <span class="tiny" style="font-weight:600;">วิเคราะห์</span>
-      </div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center;margin:4px 0;">
+  
+  <div onclick="showScreen('transactions'); setType('expense');" style="cursor:pointer;">
+    <div class="circle-btn" style="margin:0 auto 4px;">
+      <i data-lucide="minus" style="color:var(--primary)"></i>
     </div>
+    <div style="font-size:12px;font-weight:600;">จ่ายออก</div>
+  </div>
+
+  <div onclick="showScreen('transactions'); setType('income');" style="cursor:pointer;">
+    <div class="circle-btn" style="margin:0 auto 4px;">
+      <i data-lucide="plus" style="color:var(--primary)"></i>
+    </div>
+    <div style="font-size:12px;font-weight:600;">รับเข้า</div>
+  </div>
+
+  <div onclick="showScreen('home'); scrollToSavingPlant();" style="cursor:pointer;">
+    <div class="circle-btn" style="margin:0 auto 4px;">
+      <i data-lucide="sprout" style="color:#10B981"></i>
+    </div>
+    <div style="font-size:12px;font-weight:600;">ออมเงิน</div>
+  </div>
+
+  <div onclick="showScreen('analytics');" style="cursor:pointer;">
+    <div class="circle-btn" style="margin:0 auto 4px;">
+      <i data-lucide="pie-chart" style="color:var(--primary)"></i>
+    </div>
+    <div style="font-size:12px;font-weight:600;">วิเคราะห์</div>
+  </div>
+
+</div>
 
     <!-- บันทึกด่วน -->
     <article class="glass card">
@@ -1048,7 +1061,7 @@
     // ติดตั้งเสียงให้ปุ่มกดทุกปุ่มในระบบ
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('button, .circle-btn, .category-chip, .theme-circle-btn, .nav button');
-      if (btn) {
+      if (const strokeColor = categoryColors[cat] || '#9CA3AF';
         playCuteSound('click');
       }
     });
@@ -1107,8 +1120,8 @@
 
     // --- State Management ---
     let state = {
-      user: { name: 'หมูเด้ง', avatar: '' },
-      theme: 'matcha',
+      user: { name: 'ผู้ใช้งาน', avatar: '' },
+      theme: 'purple',
       currency: 'THB',
       allowance: 0,
       fixed: 0,
@@ -1153,7 +1166,7 @@
       if (saved) {
         try { state = Object.assign(state, JSON.parse(saved)); } catch(e) {}
       }
-      applyTheme(state.theme || 'matcha');
+      applyTheme(state.theme || 'purple');
       renderQuickAmountButtons();
       renderCategoryChips();
       populateFilterCategoryOptions();
@@ -1190,7 +1203,7 @@
       state.theme = themeName;
       applyTheme(themeName);
       saveData();
-      showToast('เปลี่ยนธีมเรียบร้อยแล้ว!');
+      showToast('เปลี่ยนธีมเรียบร้อยแล้ว');
     }
 
     function applyTheme(themeName) {
@@ -1277,7 +1290,7 @@
           state.quickAmounts = parsed;
           saveData();
           renderQuickAmountButtons();
-          showToast('อัปเดตปุ่มลัดจำนวนเงินแล้ว!');
+          showToast('อัปเดตปุ่มลัดจำนวนเงินแล้ว');
         }
       }
     }
@@ -1291,7 +1304,7 @@
     function doCheckIn() {
       const today = new Date().toDateString();
       if (state.lastCheckinDate === today) {
-        showToast('วันนี้คุณเช็กอินไปแล้วนะคะ!');
+        showToast('วันนี้คุณเช็กอินไปแล้ว');
         return;
       }
       state.streak = (state.streak || 0) + 1;
@@ -1305,7 +1318,7 @@
 
     // --- Render Main Dashboard ---
     function renderAll() {
-      document.getElementById('homeName').textContent = state.user.name || 'หมูเด้ง';
+      document.getElementById('homeName').textContent = state.user.name || 'ผู้ใช้งาน';
       document.getElementById('profileName').textContent = state.user.name || 'ผู้ใช้งาน';
       
       if (state.user.avatar) {
@@ -1394,7 +1407,7 @@
         gaugeEl.className = 'progress-bar green';
         statusText.style.color = '#10B981';
         statusText.textContent = 'อยู่ในแผนการใช้วงเงินดีเยี่ยม';
-        mascotMsg.textContent = 'ใช้งบประมาณอย่างคุ้มค่า สู้ๆ นะคะ!';
+        mascotMsg.textContent = 'ใช้งบประมาณอย่างคุ้มค่า สู้ๆ!';
       } else if (percent < 75) {
         gaugeEl.className = 'progress-bar yellow';
         statusText.style.color = '#F59E0B';
@@ -1409,7 +1422,7 @@
         gaugeEl.className = 'progress-bar danger';
         statusText.style.color = '#F43F5E';
         statusText.textContent = 'ฉุกเฉิน! เกินงบประมาณแล้ว';
-        mascotMsg.textContent = 'ฉุกเฉิน! ใช้วงเงินเกินแผนแล้วนะคะ';
+        mascotMsg.textContent = 'ฉุกเฉิน! ใช้วงเงินเกินแผนแล้ว';
       }
 
       calculateBillSplit();
@@ -1683,7 +1696,7 @@
       const container = document.getElementById('goalList');
       if (!state.goals || state.goals.length === 0) {
         container.innerHTML = '<p class="tiny muted" style="text-align:center;padding:12px;">ยังไม่มีต้นไม้ออมเงิน กด "+ ปลูกต้นไม้" ได้เลยนะ</p>';
-        document.getElementById('savingPlantText').textContent = 'เริ่มปลูกต้นไม้ออมเงินกันเลยนะ';
+        document.getElementById('savingPlantText').textContent = 'เริ่มปลูกต้นไม้ออมเงินกันเลย';
         return;
       }
 
@@ -1914,7 +1927,15 @@
 
       const svg = document.getElementById('donutChartSvg');
       const legend = document.getElementById('donutLegend');
-      const colors = ['#9CB200', '#DA6C81', '#F4B207', '#DAC2EB', '#34D399', '#6366F1', '#84CC16'];
+      const categoryColors = {
+  'อาหาร': '#F4B207',
+  'เครื่องดื่ม': '#8CC8A3',
+  'เดินทาง': '#5BA8D6',
+  'ช็อปปิ้ง': '#DA6C81',
+  'บันเทิง': '#8B6BBE',
+  'การศึกษา': '#DAC2EB',
+  'ระบุเอง': '#9CA3AF'
+};
 
       let svgPathHtml = '';
       let legendHtml = '';
@@ -1928,7 +1949,7 @@
       } else {
         entries.forEach(([cat, val], idx) => {
           const slicePercent = val / spent;
-          const strokeColor = colors[idx % colors.length];
+const strokeColor = categoryColors[cat] || '#9CA3AF';
 
           const strokeDasharray = `${slicePercent * 238.76} 238.76`;
           const strokeDashoffset = -cumulativePercent * 238.76;
@@ -2019,7 +2040,7 @@
 
     // --- Profile & PIN Management ---
     function openProfile() {
-      document.getElementById('nameInput').value = state.user.name || 'หมูเด้ง';
+      document.getElementById('nameInput').value = state.user.name || 'ผู้ใช้งาน';
       openModal('profileModal');
     }
 
@@ -2098,7 +2119,7 @@
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
-      showToast('สำรองข้อมูล JSON เรียบร้อยแล้ว!');
+      showToast('สำรองข้อมูลเรียบร้อยแล้ว!');
     }
 
     function restoreBackupFromFile() {
@@ -2135,8 +2156,8 @@
     function confirmClearAll() {
       localStorage.removeItem('moodeng_budget_state_v3');
       state = {
-        user: { name: 'หมูเด้ง', avatar: '' },
-        theme: 'matcha',
+        user: { name: 'ผู้ใช้งาน', avatar: '' },
+        theme: 'purple',
         currency: 'THB',
         allowance: 0,
         fixed: 0,
