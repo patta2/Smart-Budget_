@@ -308,7 +308,7 @@ function renderHome() {
   if (alertBanner) {
     if (isOverDailyBudget) {
       alertBanner.style.display = 'block';
-      alertBanner.innerHTML = '⚠️ <b>เตือนภัย!</b> วันนี้คุณใช้เงินไปแล้ว ' + money(todaySpent) + ' (เกินงบรายวันที่แนะนำ ' + money(dailyAllowed) + ')';
+      alertBanner.innerHTML = '⚠️ <b>เตือน!</b> วันนี้คุณใช้เงินไปแล้ว ' + money(todaySpent) + ' (เกินงบรายวันที่แนะนำ ' + money(dailyAllowed) + ')';
     } else {
       alertBanner.style.display = 'none';
     }
