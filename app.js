@@ -42,7 +42,7 @@ const categoryIcons = {
 };
 
 let state = { 
-  user_id: deviceUserId, name: 'ผู้ใช้งาน', photo: '', theme: 'purple', currency: 'THB', 
+  user_id: deviceUserId, name: 'ผู้ใช้งาน', photo: '', theme: 'blue', currency: 'THB', 
   hidden: false, pin: '', allowance: 0, fixed: 0, cycleType: 'month', cycleStartDay: 1, 
   autoPayRecurring: true, transactions: [], goals: [], recurring: [] 
 };
